@@ -1,5 +1,7 @@
 # CMS CLI tool
 
+**Note**: This is not developed by me - only making it available and a few modifications
+
 ## DISCLAIMER
 
 It is important to know that this tool, as well as the API it uses, are undocumented currently and not supported by 3scale. The CMS tool, as well as the underlying API, may change at any moment, without any guarantee of backwards compatibility. Therefore, we cannot recommend this tool for production use.
