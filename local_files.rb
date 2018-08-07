@@ -51,7 +51,7 @@ module Threescale
         mtimes = get_ancestor_mtimes relative_path
 
         if content
-          file = File.new(relative_path, 'w')
+          file = File.new(relative_path, 'wb')
           file.write(content)
           file.close
         end
@@ -77,7 +77,7 @@ module Threescale
         http = http.start
         request = Net::HTTP::Get.new file_url.request_uri
         http.request(request) do |file_response|
-          open(relative_path, 'w') do |io|
+          open(relative_path, 'wb') do |io|
             file_response.read_body do |chunk|
               io.write(chunk)
             end

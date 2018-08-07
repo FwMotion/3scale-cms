@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = '3scale-cms'
-  s.version     = '0.1.0'
+  s.version     = '0.1.1'
   s.licenses    = ['MIT']
   s.summary     = 'A command line tool for 3scale developer portal CMS'
   s.description = '3scale_cms provides a simple way to work with the developer portal assets locally:
