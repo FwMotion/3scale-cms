@@ -1,12 +1,12 @@
 Gem::Specification.new do |s|
   s.name        = '3scale-cms'
-  s.version     = '0.1.1'
+  s.version     = '0.1.2'
   s.licenses    = ['MIT']
   s.summary     = 'A command line tool for 3scale developer portal CMS'
   s.description = '3scale_cms provides a simple way to work with the developer portal assets locally:
                   download them from the CMS, upload the changes and create new files and templates.'
 
-  s.add_runtime_dependency 'nokogiri', '~> 1.6', '>= 1.6.7.2'
+  s.add_runtime_dependency 'nokogiri', '~> 1.8', '>= 1.8.2'
   s.add_runtime_dependency 'rest-client', '~> 1.8', '>= 1.8.0'
   s.add_runtime_dependency 'liquid', '~> 3.0', '>= 3.0.6'
 
