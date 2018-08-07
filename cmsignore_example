@@ -1,0 +1,7 @@
+.cmsignore
+.git
+.travis.yml
+Gemfile
+Gemfile.lock
+README.md
+Rakefile
