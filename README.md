@@ -1,6 +1,7 @@
 # CMS CLI tool
 
 **Note**: This is not developed by me - only making it available and a few modifications
+**Note**: There are plans/work to implement an API for Portal CMS. Ref: https://issues.jboss.org/browse/THREESCALE-361
 
 ## DISCLAIMER
 
