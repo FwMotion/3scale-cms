@@ -271,7 +271,7 @@ module Threescale
 
 # noinspection RubyResolve
       def http_request(method, url, expected_code, options = {})
-        response = RestClient.send(method, url, options)
+        response = RestClient::Request.execute(method: method, url: url, headers: options, verify_ssl: false)
         if response.code != expected_code
           raise "Request (#{method}) to url: '#{url}' returned unexpected response code: #{response.code}\n\t#{response.body}"
         end
