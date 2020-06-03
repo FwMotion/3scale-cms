@@ -12,6 +12,8 @@ module Threescale
         raise "Invalid URL '#{url}' for CMS" unless url =~ URI::regexp
         @provider_key = provider_key
         @base_url = "#{url}/admin/api/cms"
+        dev_url = url.gsub('-admin','')
+        @dev_url = "#{dev_url}"
       end
 
       def list(kind, page = 1)
@@ -91,7 +93,12 @@ module Threescale
         response = http_request :get, "#{@base_url}/files/#{id}.xml", 200,
                                 { :params => { :provider_key => @provider_key} }
         doc = Nokogiri::XML(response.body)
-        URI(doc.xpath('//url')[0].text)
+        url = doc.xpath('//url')[0].text
+        if url.start_with?('http') == false
+          path = doc.xpath('//path')[0].text
+          url = "#{@dev_url}#{path}"
+        end
+        URI(url)
       end
 
       # TODO return both draft and published in response and let the application decide
