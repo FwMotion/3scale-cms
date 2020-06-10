@@ -125,10 +125,11 @@ module Threescale
         check_id_or_raise id
         check_template_type_or_raise type
         check_filename_or_raise filename
-
-        response = http_request :put, @base_url + "/templates/#{id}.xml", 200,
+        response = http_request_multipart :put, @base_url + "/templates/#{id}.xml", 200,
                      { :provider_key => @provider_key,
-                       :draft => File.read(filename) }
+                       :draft => File.read(filename), 
+                       :multipart => true}
+        puts 'at call'
         parse_response response, type
       end
 
@@ -150,14 +151,15 @@ module Threescale
                    :layout_name => layout_name,
                    :path => path,
                    :liquid_enabled => liquid,
-                   :draft => File.read(filename) }
+                   :draft => File.read(filename),
+                   :multipart => true }
 
         unless type == 'page'
           check_system_name_or_raise system_name
           params[:system_name] = system_name
         end
 
-        response = http_request :post, @base_url + '/templates.xml', 201, params
+        response = http_request_multipart :post, @base_url + '/templates.xml', 201, params
 
         parse_response response, type
       end
@@ -277,8 +279,35 @@ module Threescale
       end
 
 # noinspection RubyResolve
+      def http_request_multipart(method, url, expected_code, options = {})
+        response = RestClient::Request.execute(:method => method, :url => url, :payload => options, :verify_ssl => false)
+        if response.code != expected_code
+          raise "Request (#{method}) to url: '#{url}' returned unexpected response code: #{response.code}\n\t#{response.body}"
+        end
+
+        doc = Nokogiri::XML(response)
+        error = doc.xpath('//error')
+        unless error.empty?
+          options.delete(:draft)
+          options.delete(:attachment)
+          options.delete(:template)
+          raise "#{error[0].text}\n"
+        end
+
+        return response
+
+      rescue RestClient::UnprocessableEntity => e
+        options.delete(:draft)
+        options.delete(:attachment)
+        options.delete(:template)
+        doc = Nokogiri::XML(e.response)
+        error = doc.xpath('//error')[0] if doc
+        error_text = error.text if error
+        raise "Error performing #{method.upcase} to url: '#{url}' \n\t\t#{options}\n\t\t#{error_text}\n"
+      end
+
       def http_request(method, url, expected_code, options = {})
-        response = RestClient::Request.execute(method: method, url: url, headers: options, verify_ssl: false)
+        response = RestClient::Request.execute(method: method, url: url, multipart: true, headers: options, verify_ssl: false)
         if response.code != expected_code
           raise "Request (#{method}) to url: '#{url}' returned unexpected response code: #{response.code}\n\t#{response.body}"
         end
