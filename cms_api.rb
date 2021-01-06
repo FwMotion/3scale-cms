@@ -129,8 +129,12 @@ module Threescale
                      { :provider_key => @provider_key,
                        :draft => File.read(filename), 
                        :multipart => true}
-        puts 'at call'
-        parse_response response, type
+        puts 'at update call'
+        _id, _updated_at = parse_response response, type
+        response = http_request :put, "#{@base_url}/templates/#{id}/publish", 200,
+                                { :params => { :provider_key => @provider_key } }
+        puts 'at publish call'
+        parse_response response, 'page'
       end
 
       # TODO accept draft and/or published content and send accordingly if API accepts them
