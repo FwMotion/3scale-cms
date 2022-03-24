@@ -85,7 +85,7 @@ module Threescale
         path = "#{INDEX_NAME}" if path == INDEX_PATH
 
         # Make path relative to CWD
-        path = ".#{path}" if path.start_with? '/'
+        path = "#{path[1..-1]}" if path.start_with? '/'
 
         # try all valid extensions
         CONTENT_TYPE_MAPPING.keys.map { |ext|

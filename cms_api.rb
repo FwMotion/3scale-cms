@@ -199,10 +199,13 @@ module Threescale
         check_id_or_raise parent_id
 
         response = http_request :post, "#{@base_url}/sections.xml", 201,
-                                { :provider_key => @provider_key,
+                                { :params => { 
+                                    :provider_key => @provider_key,
+                                    :parent_id => parent_id,
+                                    :system_name => title
+                                  }, 
                                   :title => title,
-                                  :public => 1,
-                                  :parent_id => parent_id,
+                                  :public => true,
                                   :partial_path => partial_path }
 
         parse_response response, 'section'
@@ -311,7 +314,7 @@ module Threescale
       end
 
       def http_request(method, url, expected_code, options = {})
-        response = RestClient::Request.execute(method: method, url: url, multipart: true, headers: options, verify_ssl: false)
+        response = RestClient::Request.execute(method: method, url: url, multipart: true, headers: options, payload: options, verify_ssl: false)
         if response.code != expected_code
           raise "Request (#{method}) to url: '#{url}' returned unexpected response code: #{response.code}\n\t#{response.body}"
         end
