@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+         http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd
+         http://www.w3.org/2001/XMLSchema-instance https://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.fwmotion</groupId>
+    <artifactId>3scale-cms-tools-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <relativePath>../parent</relativePath>
+  </parent>
+
+  <artifactId>3scale-cms-rest-client</artifactId>
+  <packaging>jar</packaging>
+
+  <name>3scale CMS Tools (REST client library)</name>
+  <description><![CDATA[
+  ]]></description>
+
+  <dependencies>
+    <!-- Other dependencies -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+    </dependency>
+
+    <!-- Dependencies for generated code from openapi-generator -->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-json-provider</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.threeten-jaxb</groupId>
+      <artifactId>threeten-jaxb-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-3scale-cms-rest-client</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>
+                ${project.basedir}/src/main/resources/api-spec/3scale-cms.yaml
+              </inputSpec>
+              <output>
+                ${project.build.directory}/generated-sources/threescale-cms-client
+              </output>
+              <skipValidateSpec>false</skipValidateSpec>
+
+              <globalProperties>
+                <skipFormModel>false</skipFormModel>
+              </globalProperties>
+
+              <generatorName>java</generatorName>
+
+              <!-- Generate API client, but no test stubs or docs -->
+              <generateApis>true</generateApis>
+              <generateApiTests>false</generateApiTests>
+              <generateApiDocumentation>false</generateApiDocumentation>
+
+              <!--
+                Generate models based upon OpenAPI schemas, but no tests
+                or docs
+              -->
+              <generateModels>true</generateModels>
+              <generateModelTests>false</generateModelTests>
+              <generateModelDocumentation>false</generateModelDocumentation>
+
+              <generateSupportingFiles>true</generateSupportingFiles>
+              <supportingFilesToGenerate>
+                .openapi-generator-ignore,ApiClient.java,ApiException.java,ApiKeyAuth.java,Authentication.java,Configuration.java,HttpBasicAuth.java,HttpBearerAuth.java,JavaTimeFormatter.java,Pair.java,RFC3339DateFormat.java,ServerConfiguration.java,ServerVariable.java,StringUtil.java,VERSION,FILES
+              </supportingFilesToGenerate>
+
+              <!-- Configuration specific to the Java client generator -->
+              <configOptions>
+                <!-- Library options -->
+                <library>apache-httpclient</library>
+                <dateLibrary>java8</dateLibrary>
+                <serializationLibrary>jackson</serializationLibrary>
+
+                <!-- Configure packages -->
+                <invokerPackage>com.redhat.threescale.rest.cms</invokerPackage>
+                <apiPackage>com.redhat.threescale.rest.cms.api</apiPackage>
+                <modelPackage>com.redhat.threescale.rest.cms.model
+                </modelPackage>
+
+                <!--
+                  Don't validate data (these are mostly used in server
+                  generation)
+                -->
+                <useBeanValidation>false</useBeanValidation>
+                <performBeanValidation>false</performBeanValidation>
+
+                <!-- Use Java 8, serializable, XML -->
+                <java8>true</java8>
+                <serializableModel>true</serializableModel>
+                <withXml>true</withXml>
+
+                <!-- Other options -->
+                <openApiNullable>false</openApiNullable>
+                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                <disallowAdditionalPropertiesIfNotPresent>false
+                </disallowAdditionalPropertiesIfNotPresent>
+                <sortModelPropertiesByRequiredFlag>false
+                </sortModelPropertiesByRequiredFlag>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
