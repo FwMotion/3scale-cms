@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-
-require 'cms_cli'
-Threescale::CMS::CLI.start(ARGV)

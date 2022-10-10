@@ -1,0 +1,1118 @@
+openapi: 3.0.3
+info:
+  title: 3scale CMS API
+  version: '2.12'
+  description: 3scale's undocumented content management system API
+servers:
+- url: 'https://{tenant-name}-admin.{ocp-wildcard-url}'
+  description: TODO
+  variables:
+    tenant-name:
+      default: 3scale
+      description: The 3scale tenant to operate on
+    ocp-wildcard-url:
+      default: apps.your.openshift.example.com
+      description: Wildcard URL used when installing 3scale
+paths:
+  /admin/api/cms/files.xml:
+    get:
+      tags:
+      - Files
+      parameters:
+      - name: page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      - name: per_page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      responses:
+        '200':
+          $ref: '#/components/responses/FileListResponse'
+      operationId: list-files
+      summary: List Files
+      description: List files held within the 3scale CMS
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpdatableFields'
+        required: true
+      tags:
+      - Files
+      responses:
+        '201':
+          $ref: '#/components/responses/FileResponse'
+      operationId: create-file
+      summary: Create File
+      description: Create file within the 3scale CMS
+  '/admin/api/cms/files/{file_id}.xml':
+    get:
+      tags:
+      - Files
+      responses:
+        '200':
+          $ref: '#/components/responses/FileResponse'
+      operationId: get-file
+      summary: Get File
+      description: Get a file descriptor
+    put:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpdatableFields'
+        required: true
+      tags:
+      - Files
+      responses:
+        '200':
+          $ref: '#/components/responses/FileResponse'
+      operationId: update-file
+      summary: Update File
+      description: Update an existing file
+    delete:
+      tags:
+      - Files
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyResponse'
+      operationId: delete-file
+      summary: Delete File
+      description: Delete a file from 3scale CMS
+    parameters:
+    - name: file_id
+      schema:
+        $ref: '#/components/schemas/FileId'
+      in: path
+      required: true
+  /admin/api/cms/sections.xml:
+    get:
+      tags:
+      - Sections
+      parameters:
+      - name: page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      - name: per_page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      responses:
+        '200':
+          $ref: '#/components/responses/SectionListResponse'
+      operationId: list-sections
+      summary: List Sections
+      description: List sections held within the 3scale CMS
+  '/admin/api/cms/sections/{section_id}.xml':
+    get:
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/SectionResponse'
+      operationId: get-section
+      summary: Get Section
+      description: Get section descriptor
+    put:
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/SectionResponse'
+      operationId: update-section
+      summary: Update Section
+      description: Update section descriptor
+    delete:
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyResponse'
+      operationId: delete-section
+      summary: Delete Section
+      description: Delete a section from 3scale CMS
+    parameters:
+    - name: section_id
+      schema:
+        $ref: '#/components/schemas/SectionId'
+      in: path
+      required: true
+  /admin/api/cms/templates.xml:
+    get:
+      tags:
+      - Templates
+      parameters:
+      - name: page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      - name: per_page
+        description: TODO
+        schema:
+          type: integer
+        in: query
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateListResponse'
+      operationId: list-templates
+      summary: List Templates
+      description: List all templates contained in the 3scale CMS
+  '/admin/api/cms/templates/{template_id}.xml':
+    get:
+      tags:
+      - Templates
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateResponse'
+      operationId: get-template
+      summary: Get Template
+      description: 'Retrieve a template of any kind from 3scale (TODO: double-check response)'
+    put:
+      tags:
+      - Templates
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateResponse'
+      operationId: update-template
+      summary: Update Template
+      description: 'Update a template draft (TODO: double-check response)'
+    delete:
+      tags:
+      - Templates
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyResponse'
+      operationId: delete-template
+      summary: Delete Template
+      description: Delete a template from 3scale CMS
+    parameters:
+    - name: template_id
+      schema:
+        $ref: '#/components/schemas/TemplateId'
+      in: path
+      required: true
+  '/admin/api/cms/templates/{template_id}/publish':
+    put:
+      tags:
+      - Templates
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateResponse'
+      operationId: publish-template
+      summary: Publish Template
+      description: Move a template draft to be "published"
+    parameters:
+    - name: template_id
+      schema:
+        $ref: '#/components/schemas/TemplateId'
+      in: path
+      required: true
+components:
+  schemas:
+    BuiltinPage:
+      allOf:
+      - $ref: '#/components/schemas/TemplateCommon'
+      - properties:
+          path:
+            type: string
+          hidden:
+            type: boolean
+          layout:
+            type: string
+          title:
+            type: string
+          system_name:
+            type: string
+      xml:
+        name: builtin_page
+    BuiltinPartial:
+      allOf:
+      - $ref: '#/components/schemas/TemplateCommon'
+      - properties:
+          system_name:
+            type: string
+      xml:
+        name: builtin_page
+      example: |-
+        <builtin_partial>
+            <id>133</id>
+            <created_at>2022-03-05T04:48:29Z</created_at>
+            <updated_at>2022-03-05T04:48:29Z</updated_at>
+            <system_name>field</system_name>
+            <content_type>text/html</content_type>
+            <handler/>
+            <liquid_enabled>true</liquid_enabled>
+        </builtin_partial>
+    File:
+      description: File as held in the 3scale CMS
+      allOf:
+      - $ref: '#/components/schemas/FileUpdatableFields'
+      - properties:
+          id:
+            $ref: '#/components/schemas/FileId'
+          created_at:
+            format: date-time
+            description: The instant at which the file was first created in the 3scale CMS
+            type: string
+          updated_at:
+            format: date-time
+            description: The instant at which the file was last updated
+            type: string
+          url:
+            description: The location at which the file is stored by 3scale; for 3scale-internal use
+            type: string
+          title:
+            description: The name of the file
+            type: string
+      xml:
+        name: file
+      example: |-
+        <file>
+            <id>9</id>
+            <created_at>2022-03-05T04:48:27Z</created_at>
+            <updated_at>2022-03-05T04:48:27Z</updated_at>
+            <section_id>33</section_id>
+            <path>/images/desk.jpg</path>
+            <url>
+                http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
+            </url>
+            <tag_list></tag_list>
+            <title>desk.jpg</title>
+        </file>
+    FileId:
+      type: integer
+      example: '9'
+    FileList:
+      description: List of files
+      type: array
+      items:
+        $ref: '#/components/schemas/File'
+      xml:
+        name: files
+        wrapped: true
+      example: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <files>
+            <file>
+                <id>9</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/desk.jpg</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
+                </url>
+                <tag_list></tag_list>
+                <title>desk.jpg</title>
+            </file>
+            <file>
+                <id>10</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/mouse.jpg</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/mouse-54d77f30bdfb31a4.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=186eab31325093ec6b542ff9805621e6c1fa9a26bdfce24f7f9e446f22e635ca
+                </url>
+                <tag_list></tag_list>
+                <title>mouse.jpg</title>
+            </file>
+            <file>
+                <id>11</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/notes.jpg</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/notes-cdb012e0b44492d9.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=0424bc84bed739a8d760c2e2d82ff9bc9707a1c232ee52364195a48fd11ea8f5
+                </url>
+                <tag_list></tag_list>
+                <title>notes.jpg</title>
+            </file>
+            <file>
+                <id>12</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/plant.jpg</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/plant-6cf9405a5703c212.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=e1b213fb1a7f2bf0690cd03e1d356245c06bb11b116e146d4e13cdf96ef8ce13
+                </url>
+                <tag_list></tag_list>
+                <title>plant.jpg</title>
+            </file>
+            <file>
+                <id>13</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/powered-by-3scale-dark.png</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-dark-2519267beee72f21.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=1830ac1251e8a29c6bae2a4f63cb561ea0fa6c1b74e742d0a5afea738fdcdb33
+                </url>
+                <tag_list></tag_list>
+                <title>powered-by-3scale-dark.png</title>
+            </file>
+            <file>
+                <id>14</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/powered-by-3scale-light.png</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-light-0c73033502d430fb.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=89232e2f94c6335db99c5e6f41be31cdfed6101f4b0d678acce1e8fd833665ba
+                </url>
+                <tag_list></tag_list>
+                <title>powered-by-3scale-light.png</title>
+            </file>
+            <file>
+                <id>15</id>
+                <created_at>2022-03-05T04:48:28Z</created_at>
+                <updated_at>2022-03-05T04:48:28Z</updated_at>
+                <section_id>33</section_id>
+                <path>/images/powered-by-3scale.png</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-944f5dc769f78f56.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=12e9b10a8e0a36c3cbfc7fb857a6203037cf6f79e07e6afc52e7972adfc2e883
+                </url>
+                <tag_list></tag_list>
+                <title>powered-by-3scale.png</title>
+            </file>
+            <file>
+                <id>16</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <section_id>33</section_id>
+                <path>/favicon.ico</path>
+                <url>
+                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/favicon-e94f1a378c59231c.ico?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=deb0c4a3741a76adf739c3865c978aa0a062410685efa0b16e2827c977ea3143
+                </url>
+                <tag_list></tag_list>
+                <title>favicon.ico</title>
+            </file>
+        </files>
+    FileUpdatableFields:
+      description: Fields that may be modified after file creation
+      properties:
+        section_id:
+          $ref: '#/components/schemas/SectionId'
+        path:
+          description: |
+            The path from which the file is retrieved from the 3scale Developer
+            Portal
+          type: string
+        tag_list:
+          description: Comma-separated list of tags
+          type: string
+        downloadable:
+          description: |
+            Flag indicating whether the file will be returned from the Developer
+            Portal with headers indicating it is intended to be downloaded
+          default: false
+          type: boolean
+        attachment:
+          format: binary
+          type: string
+    Layout:
+      allOf:
+      - $ref: '#/components/schemas/TemplateCommon'
+      - properties:
+          system_name:
+            type: string
+      xml:
+        name: layout
+      example: |-
+        <layout>
+            <id>119</id>
+            <created_at>2022-03-05T04:48:27Z</created_at>
+            <updated_at>2022-03-05T04:48:27Z</updated_at>
+            <system_name>main_layout</system_name>
+            <content_type>text/html</content_type>
+            <handler/>
+            <liquid_enabled>true</liquid_enabled>
+            <title>Main layout</title>
+        </layout>
+    ListPaginationAttributes:
+      properties:
+        per_page:
+          type: integer
+          xml:
+            attribute: true
+        total_entries:
+          type: integer
+          xml:
+            attribute: true
+        total_pages:
+          type: integer
+          xml:
+            attribute: true
+        current_page:
+          type: integer
+          xml:
+            attribute: true
+    Page:
+      allOf:
+      - $ref: '#/components/schemas/TemplateCommon'
+      - properties:
+          path:
+            type: string
+          hidden:
+            type: boolean
+          layout:
+            type: string
+          title:
+            type: string
+      xml:
+        name: page
+      example: |-
+        <page>
+            <id>125</id>
+            <created_at>2022-03-05T04:48:27Z</created_at>
+            <updated_at>2022-03-05T04:48:27Z</updated_at>
+            <title>3scale_v2.js</title>
+            <system_name/>
+            <path>/javascripts/3scale_v2.js</path>
+            <hidden>false</hidden>
+            <layout/>
+            <content_type>text/javascript</content_type>
+            <handler/>
+            <liquid_enabled/>
+        </page>
+    Partial:
+      allOf:
+      - $ref: '#/components/schemas/TemplateCommon'
+      - properties:
+          system_name:
+            type: string
+      xml:
+        name: partial
+      example: |-
+        <partial>
+            <id>123</id>
+            <created_at>2022-03-05T04:48:27Z</created_at>
+            <updated_at>2022-03-05T04:48:27Z</updated_at>
+            <system_name>analytics</system_name>
+            <content_type>text/html</content_type>
+            <handler/>
+            <liquid_enabled/>
+        </partial>
+    Section:
+      description: Section within 3scale CMS
+      properties:
+        id:
+          $ref: '#/components/schemas/SectionId'
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        partial_path:
+          type: string
+        public:
+          type: boolean
+        title:
+          type: string
+        parent_id:
+          $ref: '#/components/schemas/SectionId'
+        system_name:
+          type: string
+      example: |-
+        <section>
+            <id>30</id>
+            <created_at>2022-03-05T04:48:27Z</created_at>
+            <updated_at>2022-03-18T06:31:57Z</updated_at>
+            <partial_path>/</partial_path>
+            <public>true</public>
+            <title>Root</title>
+            <parent_id/>
+            <system_name>root</system_name>
+        </section>
+    SectionId:
+      type: integer
+      example: '30'
+    SectionList:
+      allOf:
+      - $ref: '#/components/schemas/ListPaginationAttributes'
+      - properties:
+          sections:
+            type: array
+            items:
+              $ref: '#/components/schemas/Section'
+      example: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <sections per_page="20" total_entries="25" total_pages="2" current_page="1">
+            <section>
+                <id>30</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-18T06:31:57Z</updated_at>
+                <partial_path>/</partial_path>
+                <public>true</public>
+                <title>Root</title>
+                <parent_id/>
+                <system_name>root</system_name>
+            </section>
+            <section>
+                <id>31</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <partial_path>/javascripts</partial_path>
+                <public>true</public>
+                <title>javascripts</title>
+                <parent_id>30</parent_id>
+                <system_name>javascripts</system_name>
+            </section>
+            <section>
+                <id>32</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <partial_path>/css</partial_path>
+                <public>true</public>
+                <title>css</title>
+                <parent_id>30</parent_id>
+                <system_name>css</system_name>
+            </section>
+            <section>
+                <id>33</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/images</partial_path>
+                <public>true</public>
+                <title>images</title>
+                <parent_id>30</parent_id>
+                <system_name>images</system_name>
+            </section>
+            <section>
+                <id>34</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/password</partial_path>
+                <public>true</public>
+                <title>Password</title>
+                <parent_id>30</parent_id>
+                <system_name>password</system_name>
+            </section>
+            <section>
+                <id>35</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/login</partial_path>
+                <public>true</public>
+                <title>Login</title>
+                <parent_id>30</parent_id>
+                <system_name>login</system_name>
+            </section>
+            <section>
+                <id>36</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/signup</partial_path>
+                <public>true</public>
+                <title>Signup</title>
+                <parent_id>30</parent_id>
+                <system_name>signup</system_name>
+            </section>
+            <section>
+                <id>37</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/messages</partial_path>
+                <public>true</public>
+                <title>Messages</title>
+                <parent_id>30</parent_id>
+                <system_name>messages</system_name>
+            </section>
+            <section>
+                <id>38</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/messages/outbox</partial_path>
+                <public>true</public>
+                <title>Outbox</title>
+                <parent_id>37</parent_id>
+                <system_name>outbox</system_name>
+            </section>
+            <section>
+                <id>39</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/messages/inbox</partial_path>
+                <public>true</public>
+                <title>Inbox</title>
+                <parent_id>37</parent_id>
+                <system_name>inbox</system_name>
+            </section>
+            <section>
+                <id>40</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/messages/trash</partial_path>
+                <public>true</public>
+                <title>Trash</title>
+                <parent_id>37</parent_id>
+                <system_name>trash</system_name>
+            </section>
+            <section>
+                <id>41</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/stats</partial_path>
+                <public>true</public>
+                <title>Stats</title>
+                <parent_id>30</parent_id>
+                <system_name>stats</system_name>
+            </section>
+            <section>
+                <id>42</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/applications</partial_path>
+                <public>true</public>
+                <title>Applications</title>
+                <parent_id>30</parent_id>
+                <system_name>applications</system_name>
+            </section>
+            <section>
+                <id>43</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/application/alerts</partial_path>
+                <public>true</public>
+                <title>Application Alerts</title>
+                <parent_id>30</parent_id>
+                <system_name>application alerts</system_name>
+            </section>
+            <section>
+                <id>44</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/invoices</partial_path>
+                <public>true</public>
+                <title>Invoices</title>
+                <parent_id>30</parent_id>
+                <system_name>invoices</system_name>
+            </section>
+            <section>
+                <id>45</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/account_plans</partial_path>
+                <public>true</public>
+                <title>Account Plans</title>
+                <parent_id>30</parent_id>
+                <system_name>account plans</system_name>
+            </section>
+            <section>
+                <id>46</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/account</partial_path>
+                <public>true</public>
+                <title>Account</title>
+                <parent_id>30</parent_id>
+                <system_name>account</system_name>
+            </section>
+            <section>
+                <id>47</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/users</partial_path>
+                <public>true</public>
+                <title>Users</title>
+                <parent_id>30</parent_id>
+                <system_name>users</system_name>
+            </section>
+            <section>
+                <id>48</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/user</partial_path>
+                <public>true</public>
+                <title>User</title>
+                <parent_id>30</parent_id>
+                <system_name>user</system_name>
+            </section>
+            <section>
+                <id>49</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <partial_path>/search</partial_path>
+                <public>true</public>
+                <title>Search</title>
+                <parent_id>30</parent_id>
+                <system_name>search</system_name>
+            </section>
+        </sections>
+    Template:
+      oneOf:
+      - $ref: '#/components/schemas/BuiltinPage'
+      - $ref: '#/components/schemas/BuiltinPartial'
+      - $ref: '#/components/schemas/Layout'
+      - $ref: '#/components/schemas/Page'
+      - $ref: '#/components/schemas/Partial'
+    TemplateCommon:
+      description: Fields that are common across all types of templates
+      properties:
+        id:
+          $ref: '#/components/schemas/TemplateId'
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+        content_type:
+          type: string
+        handler:
+          type: string
+        liquid_enabled:
+          type: boolean
+        draft:
+          type: string
+        published:
+          type: string
+    TemplateId:
+      type: integer
+      example: '119'
+    TemplateList:
+      allOf:
+      - $ref: '#/components/schemas/ListPaginationAttributes'
+      - properties:
+          builtinPages:
+            type: array
+            items:
+              $ref: '#/components/schemas/BuiltinPage'
+            xml:
+              name: builtin_page
+              wrapped: false
+          builtinPartials:
+            type: array
+            items:
+              $ref: '#/components/schemas/BuiltinPartial'
+            xml:
+              name: builtin_partial
+              wrapped: false
+          layouts:
+            type: array
+            items:
+              $ref: '#/components/schemas/Layout'
+            xml:
+              name: layout
+              wrapped: false
+          pages:
+            type: array
+            items:
+              $ref: '#/components/schemas/Page'
+            xml:
+              name: page
+              wrapped: false
+          partials:
+            type: array
+            items:
+              $ref: '#/components/schemas/Partial'
+            xml:
+              name: partial
+              wrapped: false
+      xml:
+        name: templates
+      example: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <templates per_page="20" total_entries="64" total_pages="4" current_page="1">
+            <layout>
+                <id>119</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <system_name>main_layout</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+                <title>Main layout</title>
+            </layout>
+            <layout>
+                <id>120</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <system_name>error</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+                <title>Error layout</title>
+            </layout>
+            <page>
+                <id>121</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T06:13:53Z</updated_at>
+                <title>Homepage</title>
+                <system_name></system_name>
+                <path>/</path>
+                <hidden>false</hidden>
+                <layout>main_layout</layout>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </page>
+            <page>
+                <id>122</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-18T05:39:40Z</updated_at>
+                <title>ActiveDocs Display</title>
+                <system_name></system_name>
+                <path>/api-docs</path>
+                <hidden>false</hidden>
+                <layout>main_layout</layout>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </page>
+            <partial>
+                <id>123</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <system_name>analytics</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </partial>
+            <page>
+                <id>124</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>3scale.js</title>
+                <system_name/>
+                <path>/javascripts/3scale.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>125</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>3scale_v2.js</title>
+                <system_name/>
+                <path>/javascripts/3scale_v2.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>126</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>bootstrap.js</title>
+                <system_name/>
+                <path>/javascripts/bootstrap.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>127</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>bootstrap.min.js</title>
+                <system_name/>
+                <path>/javascripts/bootstrap.min.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>128</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>excanvas.compiled.js</title>
+                <system_name/>
+                <path>/javascripts/excanvas.compiled.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>129</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>jquery.js</title>
+                <system_name/>
+                <path>/javascripts/jquery.js</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/javascript</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>130</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>bootstrap.css</title>
+                <system_name/>
+                <path>/css/bootstrap.css</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/css</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>131</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>default.css</title>
+                <system_name/>
+                <path>/css/default.css</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/css</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <page>
+                <id>132</id>
+                <created_at>2022-03-05T04:48:27Z</created_at>
+                <updated_at>2022-03-05T04:48:27Z</updated_at>
+                <title>plans_widget_overrides.css</title>
+                <system_name/>
+                <path>/css/plans_widget_overrides.css</path>
+                <hidden>false</hidden>
+                <layout/>
+                <content_type>text/css</content_type>
+                <handler/>
+                <liquid_enabled/>
+            </page>
+            <builtin_partial>
+                <id>133</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>field</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+            <builtin_partial>
+                <id>134</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>shared/pagination</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+            <builtin_partial>
+                <id>135</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>shared/swagger_ui</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+            <builtin_partial>
+                <id>136</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>submenu</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+            <builtin_partial>
+                <id>137</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>menu_item</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+            <builtin_partial>
+                <id>138</id>
+                <created_at>2022-03-05T04:48:29Z</created_at>
+                <updated_at>2022-03-05T04:48:29Z</updated_at>
+                <system_name>users_menu</system_name>
+                <content_type>text/html</content_type>
+                <handler/>
+                <liquid_enabled>true</liquid_enabled>
+            </builtin_partial>
+        </templates>
+  responses:
+    EmptyResponse:
+      content:
+        application/xml:
+          schema:
+            default: ''
+            maxLength: 0
+            minLength: 0
+            type: string
+      description: Response indicating successful deletion
+    FileResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/File'
+      description: Response containing a single file declaration
+    FileListResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/FileList'
+      description: Response containing a list of files
+    SectionListResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/SectionList'
+      description: Response containing a list of `File`s
+    TemplateResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Template'
+      description: Response containing a single `Template` of any kind
+    TemplateListResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/TemplateList'
+      description: Response containing a list of templates of various kinds
+    SectionResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Section'
+      description: Response containing a single `Section`
+  securitySchemes:
+    provider_key:
+      type: apiKey
+      description: >-
+        Provider API Key from the Account Settings Overview page when logged into the 3scale tenant as
+        a user with `admin` privileges.
+      name: provider_key
+      in: query
+security:
+- provider_key: [ ]
+tags:
+- name: Files
+  description: Requests related specifically to files
+- name: Sections
+  description: Requests related specifically to sections
+- name: Templates
+  description: Requests related specifically to templates

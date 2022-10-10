@@ -1,54 +1,58 @@
-# CMS CLI tool
+# 3scale CMS Tools
 
-**Note**: This is not developed by me - only making it available and a few modifications
+**TODO**: Rewrite this as needed
 
-**Note**: There are plans/work to implement an API for Portal CMS. Ref: https://issues.jboss.org/browse/THREESCALE-361
+**Note**: There are plans/work to implement an API for Portal CMS. Ref: https://issues.redhat.com/browse/THREESCALE-7244
 
 ## DISCLAIMER
 
-It is important to know that this tool, as well as the API it uses, are undocumented currently and not supported by 3scale. The CMS tool, as well as the underlying API, may change at any moment, without any guarantee of backwards compatibility. Therefore, we cannot recommend this tool for production use.
+It is important to know that these tools, as well as the 3scale REST API that they use, are undocumented and not supported by Red Hat. These CMS tools, as well as the underlying API, may change at any moment, without any guarantee of backwards compatibility. Therefore, we cannot recommend this tool for production use.
+
+## Concepts
+
+### File
+
+A file is a binary item, such as an image.
+
+### Section
+
+Section is a logical grouping, somewhat similar to a directory.
+
+### Template
+
+Templates refer to textual content that will be served from the 3scale CMS. Templates may hold static content (such as scripts or stylesheets) or may
+be templated for server-side rendering as needed.
 
 ## Installation
 
-If you build and install the **3scale-cms** gem, then it will install a command line tool called `cms` in your path, allowing you to execute it from any directory and work on multiple CMS projects in parallel in separate directories.
-
-Build the Gem:
-
-    gem build 3scale-cms.gemspec
-
-Install the gem:
-
-    gem install 3scale-cms
-
-If you have multiple gems in the directory, you may need to specify the version, for example:
-
-    gem install 3scale-cms-0.1.0.gem
-
-Now you should have the `cms` command on your system path. When called without parameters, it should print its own usage.
-
-    cms
+TODO
 
 ## Overview
+
 The `cms` command enables you to do offline editing, changes or version control of the contents of a CMS in your admin portal in 3scale.
 
 In the CMS it is possible to create a file, a template or a section. Files are for example an image, a JS script or a CSS stylesheet. A template is generally content in `.html.liquid` file. A section is a hierarchical folder in the CMS for storing other elements.
 
 ### Mirroring CMS contents locally
+
 The mirror used locally is a hierarchy of folders that mirrors the content organization in the CMS. Thus _sections_ in the CMS are mirrored as directories on your local file system, and the elements below that section in the CMS are placed inside that directory.
 
 An exception occurs, as it is possible to create a file/template in the CMS that is served from a path other than its location in the CMS. e.g. a file called `image.jpg` that is in the root section of the CMS, but is served from `other_path/image.jpg`. This file will be mirrored locally into `./other_path/image.jpg`, with the directory `other_path` being created to store it. However, this directory is tracked as one of the _implicit folders_, to avoid a section for it being created by mistake on any later upload.
 
 ### CMS Ignore File
+
 It is often desireable to have some files in the local directory that you do not want to upload to the CMS. Examples could be files used in the version control of your CMS contents (e.g. a `.git` folder), or files used in the testing or Continuous Integration of your contents (e.g. `travis.yml` file).
 
 To have the `cms` command ignore these files, they can be added to the `.cmsignore` file in the root directory of the CMS mirror. These files use the 'glob' format to allow specifying patterns of files and directories, not just specific files.
 
 ### New local page/layout files
+
 When a local file of type `.html` or `.html.liquid` is created that does not have the '_' prefix to indicate it is a partial, then the tool cannot tell if it is intended as a new page or new layout.
 
 To allow unattended use of the tool, at the moment it assumes that new pages are more frequent and more useful and so assumes the new file is a page and uploads it as such.
 
 ### Default layouts for new pages
+
 When a page is created in the CMS, the layout to apply to it must be specified. To allow for automatic use of the tool
 without user intervention the tool chooses a default layout from the layouts in the CMS to use for new files it creates.
 
@@ -58,17 +62,19 @@ will be created.
 If no layouts are available in the CMS, the tool will not run.
 
 If you wish to use a different layout for a newly created page, you currently have to go to the CMS in the admin portal
-and change it manually. 
+and change it manually.
 
 ## Using the `cms` command
 
 ### Prerequisites
+
 You must have an account in 3scale. The CMS contents can be viewed in the **Developer Portal** section of the admin portal for that account.
 To use the `cms` command you need two pieces of information:
 - Your **PROVIDER_KEY**. This can be found in the Account tab of your admin portal (only visible to the users with "admin" role).
 - The **PROVIDER_DOMAIN** of your admin portal. e.g. `https://mycompany-admin.3scale.net`
 
 ### Usage
+
 The command should be invoked from the root directory of the folder where your local copy of the CMS will be made and worked on.
 
 Invoke the `cms` command with the following:
@@ -119,7 +125,7 @@ Use
 Output should resemble:
 > Contacting CMS at PROVIDER_DOMAIN/admin/api/cms to get content list
 > The layout 'main_layout' was selected as the default layout for uploading new pages
-> 
+>
 > Summary:
 > 0 files to be created locally
 > 0 files to be updated locally
@@ -149,7 +155,7 @@ If a directory name is specified, then it and all its contents (recursively down
 Files matching patterns in '.cmsignore' and skipped.
 
 ### cms delete
-If used without an additional parameter this will attempt to delete all content under the 'root' section on the remote CMS (indicated via domain parameter). 
+If used without an additional parameter this will attempt to delete all content under the 'root' section on the remote CMS (indicated via domain parameter).
 
 If used with a specific filename it will attempt to delete that entry int he remote CMS.
 
