@@ -12,9 +12,14 @@ import com.redhat.threescale.rest.cms.api.TemplatesApi;
 import com.redhat.threescale.rest.cms.model.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.mapstruct.factory.Mappers;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -63,18 +68,25 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     @Nonnull
     @Override
     public Optional<InputStream> getFileContent(int fileId) throws ApiException {
+        HttpClient httpClient = filesApi.getApiClient().getHttpClient();
         ModelFile file = filesApi.getFile(fileId);
+        ProviderAccount account = filesApi.readProviderSettings();
 
-        String url = file.getUrl();
-        if (file.getUrl() == null) {
-            url = filesApi.getApiClient().getBasePath()
-                .replace("-admin.", ".")
-                + file.getPath();
+        HttpGet request = new HttpGet(account.getBaseUrl() + file.getPath());
+        request.setHeader(HttpHeaders.ACCEPT, "*/*");
+        if (StringUtils.isNotEmpty(account.getSiteAccessCode())) {
+            request.addHeader("Cookie", "access_code=" + account.getSiteAccessCode());
         }
 
-        // TODO: request body of `url`
-        // filesApi.getApiClient().getHttpClient().execute(...)
-        return Optional.empty();
+        try {
+            HttpResponse response = httpClient.execute(request);
+
+            // TODO: Validate response headers, status code, etc
+
+            return Optional.of(response.getEntity().getContent());
+        } catch (IOException e) {
+            throw new ApiException(e);
+        }
     }
 
     @Nonnull

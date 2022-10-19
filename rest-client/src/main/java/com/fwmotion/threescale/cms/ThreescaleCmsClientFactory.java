@@ -2,6 +2,8 @@ package com.fwmotion.threescale.cms;
 
 import com.fwmotion.threescale.cms.support.ApiClientBuilder;
 import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
+import com.redhat.threescale.rest.cms.auth.ApiKeyAuth;
+import com.redhat.threescale.rest.cms.auth.Authentication;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
@@ -20,6 +22,7 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
     private String baseUrl;
     private boolean useInsecureConnections;
     private String providerKey;
+    private String accessToken;
 
     private CloseableHttpClient httpClient;
 
@@ -60,7 +63,16 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
         XmlEnabledApiClient apiClient = ApiClientBuilder.buildApiClient(getHttpClient());
 
         apiClient.setBasePath(baseUrl);
-        apiClient.setApiKey(providerKey);
+
+        if (providerKey != null) {
+            Authentication providerKeyAuth = apiClient.getAuthentication("provider_key");
+            ((ApiKeyAuth) providerKeyAuth).setApiKey(providerKey);
+        } else if (accessToken != null) {
+            Authentication accessTokenAuth = apiClient.getAuthentication("access_token");
+            ((ApiKeyAuth) accessTokenAuth).setApiKey(accessToken);
+        } else {
+            throw new IllegalStateException("Authentication not set for 3scale CMS client; must provide one of: providerKey, accessToken");
+        }
 
         return apiClient;
     }
@@ -90,6 +102,16 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
 
     public void setProviderKey(String providerKey) {
         this.providerKey = providerKey;
+        this.accessToken = null;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+        this.providerKey = null;
     }
 
     @Nonnull
