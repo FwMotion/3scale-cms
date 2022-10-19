@@ -216,6 +216,21 @@ paths:
         $ref: '#/components/schemas/TemplateId'
       in: path
       required: true
+  /admin/api/provider.xml:
+    get:
+      operationId: read-provider-settings
+      summary: |
+        Read 3scale Provider (Tenant) settings; particularly related to
+        the developer portal.
+
+        *Note:* This is technically part of the Account Management API, but is
+        used to determine the location and access-token for retrieving file
+        content, so it is tagged with `Files`.
+      tags:
+      - Files
+      responses:
+        '200':
+          $ref: '#/components/responses/ProviderAccountResponse'
 components:
   schemas:
     BuiltinPage:
@@ -504,6 +519,257 @@ components:
             <handler/>
             <liquid_enabled/>
         </partial>
+    ProviderAccount:
+      description: >-
+        Settings for the tenant (provider), including base URL and access code
+        (if any) for the developer portal.
+      properties:
+        id:
+          $ref: '#/components/schemas/ProviderAccountId'
+        createdAt:
+          type: string
+          format: date-time
+          xml:
+            name: created_at
+        updatedAt:
+          type: string
+          format: date-time
+          xml:
+            name: updated_at
+        state:
+          type: string
+        adminDomain:
+          type: string
+          xml:
+            name: admin_domain
+        domain:
+          type: string
+        adminBaseUrl:
+          type: string
+          xml:
+            name: admin_base_url
+        baseUrl:
+          type: string
+          xml:
+            name: base_url
+        fromEmail:
+          type: string
+          xml:
+            name: from_email
+        supportEmail:
+          type: string
+          xml:
+            name: support_email
+        financeSupportEmail:
+          type: string
+          xml:
+            name: finance_support_email
+        siteAccessCode:
+          type: string
+          format: password
+          xml:
+            name: site_access_code
+        organizationName:
+          type: string
+          xml:
+            name: org_name
+        extraFields:
+          type: array
+          items: {}
+          xml:
+            name: extra_fields
+            wrapped: true
+        monthlyBillingEnabled:
+          type: boolean
+          xml:
+            name: monthly_billing_enabled
+        monthlyChargingEnabled:
+          type: boolean
+          xml:
+            name: monthly_charging_enabled
+        creditCardStored:
+          type: boolean
+          xml:
+            name: credit_card_stored
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProviderPlan'
+          xml:
+            wrapped: true
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProviderUser'
+          xml:
+            wrapped: true
+      xml:
+        name: account
+      example: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <account>
+          <id>2</id>
+          <created_at>2022-03-05T03:27:58Z</created_at>
+          <updated_at>2022-10-11T18:44:46Z</updated_at>
+          <state>approved</state>
+          <admin_domain>3scale-admin.apps.ocp.example.com</admin_domain>
+          <domain>3scale.apps.ocp.example.com</domain>
+          <admin_base_url>https://3scale-admin.apps.ocp.example.com</admin_base_url>
+          <base_url>https://3scale.apps.ocp.example.com</base_url>
+          <from_email>no-reply@3scale.apps.ocp.example.com</from_email>
+          <support_email>admin@3scale.apps.ocp.example.com</support_email>
+          <finance_support_email>admin@3scale.apps.ocp.example.com</finance_support_email>
+          <site_access_code>abcd</site_access_code>
+          <org_name>Provider Name</org_name>
+          <extra_fields></extra_fields>
+          <monthly_billing_enabled>true</monthly_billing_enabled>
+          <monthly_charging_enabled>true</monthly_charging_enabled>
+          <credit_card_stored>false</credit_card_stored>
+          <plans>
+            <plan custom="false" default="true">
+              <id>4</id>
+              <name>enterprise</name>
+              <type>application_plan</type>
+              <state>hidden</state>
+              <approval_required>false</approval_required>
+              <setup_fee>0.0</setup_fee>
+              <cost_per_month>0.0</cost_per_month>
+              <trial_period_days/>
+              <cancellation_period>0</cancellation_period>
+              <service_id>1</service_id>
+            </plan>
+          </plans>
+          <users>
+            <user>
+              <id>3</id>
+              <created_at>2022-03-05T03:27:59Z</created_at>
+              <updated_at>2022-03-05T03:27:59Z</updated_at>
+              <account_id>2</account_id>
+              <state>active</state>
+              <role>admin</role>
+              <username>3scaleadmin</username>
+              <email>3scaleadmin+3scale-admin.apps.ocp.example.com@3scale.net</email>
+              <extra_fields></extra_fields>
+            </user>
+            <user>
+              <id>2</id>
+              <created_at>2022-03-05T03:27:59Z</created_at>
+              <updated_at>2022-03-05T03:27:59Z</updated_at>
+              <account_id>2</account_id>
+              <state>active</state>
+              <role>admin</role>
+              <username>admin</username>
+              <email>admin@3scale.apps.ocp.example.com</email>
+              <extra_fields></extra_fields>
+            </user>
+          </users>
+        </account>
+    ProviderAccountId:
+      type: integer
+      example: '2'
+    ProviderPlan:
+      properties:
+        custom:
+          type: boolean
+          xml:
+            attribute: true
+        default:
+          type: boolean
+          xml:
+            attribute: true
+        id:
+          $ref: '#/components/schemas/ProviderPlanId'
+        name:
+          type: string
+        type:
+          type: string
+        state:
+          type: string
+        approvalRequired:
+          type: boolean
+          xml:
+            name: approval_required
+        setupFee:
+          type: number
+          xml:
+            name: setup_fee
+        costPerMonth:
+          type: number
+          xml:
+            name: costPerMonth
+        trialPeriodDays:
+          type: integer
+          xml:
+            name: trial_period_days
+        cancellationPeriod:
+          type: integer
+          xml:
+            name: cancellation_period
+        apiProductId:
+          type: integer
+          xml:
+            name: service_id
+      example: |-
+        <plan custom="false" default="true">
+          <id>4</id>
+          <name>enterprise</name>
+          <type>application_plan</type>
+          <state>hidden</state>
+          <approval_required>false</approval_required>
+          <setup_fee>0.0</setup_fee>
+          <cost_per_month>0.0</cost_per_month>
+          <trial_period_days/>
+          <cancellation_period>0</cancellation_period>
+          <service_id>1</service_id>
+        </plan>
+    ProviderPlanId:
+      type: integer
+      example: '4'
+    ProviderUser:
+      properties:
+        id:
+          $ref: '#/components/schemas/ProviderUserId'
+        createdAt:
+          type: string
+          format: date-time
+          xml:
+            name: created_at
+        updatedAt:
+          type: string
+          format: date-time
+          xml:
+            name: updated_at
+        accountId:
+          description: The same as ProviderAccountId
+          type: integer
+          xml:
+            name: account_id
+        state:
+          type: string
+        role:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        extraFields:
+          xml:
+            name: extra_fields
+      example: |-
+        <user>
+          <id>3</id>
+          <created_at>2022-03-05T03:27:59Z</created_at>
+          <updated_at>2022-03-05T03:27:59Z</updated_at>
+          <account_id>2</account_id>
+          <state>active</state>
+          <role>admin</role>
+          <username>3scaleadmin</username>
+          <email>3scaleadmin+3scale-admin.apps.ocp.example.com@3scale.net</email>
+          <extra_fields></extra_fields>
+        </user>
+    ProviderUserId:
+      type: integer
+      example: 3
     Section:
       description: Section within 3scale CMS
       properties:
@@ -1075,6 +1341,12 @@ components:
           schema:
             $ref: '#/components/schemas/FileList'
       description: Response containing a list of files
+    ProviderAccountResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ProviderAccount'
+      description: Response containing the `ProviderAccount` configuration
     SectionListResponse:
       content:
         application/xml:
@@ -1103,12 +1375,21 @@ components:
     provider_key:
       type: apiKey
       description: >-
-        Provider API Key from the Account Settings Overview page when logged into the 3scale tenant as
-        a user with `admin` privileges.
+        Provider API Key from the `Account Settings > Overview` page of a 3scale tenant.
+        To view this key, a user must be logged in with `admin` privileges.
       name: provider_key
+      in: query
+    access_token:
+      type: apiKey
+      description: >-
+        Access Token from the `Account Settings > Personal > Tokens` page of a 3scale tenant.
+        The token must have access to both the `Account Management API` and the
+        unlisted `Developer Portal API`.
+      name: access_token
       in: query
 security:
 - provider_key: [ ]
+- access_token: [ ]
 tags:
 - name: Files
   description: Requests related specifically to files
