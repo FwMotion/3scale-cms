@@ -25,6 +25,60 @@
       <groupId>com.fwmotion</groupId>
       <artifactId>3scale-cms-rest-client</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-apache-httpclient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-config-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-container-image-jib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-picocli</artifactId>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>${groupId.quarkus}</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>default-generate-code</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate-code</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-generate-code-tests</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>generate-code-tests</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-build</id>
+            <phase>package</phase>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
