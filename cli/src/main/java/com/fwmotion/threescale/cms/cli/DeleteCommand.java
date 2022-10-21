@@ -2,7 +2,7 @@ package com.fwmotion.threescale.cms.cli;
 
 import com.fwmotion.threescale.cms.ThreescaleCmsClient;
 import com.redhat.threescale.rest.cms.ApiException;
-import jdk.internal.org.jline.utils.Log;
+import io.quarkus.logging.Log;
 import picocli.CommandLine;
 
 import javax.annotation.Nonnull;

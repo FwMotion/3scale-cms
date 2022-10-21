@@ -62,6 +62,9 @@
               <goal>generate-code</goal>
             </goals>
           </execution>
+          <!--
+            Temporarily disable this; since quarkus generate-code-tests will
+            fail if there are no actual tests yet.
           <execution>
             <id>default-generate-code-tests</id>
             <phase>generate-test-sources</phase>
@@ -69,6 +72,7 @@
               <goal>generate-code-tests</goal>
             </goals>
           </execution>
+          -->
           <execution>
             <id>default-build</id>
             <phase>package</phase>
