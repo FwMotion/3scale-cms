@@ -26,6 +26,8 @@
 
     <!-- Maven First-party Plugins -->
     <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
+    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
+    <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
 
     <!-- Third-party Maven Plugins -->
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
@@ -36,6 +38,7 @@
 
     <!-- Dependency Group IDs -->
     <groupId.swagger-parser>io.swagger.parser.v3</groupId.swagger-parser>
+    <groupId.quarkus>io.quarkus.platform</groupId.quarkus>
 
     <!-- Dependency Versions -->
     <version.apache-commons-codec>1.15</version.apache-commons-codec>
@@ -51,6 +54,7 @@
     <version.log4j>2.17.2</version.log4j>
     <version.mapstruct>1.5.3.Final</version.mapstruct>
     <version.mockito>4.4.0</version.mockito>
+    <version.quarkus>2.13.2.Final</version.quarkus>
     <version.slf4j>1.7.36</version.slf4j>
     <version.swagger-annotations>1.6.5</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
@@ -70,6 +74,15 @@
         <groupId>com.fwmotion</groupId>
         <artifactId>3scale-cms-rest-client</artifactId>
         <version>${project.version}</version>
+      </dependency>
+
+      <!-- Quarkus -->
+      <dependency>
+        <groupId>${groupId.quarkus}</groupId>
+        <artifactId>quarkus-bom</artifactId>
+        <version>${version.quarkus}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
       <!-- Other dependencies -->
@@ -165,6 +178,11 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>${groupId.quarkus}</groupId>
+          <artifactId>quarkus-maven-plugin</artifactId>
+          <version>${version.quarkus}</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.maven-compiler-plugin}</version>
@@ -192,40 +210,43 @@
     </pluginManagement>
   </build>
 
-  <!--
-  <repositories>
-    <repository>
-      <id>redhat-ga-repository</id>
-      <name>Red Hat General Availability repository (all)</name>
-      <url>https://maven.repository.redhat.com/ga/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>redhat-ga-repository</id>
-      <name>Red Hat General Availability repository (all)</name>
-      <url>https://maven.repository.redhat.com/ga/</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  -->
+  <profiles>
+    <profile>
+      <id>native</id>
+      <activation>
+        <property>
+          <name>native</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>${version.maven-failsafe-plugin}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+                <configuration>
+                  <systemPropertyVariables>
+                    <native.image.path>${project.build.directory}/${project.artifactId}</native.image.path>
+                    <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                    <!--suppress MavenModelInspection -->
+                    <maven.home>${maven.home}</maven.home>
+                  </systemPropertyVariables>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <quarkus.package.type>native</quarkus.package.type>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

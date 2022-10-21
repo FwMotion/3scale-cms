@@ -1,0 +1,20 @@
+quarkus:
+  banner:
+    enabled: false
+
+  log:
+    console:
+      format: '%s%e%n'
+    category:
+      'io.quarkus':
+        level: ERROR
+      'com.fwmotion.threscale.cms.cli':
+        level: TRACE
+    min-level: TRACE
+
+  native:
+    additional-build-args:
+    - --report-unsupported-elements-at-runtime
+    enable-http-url-handler: true
+    enable-https-url-handler: true
+
