@@ -15,6 +15,7 @@ quarkus:
   native:
     additional-build-args:
     - --report-unsupported-elements-at-runtime
+    - --initialize-at-run-time=com.redhat.threescale.rest.cms.Configuration
     enable-http-url-handler: true
     enable-https-url-handler: true
 

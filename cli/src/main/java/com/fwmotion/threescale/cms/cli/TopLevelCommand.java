@@ -15,21 +15,25 @@ import java.util.List;
 @CommandLine.Command(
     header = {"3scale Content Management System CLI Tool"},
     name = "3scale-cms",
+    description = "Tool for interacting with 3scale's Content Management " +
+        "System for managing content and templates that will be used to " +
+        "render a tenant's Developer Portal",
     subcommands = {
+        InfoCommand.class,
+        DiffCommand.class,
         DownloadCommand.class,
         UploadCommand.class,
         DeleteCommand.class,
-        InfoCommand.class,
-        DiffCommand.class
     },
-    synopsisSubcommandLabel = "[SUBCOMMAND]",
-    commandListHeading = "%n@|red,bold SUBCOMMANDS|@%n"
+    synopsisSubcommandLabel = "[COMMAND] ",
+    commandListHeading = "%n@|red,bold COMMANDS|@%n"
 )
 public class TopLevelCommand extends CommandBase {
 
     @CommandLine.Option(
         names = {"-k", "--insecure"},
-        description = "Proceed with server connections that fail TLS certificate validation"
+        description = "Proceed with server connections that fail TLS " +
+            "certificate validation"
     )
     private boolean useInsecureConnections;
 
@@ -37,7 +41,8 @@ public class TopLevelCommand extends CommandBase {
         index = "0",
         paramLabel = "PROVIDER_KEY",
         arity = "1",
-        description = "Provider Key for full control of the target tenant. This will be ignored if --access-token is specified."
+        description = "Provider Key for full control of the target tenant. " +
+            "This will be ignored if --access-token is specified."
     )
     private String providerKey;
 
@@ -45,7 +50,8 @@ public class TopLevelCommand extends CommandBase {
         index = "1",
         paramLabel = "PROVIDER_DOMAIN",
         arity = "1",
-        description = "The base URL of the admin portal; for example: %n  https://3scale-admin.apps.example.com/"
+        description = "The base URL of the admin portal; for example: %n" +
+            "  https://3scale-admin.apps.example.com/"
     )
     private String providerDomain;
 
@@ -53,7 +59,9 @@ public class TopLevelCommand extends CommandBase {
         names = {"-a", "--access-token"},
         paramLabel = "ACCESS_TOKEN",
         arity = "1",
-        description = "Use an access token instead of a provider key. The access token must be granted permissions to both Account Management API and the hidden Content Management API"
+        description = "Use an access token instead of a provider key. The " +
+            "access token must be granted permissions to both " +
+            "Account Management API and the hidden Content Management API"
     )
     private String accessToken;
 
