@@ -27,6 +27,18 @@ jobs:
         settings-path: ${{ github.workspace }}
         server-id: github
 
+    - name: Make repository_owner lowercase for container image group
+      id: repo-owner-string
+      uses: ASzc/change-string-case-action@v3
+      with:
+        string: ${{ github.repository_owner }}
+
+    - name: Make repository name lowercase for container image group
+      id: repo-name-string
+      uses: ASzc/change-string-case-action@v3
+      with:
+        string: ${{ github.event.repository.name }}
+
     - name: Maven Build, Deploy, and Push Container Image
       run: >-
         ./mvnw
@@ -37,8 +49,8 @@ jobs:
         -Dquarkus.container-image.build=true
         -Dquarkus.container-image.push=true
         -Dquarkus.container-image.registry=ghcr.io
-        -Dquarkus.container-image.group=${{ github.repository_owner }}
-        -Dquarkus.container-image.name=${{ github.event.repository.name }}
+        -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
+        -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
         -Dquarkus.container-image.tag=latest
         -Dquarkus.container-image.username=${{ github.actor }}
         -Dquarkus.container-image.password=${{ github.token }}
