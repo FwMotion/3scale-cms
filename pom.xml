@@ -18,8 +18,9 @@
 
   <name>3scale CMS Tools (aggregate)</name>
   <description><![CDATA[
-    Project to group multiple submodules related to 3scale's Content Management System API, and
-    to handle build ordering and aggregate test reporting
+    Maven project to group multiple submodules related to 3scale's Content
+    Management System API, and to handle build ordering and aggregate test
+    reporting
   ]]></description>
 
   <modules>

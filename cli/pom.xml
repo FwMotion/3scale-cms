@@ -18,6 +18,9 @@
 
   <name>3scale CMS Tools (command-line interface)</name>
   <description><![CDATA[
+    A Quarkus-based command-line interface to the 3scale Content Management
+    System. It is recommended to use this via the native-mode compiled
+    container image `ghcr.io/fwmotion/3scale-cms`.
   ]]></description>
 
   <dependencies>
@@ -53,6 +56,7 @@
       <plugin>
         <groupId>${groupId.quarkus}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${version.quarkus}</version>
         <extensions>true</extensions>
         <executions>
           <execution>

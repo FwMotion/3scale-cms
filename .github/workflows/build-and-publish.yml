@@ -1,0 +1,71 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch: { }
+  release:
+    types:
+    - created
+
+jobs:
+  build:
+    name: Build and Push to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout 3scale CMS
+      uses: actions/checkout@v3
+
+    - name: Set Up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: 'maven'
+        settings-path: ${{ github.workspace }}
+        server-id: github
+
+    - name: Maven Build, Deploy, and Push Container Image
+      run: >-
+        ./mvnw
+        --settings ${{ github.workspace }}/settings.xml
+        --batch-mode
+        deploy
+        -Pnative
+        -Dquarkus.container-image.build=true
+        -Dquarkus.container-image.push=true
+        -Dquarkus.container-image.registry=ghcr.io
+        -Dquarkus.container-image.group=${{ github.repository_owner }}
+        -Dquarkus.container-image.name=${{ github.event.repository.name }}
+        -Dquarkus.container-image.tag=latest
+        -Dquarkus.container-image.username=${{ github.actor }}
+        -Dquarkus.container-image.password=${{ github.token }}
+        -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Delete Old Parent POMs from Maven Repository
+      uses: actions/delete-package-versions@v3
+      with:
+        package-name: 'com.fwmotion.3scale-cms-tools-parent'
+        min-versions-to-keep: 3
+
+    - name: Delete Old REST client JARs from Maven Repository
+      uses: actions/delete-package-versions@v3
+      with:
+        package-name: 'com.fwmotion.3scale-cms-rest-client'
+        min-versions-to-keep: 3
+
+    - name: Delete Old CLI JARs from Maven Repository
+      uses: actions/delete-package-versions@v3
+      with:
+        package-name: 'com.fwmotion.3scale-cms-tools-cli'
+        min-versions-to-keep: 3
+
+    - name: Delete Old Aggregate POMs from Maven Repository
+      uses: actions/delete-package-versions@v3
+      with:
+        package-name: 'com.fwmotion.3scale-cms-tools-aggregate'
+        min-versions-to-keep: 3

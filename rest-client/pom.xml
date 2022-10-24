@@ -18,6 +18,10 @@
 
   <name>3scale CMS Tools (REST client library)</name>
   <description><![CDATA[
+    Java library to interact with 3scale Content Management System via the
+    CMS's REST API. This requires use of either a Provider Key or an
+    Access Token that has been granted permission to the Account Management
+    API and the hidden Content Management API
   ]]></description>
 
   <dependencies>
@@ -103,6 +107,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.jboss.jandex</groupId>
+        <artifactId>jandex-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <executions>
@@ -153,9 +161,14 @@
                 <serializationLibrary>jackson</serializationLibrary>
 
                 <!-- Configure packages -->
-                <invokerPackage>com.redhat.threescale.rest.cms</invokerPackage>
-                <apiPackage>com.redhat.threescale.rest.cms.api</apiPackage>
-                <modelPackage>com.redhat.threescale.rest.cms.model
+                <invokerPackage>
+                  com.redhat.threescale.rest.cms
+                </invokerPackage>
+                <apiPackage>
+                  com.redhat.threescale.rest.cms.api
+                </apiPackage>
+                <modelPackage>
+                  com.redhat.threescale.rest.cms.model
                 </modelPackage>
 
                 <!--
@@ -173,9 +186,11 @@
                 <!-- Other options -->
                 <openApiNullable>false</openApiNullable>
                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
-                <disallowAdditionalPropertiesIfNotPresent>false
+                <disallowAdditionalPropertiesIfNotPresent>
+                  false
                 </disallowAdditionalPropertiesIfNotPresent>
-                <sortModelPropertiesByRequiredFlag>false
+                <sortModelPropertiesByRequiredFlag>
+                  false
                 </sortModelPropertiesByRequiredFlag>
               </configOptions>
             </configuration>
