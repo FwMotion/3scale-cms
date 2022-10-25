@@ -1,8 +1,11 @@
 package com.fwmotion.threescale.cms;
 
 import com.fwmotion.threescale.cms.mappers.CmsFileMapper;
+import com.fwmotion.threescale.cms.mappers.CmsSectionMapper;
 import com.fwmotion.threescale.cms.mappers.CmsTemplateMapper;
 import com.fwmotion.threescale.cms.model.*;
+import com.fwmotion.threescale.cms.support.PagedFilesSpliterator;
+import com.fwmotion.threescale.cms.support.PagedSectionsSpliterator;
 import com.fwmotion.threescale.cms.support.PagedTemplatesSpliterator;
 import com.redhat.threescale.rest.cms.ApiException;
 import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
@@ -29,8 +32,7 @@ import java.util.stream.StreamSupport;
 public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     private static final CmsFileMapper FILE_MAPPER = Mappers.getMapper(CmsFileMapper.class);
-    // TODO: Add Section mapper
-    //private static final CmsSectionMapper SECTION_MAPPER = Mappers.getMapper(CmsSectionMapper.class);
+    private static final CmsSectionMapper SECTION_MAPPER = Mappers.getMapper(CmsSectionMapper.class);
     private static final CmsTemplateMapper TEMPLATE_MAPPER = Mappers.getMapper(CmsTemplateMapper.class);
 
     private final FilesApi filesApi;
@@ -54,15 +56,13 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     @Nonnull
     @Override
     public Stream<CmsSection> streamSections() {
-        // TODO
-        return Stream.empty();
+        return StreamSupport.stream(new PagedSectionsSpliterator(sectionsApi), true);
     }
 
     @Nonnull
     @Override
     public Stream<CmsFile> streamFiles() {
-        // TODO
-        return Stream.empty();
+        return StreamSupport.stream(new PagedFilesSpliterator(filesApi), true);
     }
 
     @Nonnull
@@ -106,7 +106,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
         // When there's no draft content, the "draft" should be the same as
         // the "published" content
-        if (!result.isPresent()) {
+        if (result.isEmpty()) {
             return getTemplatePublished(templateId);
         }
 
@@ -124,17 +124,18 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Override
     public void save(@Nonnull CmsSection section) throws ApiException {
+        Section restSection = SECTION_MAPPER.toRest(section);
         if (section.getId() == null) {
             // TODO: Add createSection to OpenAPI spec
         } else {
             // TODO: Add update parameters
-            sectionsApi.updateSection(section.getId());
+            sectionsApi.updateSection(restSection.getId());
         }
     }
 
     @Override
     public void save(@Nonnull CmsFile file, @Nonnull InputStream fileContent) throws ApiException {
-        ModelFile restFile = FILE_MAPPER.mapToRest(file);
+        ModelFile restFile = FILE_MAPPER.toRest(file);
         if (file.getId() == null) {
             filesApi.createFile(
                 restFile.getSectionId(),

@@ -791,6 +791,8 @@ components:
           $ref: '#/components/schemas/SectionId'
         system_name:
           type: string
+      xml:
+        name: section
       example: |-
         <section>
             <id>30</id>
@@ -813,6 +815,11 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Section'
+            xml:
+              name: section
+              wrapped: false
+      xml:
+        name: sections
       example: |-
         <?xml version="1.0" encoding="UTF-8"?>
         <sections per_page="20" total_entries="25" total_pages="2" current_page="1">
