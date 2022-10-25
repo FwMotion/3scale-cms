@@ -13,22 +13,24 @@ import java.util.Set;
 public interface CmsFileMapper {
 
     @Mapping(target = "tags", source = "tagList")
-    CmsFile mapFromRest(ModelFile file);
+    CmsFile fromRest(ModelFile file);
 
     @Mapping(target = "tagList", source = "tags")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    // title is only the filename without path... not useful
     @Mapping(target = "title", ignore = true)
+    // url is the S3 or local filesystem location for 3scale... not useful
     @Mapping(target = "url", ignore = true)
-    // TODO: Map attachment
+    // attachment (aka, file content) is not held in CmsFile
     @Mapping(target = "attachment", ignore = true)
-    ModelFile mapToRest(CmsFile file);
+    ModelFile toRest(CmsFile file);
 
-    default Set<String> mapTagsFromRest(String tagList) {
+    default Set<String> tagsFromRest(String tagList) {
         return new HashSet<>(Arrays.asList(tagList.split("\\s*,\\s*")));
     }
 
-    default String mapTagsToRest(Set<String> tags) {
+    default String tagsToRest(Set<String> tags) {
         return String.join(",", tags);
     }
 

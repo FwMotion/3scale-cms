@@ -47,13 +47,6 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
         try {
             TemplateList templateList = templatesApi.listTemplates(pageNumber, pageSize);
 
-            int currentPage = Optional.ofNullable(templateList.getCurrentPage())
-                .orElse(pageNumber);
-            int totalPages = Optional.ofNullable(templateList.getTotalPages())
-                .orElse(Integer.MAX_VALUE);
-            int perPage = Optional.ofNullable(templateList.getPerPage())
-                .orElse(pageSize);
-
             List<CmsTemplate> resultPage = Stream.of(
                     ListUtils.emptyIfNull(templateList.getBuiltinPages()).stream()
                         .map(TEMPLATE_MAPPER::fromRestBuiltinPage),
@@ -69,27 +62,17 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
                 .sorted(getComparator())
                 .collect(Collectors.toList());
 
+            validateResultPageSize(
+                "template",
+                pageNumber,
+                pageSize,
+                resultPage,
+                templateList::getCurrentPage,
+                templateList::getTotalPages,
+                templateList::getPerPage,
+                templateList::getTotalEntries);
 
-            int expectedPageSize;
-            if (currentPage > totalPages) {
-                expectedPageSize = 0;
-            } else if (currentPage == totalPages) {
-                expectedPageSize = Optional.ofNullable(templateList.getTotalEntries())
-                    .map(totalEntries -> totalEntries % perPage)
-                    .orElseGet(resultPage::size);
-            } else {
-                expectedPageSize = perPage;
-            }
-
-            if (resultPage.size() == expectedPageSize) {
-                return resultPage;
-            }
-
-            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
-            throw new IllegalStateException("Unexpected page size for template list page " + pageNumber
-                + " (with page size of " + pageSize
-                + "); parsed page size is " + resultPage.size()
-                + " but expected size of " + expectedPageSize);
+            return resultPage;
         } catch (ApiException e) {
             throw new IllegalStateException("Unexpected exception while iterating CMS template list page " + pageNumber
                 + " (with page size of " + pageSize + ")", e);

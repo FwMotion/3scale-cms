@@ -3,11 +3,9 @@ package com.fwmotion.threescale.cms.support;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<T> {
 
@@ -99,6 +97,43 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
     @Override
     public long estimateSize() {
         return Long.MAX_VALUE;
+    }
+
+    protected void validateResultPageSize(@Nonnull String type,
+                                          @Nonnegative int pageNumber,
+                                          @Nonnegative int pageSize,
+                                          @Nonnull Collection<T> resultPage,
+                                          @Nonnull Supplier<Integer> getCurrentPage,
+                                          @Nonnull Supplier<Integer> getTotalPages,
+                                          @Nonnull Supplier<Integer> getPerPage,
+                                          @Nonnull Supplier<Integer> getTotalEntries) {
+        int currentPage = Optional.ofNullable(getCurrentPage.get())
+            .orElse(pageNumber);
+        int totalPages = Optional.ofNullable(getTotalPages.get())
+            .orElse(Integer.MAX_VALUE);
+        int perPage = Optional.ofNullable(getPerPage.get())
+            .orElse(pageSize);
+
+        int expectedPageSize;
+        if (currentPage > totalPages) {
+            expectedPageSize = 0;
+        } else if (currentPage == totalPages) {
+            expectedPageSize = Optional.ofNullable(getTotalEntries.get())
+                .map(totalEntries -> totalEntries % perPage)
+                .orElseGet(resultPage::size);
+        } else {
+            expectedPageSize = perPage;
+        }
+
+        if (resultPage.size() == expectedPageSize) {
+            return;
+        }
+
+        // TODO: Create ThreescaleCMSException and throw it instead of IllegalStateException
+        throw new IllegalStateException("Unexpected page size for " + type + " list page " + pageNumber
+            + " (with page size of " + pageSize
+            + "); parsed page size is " + resultPage.size()
+            + " but expected size of " + expectedPageSize);
     }
 
 }

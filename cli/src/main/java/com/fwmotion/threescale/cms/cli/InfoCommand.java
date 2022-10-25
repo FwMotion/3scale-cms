@@ -22,8 +22,16 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         URIBuilder uriBuilder = new URIBuilder(topLevelCommand.getProviderDomain());
-        String targetPath = (uriBuilder.getPath() + "/admin/api/cms")
-            .replaceAll("/+", "/");
+        String providerPath = uriBuilder.getPath();
+
+        String targetPath;
+        if (providerPath == null) {
+            targetPath = "/admin/api/cms";
+        } else {
+            targetPath = providerPath + "/admin/api/cms";
+        }
+        targetPath = targetPath.replaceAll("/+", "/");
+
         String cmsUrl = uriBuilder.setPath(targetPath).toString();
         Log.info("Contacting CMS at " + cmsUrl + " to get content list");
 
