@@ -33,6 +33,8 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
 
     private static final Map<Class<? extends CmsObject>, Function<? super CmsObject, Integer>> GET_PARENT_ID_FUNCTIONS =
         Map.of(
+            // TODO: See if there's a way to get section ID / parent ID from
+            //       other object types
             CmsFile.class, file -> ((CmsFile) file).getSectionId(),
             CmsSection.class, section -> ((CmsSection) section).getParentId()
         );
@@ -108,7 +110,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
                     RecursionOption recurseBy = recursionStyle();
 
                     if (recurseBy == RecursionOption.NONE
-                        || parentObject.getType() == ThreescaleObjectType.SECTION) {
+                        || parentObject.getType() != ThreescaleObjectType.SECTION) {
                         return Stream.of(pathKey);
                     }
 
@@ -118,18 +120,41 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
                     }
 
                     if (recurseBy == RecursionOption.PARENT_ID) {
-                        return Stream.concat(
-                            Stream.of(pathKey),
-                            remoteObjectsByPath.entrySet().stream()
-                                .filter(entry -> {
-                                    CmsObject cmsObject = entry.getValue();
-                                    int parentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(cmsObject.getClass(), o -> Integer.MIN_VALUE)
-                                        .apply(cmsObject);
+                        LinkedList<Pair<String, CmsObject>> recursingList = new LinkedList<>();
+                        recursingList.add(Pair.of(pathKey, parentObject));
 
-                                    return parentId == parentObject.getId();
-                                })
-                                .map(Map.Entry::getKey)
-                        );
+                        ListIterator<Pair<String, CmsObject>> treeWalker = recursingList.listIterator();
+
+                        while (treeWalker.hasNext()) {
+                            Pair<String, CmsObject> currentPair = treeWalker.next();
+                            CmsObject currentObject = currentPair.getRight();
+
+                            if (currentObject.getType() != ThreescaleObjectType.SECTION) {
+                                continue;
+                            }
+
+                            Integer parentId = currentObject.getId();
+
+                            int addedChildren = Math.toIntExact(
+                                remoteObjectsByPath.entrySet()
+                                    .stream()
+                                    .filter(childEntry -> {
+                                        CmsObject childObject = childEntry.getValue();
+                                        Integer childParentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(childObject.getClass(), o -> Integer.MIN_VALUE)
+                                            .apply(childObject);
+
+                                        return parentId.equals(childParentId);
+                                    })
+                                    .peek(e -> treeWalker.add(Pair.of(e)))
+                                    .count());
+
+                            for (int i = 0; i < addedChildren; i++) {
+                                treeWalker.previous();
+                            }
+                        }
+
+                        return recursingList.stream()
+                            .map(Pair::getKey);
                     }
 
                     return Stream.of(pathKey);
@@ -258,7 +283,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
 
     private void performDownloadSection(@Nonnull CmsSection cmsSection,
                                         @Nonnull File targetFile) {
-        if (!targetFile.mkdir()) {
+        if (!targetFile.exists() && !targetFile.mkdir()) {
             throw new IllegalStateException("Failed to create directory " + targetFile);
         }
     }
@@ -301,7 +326,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         @CommandLine.ArgGroup(exclusive = false)
         AllFilesDownloadGroup allFilesDownloadGroup;
 
-        @CommandLine.ArgGroup
+        @CommandLine.ArgGroup(exclusive = false)
         IndividualFilesDownloadGroup individualFilesDownloadGroup;
 
     }
