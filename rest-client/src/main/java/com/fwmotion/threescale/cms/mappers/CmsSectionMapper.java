@@ -12,8 +12,6 @@ public interface CmsSectionMapper {
     CmsSection fromRest(Section section);
 
     @Mapping(target = "partialPath", source = "path")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "_public", ignore = true)
     Section toRest(CmsSection section);
 

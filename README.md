@@ -1,7 +1,6 @@
 # 3scale CMS Tools
 
-**TODO**: Rewrite this as needed. Also add directory mount to podman command
-examples.
+**TODO**: Rewrite this as needed.
 
 **Note**: There are plans/work to implement an API for Portal CMS.
 Ref: https://issues.redhat.com/browse/THREESCALE-7244
@@ -111,24 +110,24 @@ Usage of each is explained below:
 Show information about contents of the CMS and the local files. It accepts the optional parameter: 'details'
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info
 ```
 
 Output should resemble:
 
 ```
 Contacting CMS at PROVIDER_DOMAIN/admin/api/cms to get content list
-The layout 'main_layout' was selected as the default layout for uploading new pages
-118 content elements found in CMS
+The layout 'main_layout' in file '/l_main_layout.html.liquid' was selected as the default layout for uploading new pages
+118 items found in CMS
 7 ignored local files (matching patterns in '.cmsignore')
 152 (non-ignored) local files
-4 local folders exist due to file/template system_names containing '/'
+8 implicit folders due to file/template system_names containing '/'
 ```
 
 Use
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
 ```
 
 to get the list of specific files in each of those four categories:
@@ -144,7 +143,7 @@ files.
 Use
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff
 ```
 
 Output should resemble:
@@ -162,7 +161,7 @@ Summary:
 to get the list of specific files to be applied on 'download' and 'upload' use:
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff details
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff details
 ```
 
 ### 3scale-cms download
@@ -210,11 +209,11 @@ You can edit this file at any time.
 ### Check the status
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
 ```
 
 ### Download the current contents of your CMS
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN download
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN download
 ```

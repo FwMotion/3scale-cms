@@ -1,1 +1,11 @@
 # Default .cmsignore file; also as a placeholder to keep /cms directory
+
+# Default ignore, if wanting to upload from
+# https://github.com/3scale/porta/tree/master/lib/developer_portal/app/views/developer_portal
+
+.cmsignore
+/fonts
+/layouts/forum.liquid
+**/TO_REMOVE
+**/*.erb
+**/*.sprocket

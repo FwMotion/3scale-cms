@@ -4,10 +4,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 public class CmsFile implements CmsObject {
 
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private Integer id;
     private Integer sectionId;
     private String path;
@@ -17,6 +20,24 @@ public class CmsFile implements CmsObject {
     @Override
     public ThreescaleObjectType getType() {
         return ThreescaleObjectType.FILE;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -79,6 +100,8 @@ public class CmsFile implements CmsObject {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+            .append("createdAt", createdAt)
+            .append("updatedAt", updatedAt)
             .append("id", id)
             .append("sectionId", sectionId)
             .append("path", path)

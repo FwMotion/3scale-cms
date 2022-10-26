@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="3scale-cms-tools-aggregate [generate-sources]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+  <configuration default="false" name="3scale-cms-rest-client [generate-sources...]" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -11,6 +11,9 @@
           <option name="goals">
             <list>
               <option value="generate-sources" />
+              <option value="-pl" />
+              <option value="rest-client" />
+              <option value="-am" />
             </list>
           </option>
           <option name="pomFileName" />
