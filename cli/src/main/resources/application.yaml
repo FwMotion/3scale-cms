@@ -5,6 +5,30 @@ quarkus:
   banner:
     enabled: false
 
+  container-image:
+    labels:
+      # TODO: Get jib to strip these labels
+      'com.redhat.build-host': null
+      'com.redhat.component': null
+      'com.redhat.license_terms': null
+      'io.buildah.version': null
+      'io.cekit.version': null
+      'org.jboss.product': null
+      'org.jboss.product.openjdk.version': null
+      'org.jboss.product.version': null
+
+      vendor: FwMotion.com
+      maintainer: 'Robert Grimm <rgrimm@redhat.org>'
+      name: fwmotion/${quarkus.application.name}
+      summary: >-
+        Image for running jobs to interact with the 3scale Developer Portal CMS
+      description: ${quarkus.container-image.labels.summary}
+      url: 'https://github.com/fwmotion/3scale-cms'
+
+      'io.k8s.display-name': 3scale CMS CLI Tool
+      'io.k8s.description': ${quarkus.container-image.labels.summary}
+      'org.opencontainers.image.description': ${quarkus.container-image.labels.description}
+
   log:
     console:
       format: '%s%e%n'
@@ -16,6 +40,7 @@ quarkus:
     min-level: TRACE
 
   jib:
+
     environment-variables:
       # Default to path /cms when in a container (otherwise defaults to .)
       THREESCALE_CMS_ROOT: /cms

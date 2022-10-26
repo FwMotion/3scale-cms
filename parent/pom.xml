@@ -8,7 +8,7 @@
 
   <groupId>com.fwmotion</groupId>
   <artifactId>3scale-cms-tools-parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools (parent)</name>
@@ -18,6 +18,8 @@
   ]]></description>
 
   <properties>
+    <quarkus.container-image.labels.version>${project.version}</quarkus.container-image.labels.version>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -30,8 +32,9 @@
 
     <!-- Maven First-party Plugins -->
     <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
-    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
+    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
+    <version.maven-release-plugin>3.0.0-M6</version.maven-release-plugin>
 
     <!-- Third-party Maven Plugins -->
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
@@ -53,7 +56,8 @@
     <version.apache-commons-io>2.11.0</version.apache-commons-io>
     <version.apache-commons-lang>3.12.0</version.apache-commons-lang>
     <version.apache-httpclient>4.5.13</version.apache-httpclient>
-    <version.jackson>2.14.0-rc2</version.jackson>
+    <version.jackson>2.13.4</version.jackson>
+    <version.jackson-databind>2.13.4.2</version.jackson-databind>
     <version.jakarta-annotation>1.3.5</version.jakarta-annotation>
     <version.jsr305>3.0.2</version.jsr305>
     <version.junit>5.8.2</version.junit>
@@ -65,6 +69,7 @@
     <version.swagger-annotations>1.6.5</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
     <version.threeten-jaxb>1.2</version.threeten-jaxb>
+    <version.woodstox>6.4.0</version.woodstox>
 
     <!-- Default options for plugins -->
     <default.dokka-srclink-base>
@@ -120,7 +125,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${version.jackson}</version>
+        <version>${version.jackson-databind}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -136,6 +141,11 @@
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jsr310</artifactId>
         <version>${version.jackson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.woodstox</groupId>
+        <artifactId>woodstox-core</artifactId>
+        <version>${version.woodstox}</version>
       </dependency>
       <dependency>
         <groupId>io.github.threeten-jaxb</groupId>
@@ -205,6 +215,14 @@
               <compilerArg>-Amapstruct.unmappedSourcePolicy=WARN</compilerArg>
               <compilerArg>-Amapstruct.unmappedTargetPolicy=ERROR</compilerArg>
             </compilerArgs>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>${version.maven-release-plugin}</version>
+          <configuration>
+            <tagNameFormat>v@{project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>

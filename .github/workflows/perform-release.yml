@@ -1,0 +1,90 @@
+name: Perform Release
+
+on:
+  workflow_dispatch: { }
+
+jobs:
+  build:
+    name: Build, Push, Tag Repo
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: Checkout 3scale CMS
+      uses: actions/checkout@v3
+
+    - name: Set Up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: 'maven'
+        settings-path: ${{ github.workspace }}
+        server-id: github
+
+    - name: Make repository_owner lowercase for container image group
+      id: repo-owner-string
+      uses: ASzc/change-string-case-action@v3
+      with:
+        string: ${{ github.repository_owner }}
+
+    - name: Make repository name lowercase for container image name
+      id: repo-name-string
+      uses: ASzc/change-string-case-action@v3
+      with:
+        string: ${{ github.event.repository.name }}
+
+    - name: Config Git User
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+
+    - name: Configure SCM Settings
+      run: >-
+        sed
+        -i
+        -e 's;<url>.*</url>;<url>${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }}</url>;'
+        -e 's;<connection>.*</connection>;<connection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</connection>;'
+        -e 's;<developerConnection>.*</developerConnection>;<developerConnection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</developerConnection>;'
+        pom.xml
+
+    - name: Prepare Maven Release (build code and image; push image)
+      run: >-
+        ./mvnw
+        --settings ${{ github.workspace }}/settings.xml
+        --batch-mode
+        release:prepare
+        -DcheckModificationExcludeList=pom.xml
+        -Dusername=${{ github.token }}
+        -Darguments='
+        --settings ${{ github.workspace }}/settings.xml
+        -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
+        -Dquarkus.jib.platforms=linux/amd64,linux/arm64
+        -Dquarkus.container-image.build=true
+        -Dquarkus.container-image.push=true
+        -Dquarkus.container-image.registry=ghcr.io
+        -Dquarkus.container-image.username=${{ github.actor }}
+        -Dquarkus.container-image.password=${{ github.token }}
+        -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
+        -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
+        -Dquarkus.container-image.additional-tags=latest
+        -Dquarkus.container-image.labels.name=${{ steps.repo-owner-string.outputs.lowercase }}/${{ steps.repo-name-string.outputs.lowercase }}
+        -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ github.sha }}
+        -Dquarkus.container-image.labels.vcs-type=git
+        -Dquarkus.container-image.labels.vcs-ref=${{ github.sha }}
+        '
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Perform Maven Release (deploy artifacts)
+      run: >-
+        ./mvnw
+        --settings ${{ github.workspace }}/settings.xml
+        --batch-mode
+        release:perform
+        -Dusername=${{ github.token }}
+        -Dgoals='deploy'
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
