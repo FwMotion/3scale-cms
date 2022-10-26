@@ -52,8 +52,10 @@ public class TopLevelCommand extends CommandBase {
         index = "1",
         paramLabel = "PROVIDER_DOMAIN",
         arity = "1",
-        description = "The base URL of the admin portal; for example: %n" +
-            "  https://3scale-admin.apps.example.com/"
+        description = {
+            "The base URL of the admin portal; for example:",
+            "https://3scale-admin.apps.example.com/"
+        }
     )
     private String providerDomain;
 
