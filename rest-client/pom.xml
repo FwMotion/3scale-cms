@@ -129,6 +129,8 @@
               </output>
               <skipValidateSpec>false</skipValidateSpec>
 
+              <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+
               <globalProperties>
                 <skipFormModel>false</skipFormModel>
               </globalProperties>

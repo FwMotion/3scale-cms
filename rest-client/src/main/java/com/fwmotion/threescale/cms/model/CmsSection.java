@@ -4,8 +4,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.time.OffsetDateTime;
+
 public class CmsSection implements CmsObject{
 
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private Integer id;
     private String systemName;
     private Integer parentId;
@@ -16,6 +20,24 @@ public class CmsSection implements CmsObject{
     @Override
     public ThreescaleObjectType getType() {
         return ThreescaleObjectType.SECTION;
+    }
+
+    @Override
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    @Override
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -86,6 +108,8 @@ public class CmsSection implements CmsObject{
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+            .append("createdAt", createdAt)
+            .append("updatedAt", updatedAt)
             .append("id", id)
             .append("systemName", systemName)
             .append("parentId", parentId)

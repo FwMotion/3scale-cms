@@ -19,3 +19,6 @@ quarkus:
     enable-http-url-handler: true
     enable-https-url-handler: true
 
+  jib:
+    environment-variables:
+      THREESCALE_CMS_ROOT: /cms

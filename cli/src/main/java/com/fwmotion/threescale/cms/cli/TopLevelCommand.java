@@ -8,6 +8,8 @@ import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,12 +67,18 @@ public class TopLevelCommand extends CommandBase {
     )
     private String accessToken;
 
+    @CommandLine.Option(
+        names = {"-d", "--directory"},
+        paramLabel = "DIRECTORY",
+        arity = "1",
+        description = "Specify local directory path for determining files " +
+            "to upload, download, or compare between local filesystem and " +
+            "3scale CMS content"
+    )
+    private File rootDirectory;
+
     private ThreescaleCmsClientFactory factory;
     private List<CmsObject> cmsObjects;
-
-    public String getProviderDomain() {
-        return providerDomain;
-    }
 
     public ThreescaleCmsClient getClient() {
         if (factory == null) {
@@ -101,6 +109,27 @@ public class TopLevelCommand extends CommandBase {
             .findFirst()
             .map(cmsObj -> (CmsLayout) cmsObj)
             .orElseThrow(() -> new IllegalStateException("Couldn't find any layout to use as default"));
+    }
+
+    public String getProviderDomain() {
+        return providerDomain;
+    }
+
+    public File getRootDirectory() throws IOException {
+        if (rootDirectory == null) {
+            String threescaleCmsRoot = System.getenv("THREESCALE_CMS_ROOT");
+            if (StringUtils.isNotBlank(threescaleCmsRoot)) {
+                rootDirectory = new File(threescaleCmsRoot);
+            } else {
+                rootDirectory = new File(".");
+            }
+        }
+
+        if (!rootDirectory.getCanonicalFile().isDirectory()) {
+            throw new IllegalStateException("Specified root directory is not a directory");
+        }
+
+        return rootDirectory;
     }
 
 }
