@@ -94,7 +94,7 @@ The command should be invoked from the root directory of the folder where your l
 Invoke the `3scale-cms` command with the following:
 
 ```bash
-podman run --rm -it ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN <action> [parameter]
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN <action> [parameter]
 ```
 
 The `3scale-cms` command has five actions:

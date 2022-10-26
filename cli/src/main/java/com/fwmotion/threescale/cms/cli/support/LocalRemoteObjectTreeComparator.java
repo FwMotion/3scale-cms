@@ -100,7 +100,7 @@ public class LocalRemoteObjectTreeComparator {
         details.setLocalObjectsByCmsPath(localObjectsByCmsPath);
     }
 
-    private void calculateDiffs(LocalRemoteTreeComparisonDetails details) {
+    private void calculateDiffs(@Nonnull LocalRemoteTreeComparisonDetails details) {
         Set<String> remoteObjectsNewerThanLocal = new HashSet<>();
         Set<String> localObjectsNewerThanLocal = new HashSet<>();
         Set<String> remotePathsMissingInLocal = new HashSet<>();
@@ -112,7 +112,9 @@ public class LocalRemoteObjectTreeComparator {
             Pair<CmsObject, File> localFilePair = localObjects.remove(path);
 
             if (localFilePair == null) {
-                remotePathsMissingInLocal.add(path);
+                if (remoteEntry.getValue().getType() != ThreescaleObjectType.SECTION) {
+                    remotePathsMissingInLocal.add(path);
+                }
             } else {
                 if (remoteEntry.getValue().getType() == localFilePair.getLeft().getType()
                     && remoteEntry.getValue().getType() == ThreescaleObjectType.SECTION) {
