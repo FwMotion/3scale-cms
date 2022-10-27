@@ -8,12 +8,12 @@ import javax.inject.Inject;
 
 @CommandLine.Command(
     headerHeading = "%n",
-    synopsisHeading = "%n@|red,bold USAGE|@%n    ",
-    parameterListHeading = "%n@|red,bold PARAMETERS|@%n",
-    descriptionHeading = "%n@|red,bold DESCRIPTION|@%n    ",
-    optionListHeading = "%n@|red,bold OPTIONS|@%n",
+    synopsisHeading = "%n@|green,bold USAGE|@%n    ",
+    parameterListHeading = "%n@|green,bold PARAMETERS|@%n",
+    descriptionHeading = "%n@|green,bold DESCRIPTION|@%n    ",
+    optionListHeading = "%n@|green,bold OPTIONS|@%n",
     synopsisSubcommandLabel = "[SUBCOMMAND]",
-    commandListHeading = "%n@|red,bold SUBCOMMANDS|@%n",
+    commandListHeading = "%n@|green,bold SUBCOMMANDS|@%n",
     abbreviateSynopsis = true,
     mixinStandardHelpOptions = true,
     showDefaultValues = true,
