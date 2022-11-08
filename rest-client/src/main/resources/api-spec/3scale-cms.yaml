@@ -20,14 +20,30 @@ paths:
       - Files
       parameters:
       - name: page
-        description: TODO
+        description: |
+          The number for the page of results to retrieve, starting from page 1;
+          defautls to 1
         schema:
           type: integer
+          minimum: 1
+          default: 1
         in: query
+        required: false
       - name: per_page
-        description: TODO
+        description: |
+          The number of items to retrieve per page of results; defaults to 20
         schema:
           type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        required: false
+        in: query
+      - name: section_id
+        description: The section to query for files (hidden option in CMS API)
+        schema:
+          $ref: '#/components/schemas/SectionId'
+        required: false
         in: query
       responses:
         '200':
@@ -40,7 +56,7 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/FileUpdatableFields'
+              $ref: '#/components/schemas/FileCreationRequest'
         required: true
       tags:
       - Files
@@ -96,14 +112,24 @@ paths:
       - Sections
       parameters:
       - name: page
-        description: TODO
+        description: |
+          The number for the page of results to retrieve, starting from page 1;
+          defautls to 1
         schema:
           type: integer
+          minimum: 1
+          default: 1
         in: query
+        required: false
       - name: per_page
-        description: TODO
+        description: |
+          The number of items to retrieve per page of results; defaults to 20
         schema:
           type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        required: false
         in: query
       responses:
         '200':
@@ -111,6 +137,21 @@ paths:
       operationId: list-sections
       summary: List Sections
       description: List sections held within the 3scale CMS
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SectionCreationRequest'
+        required: true
+      tags:
+      - Sections
+      responses:
+        '201':
+          $ref: '#/components/responses/SectionResponse'
+      operationId: create-section
+      summary: Create Section
+      description: Create section within the 3scale CMS
   '/admin/api/cms/sections/{section_id}.xml':
     get:
       tags:
@@ -122,6 +163,12 @@ paths:
       summary: Get Section
       description: Get section descriptor
     put:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SectionUpdatableFields'
+        required: true
       tags:
       - Sections
       responses:
@@ -145,20 +192,70 @@ paths:
         $ref: '#/components/schemas/SectionId'
       in: path
       required: true
+  '/admin/api/cms/sections/{system_name}.xml':
+    get:
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/SectionResponse'
+      operationId: get-section-by-system-name
+      summary: Get Section by System Name
+      description: Get section descriptor
+    put:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SectionUpdatableFields'
+        required: true
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/SectionResponse'
+      operationId: update-section-by-system-name
+      summary: Update Section by System Name
+      description: Update section descriptor
+    delete:
+      tags:
+      - Sections
+      responses:
+        '200':
+          $ref: '#/components/responses/EmptyResponse'
+      operationId: delete-section-by-system-name
+      summary: Delete Section by System Name
+      description: Delete a section from 3scale CMS
+    parameters:
+    - name: system_name
+      schema:
+        $ref: '#/components/schemas/SystemName'
+      in: path
+      required: true
   /admin/api/cms/templates.xml:
     get:
       tags:
       - Templates
       parameters:
       - name: page
-        description: TODO
+        description: |
+          The number for the page of results to retrieve, starting from page 1;
+          defaults to 1
         schema:
           type: integer
+          minimum: 1
+          default: 1
         in: query
+        required: false
       - name: per_page
-        description: TODO
+        description: |
+          The number of items to retrieve per page of results; defaults to 20
         schema:
           type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+        required: false
         in: query
       responses:
         '200':
@@ -166,6 +263,21 @@ paths:
       operationId: list-templates
       summary: List Templates
       description: List all templates contained in the 3scale CMS
+    post:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TemplateCreationRequest'
+        required: true
+      tags:
+      - Templates
+      responses:
+        '201':
+          $ref: '#/components/responses/TemplateResponse'
+      operationId: create-template
+      summary: Create Template
+      description: Create template with the 3scale CMS
   '/admin/api/cms/templates/{template_id}.xml':
     get:
       tags:
@@ -177,6 +289,12 @@ paths:
       summary: Get Template
       description: 'Retrieve a template of any kind from 3scale (TODO: double-check response)'
     put:
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TemplateUpdatableFields'
+        required: true
       tags:
       - Templates
       responses:
@@ -219,7 +337,8 @@ paths:
   /admin/api/provider.xml:
     get:
       operationId: read-provider-settings
-      summary: |
+      summary: Read 3scale Provider Settings
+      description: |
         Read 3scale Provider (Tenant) settings; particularly related to
         the developer portal.
 
@@ -239,14 +358,17 @@ components:
       - properties:
           path:
             type: string
+            maxLength: 255
           hidden:
             type: boolean
           layout:
             type: string
+            maxLength: 255
           title:
             type: string
+            maxLength: 255
           system_name:
-            type: string
+            $ref: '#/components/schemas/SystemName'
       xml:
         name: builtin_page
     BuiltinPartial:
@@ -254,7 +376,7 @@ components:
       - $ref: '#/components/schemas/TemplateCommon'
       - properties:
           system_name:
-            type: string
+            $ref: '#/components/schemas/SystemName'
       xml:
         name: builtin_page
       example: |-
@@ -267,6 +389,20 @@ components:
             <handler/>
             <liquid_enabled>true</liquid_enabled>
         </builtin_partial>
+    EnumHandler:
+      description: Handler type for rendering templates.
+      type: string
+      enum:
+      - markdown
+      - textile
+      maxLength: 255
+    EnumTemplateType:
+      description: Type of `Template` for creation requests
+      type: string
+      enum:
+      - page
+      - layout
+      - partial
     File:
       description: File as held in the 3scale CMS
       allOf:
@@ -303,17 +439,31 @@ components:
             <tag_list></tag_list>
             <title>desk.jpg</title>
         </file>
+    FileCreationRequest:
+      required:
+      - section_id
+      - path
+      - attachment
+      allOf:
+      - $ref: '#/components/schemas/FileUpdatableFields'
     FileId:
+      description: Unique identifier for a `File` object
       type: integer
       example: '9'
     FileList:
-      description: List of files
-      type: array
-      items:
-        $ref: '#/components/schemas/File'
+      description: List of `File` objects
+      allOf:
+      - $ref: '#/components/schemas/ListPaginationAttributes'
+      - properties:
+          files:
+            type: array
+            items:
+              $ref: '#/components/schemas/File'
+            xml:
+              name: file
+              wrapped: false
       xml:
         name: files
-        wrapped: true
       example: |-
         <?xml version="1.0" encoding="UTF-8"?>
         <files>
@@ -422,8 +572,9 @@ components:
         path:
           description: |
             The path from which the file is retrieved from the 3scale Developer
-            Portal
+            Portal. Must be unique across all CMS objects
           type: string
+          maxLength: 255
         tag_list:
           description: Comma-separated list of tags
           type: string
@@ -431,17 +582,18 @@ components:
           description: |
             Flag indicating whether the file will be returned from the Developer
             Portal with headers indicating it is intended to be downloaded
-          default: false
           type: boolean
+          default: false
         attachment:
-          format: binary
+          description: The full contents of the file
           type: string
+          format: byte
     Layout:
       allOf:
       - $ref: '#/components/schemas/TemplateCommon'
       - properties:
           system_name:
-            type: string
+            $ref: '#/components/schemas/SystemName'
       xml:
         name: layout
       example: |-
@@ -458,18 +610,22 @@ components:
     ListPaginationAttributes:
       properties:
         per_page:
+          description: The number of items returned per page
           type: integer
           xml:
             attribute: true
         total_entries:
+          description: The total number of items available
           type: integer
           xml:
             attribute: true
         total_pages:
+          description: The total number of pages available
           type: integer
           xml:
             attribute: true
         current_page:
+          description: The current page number, starting from 1
           type: integer
           xml:
             attribute: true
@@ -478,13 +634,19 @@ components:
       - $ref: '#/components/schemas/TemplateCommon'
       - properties:
           path:
+            description: |
+              The path to which this template will be retrieved when browsing
+              the developer portal
             type: string
+            maxLength: 255
           hidden:
             type: boolean
           layout:
             type: string
+            maxLength: 255
           title:
             type: string
+            maxLength: 255
       xml:
         name: page
       example: |-
@@ -506,7 +668,7 @@ components:
       - $ref: '#/components/schemas/TemplateCommon'
       - properties:
           system_name:
-            type: string
+            $ref: '#/components/schemas/SystemName'
       xml:
         name: partial
       example: |-
@@ -772,25 +934,22 @@ components:
       example: 3
     Section:
       description: Section within 3scale CMS
-      properties:
-        id:
-          $ref: '#/components/schemas/SectionId'
-        created_at:
-          format: date-time
-          type: string
-        updated_at:
-          format: date-time
-          type: string
-        partial_path:
-          type: string
-        public:
-          type: boolean
-        title:
-          type: string
-        parent_id:
-          $ref: '#/components/schemas/SectionId'
-        system_name:
-          type: string
+      allOf:
+      - $ref: '#/components/schemas/SectionUpdatableFields'
+      - properties:
+          id:
+            $ref: '#/components/schemas/SectionId'
+          created_at:
+            format: date-time
+            type: string
+          updated_at:
+            format: date-time
+            type: string
+          partial_path:
+            type: string
+            maxLength: 255
+          system_name:
+            $ref: '#/components/schemas/SystemName'
       xml:
         name: section
       example: |-
@@ -804,10 +963,22 @@ components:
             <parent_id/>
             <system_name>root</system_name>
         </section>
+    SectionCreationRequest:
+      description: Request fields for creation of Sections
+      allOf:
+      - $ref: '#/components/schemas/SectionUpdatableFields'
+      - properties:
+          partial_path:
+            type: string
+            maxLength: 255
+          system_name:
+            $ref: '#/components/schemas/SystemName'
     SectionId:
+      description: Unique identifier for a `Section`
       type: integer
       example: '30'
     SectionList:
+      description: List of sections
       allOf:
       - $ref: '#/components/schemas/ListPaginationAttributes'
       - properties:
@@ -1024,6 +1195,23 @@ components:
                 <system_name>search</system_name>
             </section>
         </sections>
+    SectionUpdatableFields:
+      description: Fields that may be modified after section creation
+      properties:
+        public:
+          description: Whether the section is viewable by users not logged in
+          type: boolean
+        title:
+          description: |
+            Title of the section; must be unique within parent section.
+          type: string
+          maxLength: 255
+        parent_id:
+          $ref: '#/components/schemas/SectionId'
+    SystemName:
+      description: Unique name for an object in 3scale CMS
+      type: string
+      maxLength: 255
     Template:
       oneOf:
       - $ref: '#/components/schemas/BuiltinPage'
@@ -1043,15 +1231,36 @@ components:
           format: date-time
           type: string
         content_type:
+          description: |
+            How the template should be described to web browsers with the
+            Content-Type header
           type: string
+          maxLength: 255
         handler:
-          type: string
+          $ref: '#/components/schemas/EnumHandler'
         liquid_enabled:
+          description: |
+            Boolean flag to indicate whether the template should be populated
+            by the Liquid templating system prior to rendering with `handler`
           type: boolean
         draft:
+          description: |
+            Full content of the template as held in draft mode. When published,
+            this will be blank.
           type: string
+          maxLength: 16777215
         published:
+          description: Full content of the template as held in published mode.
           type: string
+          maxLength: 16777215
+    TemplateCreationRequest:
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/TemplateUpdatableFields'
+      - properties:
+          type:
+            $ref: '#/components/schemas/EnumTemplateType'
     TemplateId:
       type: integer
       example: '119'
@@ -1326,6 +1535,32 @@ components:
                 <liquid_enabled>true</liquid_enabled>
             </builtin_partial>
         </templates>
+    TemplateUpdatableFields:
+      properties:
+        system_name:
+          $ref: '#/components/schemas/SystemName'
+        title:
+          type: string
+          maxLength: 255
+        path:
+          type: string
+          maxLength: 255
+        draft:
+          type: string
+          maxLength: 16777215
+        section_id:
+          $ref: '#/components/schemas/SectionId'
+        layout_name:
+          type: string
+        layout_id:
+          $ref: '#/components/schemas/TemplateId'
+        liquid_enabled:
+          type: boolean
+        handler:
+          $ref: '#/components/schemas/EnumHandler'
+        content_type:
+          type: string
+          maxLength: 255
   responses:
     EmptyResponse:
       content:
@@ -1347,7 +1582,7 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/FileList'
-      description: Response containing a list of files
+      description: Response containing a list of `File`s
     ProviderAccountResponse:
       content:
         application/xml:
@@ -1359,7 +1594,7 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/SectionList'
-      description: Response containing a list of `File`s
+      description: Response containing a list of `Section`s
     TemplateResponse:
       content:
         application/xml:

@@ -31,6 +31,7 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
             try {
                 httpClient.close();
             } catch (IOException e) {
+                // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
                 throw new IllegalStateException("Couldn't close old HTTP client", e);
             }
         }
@@ -49,6 +50,7 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
                         .build();
                 } catch (NoSuchAlgorithmException | KeyManagementException |
                          KeyStoreException e) {
+                    // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
                     throw new IllegalStateException("Unable to create insecure HttpClient", e);
                 }
             } else {
@@ -71,6 +73,7 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
             Authentication accessTokenAuth = apiClient.getAuthentication("access_token");
             ((ApiKeyAuth) accessTokenAuth).setApiKey(accessToken);
         } else {
+            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
             throw new IllegalStateException("Authentication not set for 3scale CMS client; must provide one of: providerKey, accessToken");
         }
 

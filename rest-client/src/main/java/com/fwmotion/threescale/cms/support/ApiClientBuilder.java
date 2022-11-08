@@ -1,9 +1,11 @@
 package com.fwmotion.threescale.cms.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fwmotion.threescale.cms.mixins.FileListMixIn;
 import com.fwmotion.threescale.cms.mixins.SectionListMixIn;
 import com.fwmotion.threescale.cms.mixins.TemplateListMixIn;
 import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
+import com.redhat.threescale.rest.cms.model.FileList;
 import com.redhat.threescale.rest.cms.model.SectionList;
 import com.redhat.threescale.rest.cms.model.TemplateList;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -30,6 +32,7 @@ public final class ApiClientBuilder {
      */
     static void applyMixIns(ObjectMapper objectMapper) {
         objectMapper.addMixIn(SectionList.class, SectionListMixIn.class);
+        objectMapper.addMixIn(FileList.class, FileListMixIn.class);
         objectMapper.addMixIn(TemplateList.class, TemplateListMixIn.class);
     }
 

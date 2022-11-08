@@ -28,7 +28,7 @@ import java.util.List;
         DeleteCommand.class,
     },
     synopsisSubcommandLabel = "[COMMAND] ",
-    commandListHeading = "%n@|red,bold COMMANDS|@%n"
+    commandListHeading = "%n@|green,bold COMMANDS|@%n"
 )
 public class TopLevelCommand extends CommandBase {
 

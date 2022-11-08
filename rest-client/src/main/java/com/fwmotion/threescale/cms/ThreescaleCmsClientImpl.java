@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.mapstruct.factory.Mappers;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -85,6 +86,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
             return Optional.of(response.getEntity().getContent());
         } catch (IOException e) {
+            // TODO: Create ThreescaleCmsException and throw it instead of ApiException
             throw new ApiException(e);
         }
     }
@@ -126,73 +128,175 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     public void save(@Nonnull CmsSection section) throws ApiException {
         Section restSection = SECTION_MAPPER.toRest(section);
         if (section.getId() == null) {
-            // TODO: Add createSection to OpenAPI spec
+            sectionsApi.createSection(
+                restSection.getPublic(),
+                restSection.getTitle(),
+                restSection.getParentId(),
+                restSection.getPartialPath(),
+                restSection.getSystemName());
         } else {
-            // TODO: Add update parameters
-            sectionsApi.updateSection(restSection.getId());
+            sectionsApi.updateSection(restSection.getId(),
+                restSection.getPublic(),
+                restSection.getTitle(),
+                restSection.getParentId());
         }
     }
 
     @Override
-    public void save(@Nonnull CmsFile file, @Nonnull InputStream fileContent) throws ApiException {
+    public void save(@Nonnull CmsFile file, @Nullable InputStream fileContent) throws ApiException {
         ModelFile restFile = FILE_MAPPER.toRest(file);
+
+        byte[] attachment;
+        if (fileContent == null) {
+            attachment = null;
+        } else {
+            try {
+                attachment = IOUtils.toByteArray(fileContent);
+            } catch (IOException e) {
+                // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
+                throw new RuntimeException(e);
+            }
+        }
+
         if (file.getId() == null) {
             filesApi.createFile(
                 restFile.getSectionId(),
                 restFile.getPath(),
+                attachment,
                 restFile.getTagList(),
-                restFile.getDownloadable(),
-                // TODO: Send data as "attachment" here
-                null);
+                restFile.getDownloadable());
         } else {
             filesApi.updateFile(file.getId(),
                 restFile.getSectionId(),
                 restFile.getPath(),
                 restFile.getTagList(),
                 restFile.getDownloadable(),
-                // TODO: Send data as "attachment" here
-                null);
+                attachment);
         }
     }
 
     @Override
-    public void save(@Nonnull CmsTemplate template, @Nonnull InputStream templateDraft) throws ApiException {
-        // TODO: Does saving over builtins do something? should it be supported?
-        // TODO: do something with template draft
-        if (template instanceof CmsLayout) {
-            saveLayout(TEMPLATE_MAPPER.toRestLayout((CmsLayout) template));
+    public void save(@Nonnull CmsTemplate template, @Nullable InputStream templateDraft) throws ApiException {
+        if (template instanceof CmsBuiltinPage) {
+            saveBuiltinPage((CmsBuiltinPage) template, templateDraft);
+        } else if (template instanceof CmsBuiltinPartial) {
+            saveBuiltinPartial((CmsBuiltinPartial) template, templateDraft);
+        } else if (template instanceof CmsLayout) {
+            saveLayout((CmsLayout) template, templateDraft);
         } else if (template instanceof CmsPage) {
-            savePage(TEMPLATE_MAPPER.toRestPage((CmsPage) template));
+            savePage((CmsPage) template, templateDraft);
         } else if (template instanceof CmsPartial) {
-            savePartial(TEMPLATE_MAPPER.toRestPartial((CmsPartial) template));
+            savePartial((CmsPartial) template, templateDraft);
         }
     }
 
-    private void saveLayout(Layout layout) throws ApiException {
-        if (layout.getId() == null) {
-            // TODO: Add create to OpenAPI spec
-        } else {
-            // TODO: Add update parameters to OpenAPI spec
-            templatesApi.updateTemplate(layout.getId());
-        }
-    }
-
-    private void savePage(Page page) throws ApiException {
+    private void saveBuiltinPage(@Nonnull CmsBuiltinPage page, @Nullable InputStream templateDraft) throws ApiException {
         if (page.getId() == null) {
-            // TODO: Add create to OpenAPI spec
+            throw new IllegalArgumentException("Built-in pages cannot be created.");
+        }
+
+        saveUpdatedTemplate(page.getId(),
+            TEMPLATE_MAPPER.toRestBuiltinPage(page),
+            templateDraft);
+    }
+
+    private void saveBuiltinPartial(@Nonnull CmsBuiltinPartial partial, @Nullable InputStream templateDraft) throws ApiException {
+        if (partial.getId() == null) {
+            throw new IllegalArgumentException("Built-in partials cannot be created.");
+        }
+
+        saveUpdatedTemplate(partial.getId(),
+            TEMPLATE_MAPPER.toRestBuiltinPartial(partial),
+            templateDraft);
+    }
+
+    private void saveLayout(@Nonnull CmsLayout layout, @Nullable InputStream templateDraft) throws ApiException {
+        if (layout.getId() == null) {
+            saveNewTemplate(
+                TEMPLATE_MAPPER.toRestLayoutCreation(layout),
+                templateDraft);
         } else {
-            // TODO: Add update parameters to OpenAPI spec
-            templatesApi.updateTemplate(page.getId());
+            saveUpdatedTemplate(layout.getId(),
+                TEMPLATE_MAPPER.toRestLayoutUpdate(layout),
+                templateDraft);
         }
     }
 
-    private void savePartial(Partial partial) throws ApiException {
-        if (partial.getId() == null) {
-            // TODO: Add create to OpenAPI spec
+    private void savePage(@Nonnull CmsPage page, @Nullable InputStream templateDraft) throws ApiException {
+        if (page.getId() == null) {
+            saveNewTemplate(
+                TEMPLATE_MAPPER.toRestPageCreation(page), templateDraft);
         } else {
-            // TODO: Add update parameters to OpenAPI spec
-            templatesApi.updateTemplate(partial.getId());
+            saveUpdatedTemplate(page.getId(),
+                TEMPLATE_MAPPER.toRestPageUpdate(page),
+                templateDraft);
         }
+    }
+
+    private void savePartial(@Nonnull CmsPartial partial, @Nullable InputStream templateDraft) throws ApiException {
+        if (partial.getId() == null) {
+            saveNewTemplate(
+                TEMPLATE_MAPPER.toRestPartialCreation(partial),
+                templateDraft);
+        } else {
+            saveUpdatedTemplate(partial.getId(),
+                TEMPLATE_MAPPER.toRestPartialUpdate(partial),
+                templateDraft);
+        }
+    }
+
+    private void saveNewTemplate(@Nonnull TemplateCreationRequest template, @Nullable InputStream templateDraft) throws ApiException {
+        if (templateDraft == null) {
+            throw new IllegalArgumentException("New template must have draft content");
+        }
+
+        String draft;
+        try {
+            draft = IOUtils.toString(templateDraft, Charset.defaultCharset());
+        } catch (IOException e) {
+            // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
+            throw new RuntimeException(e);
+        }
+
+        templatesApi.createTemplate(template.getType(),
+            template.getSystemName(),
+            template.getTitle(),
+            template.getPath(),
+            draft,
+            template.getSectionId(),
+            template.getLayoutName(),
+            template.getLayoutId(),
+            template.getLiquidEnabled(),
+            template.getHandler(),
+            template.getContentType());
+
+    }
+
+    private void saveUpdatedTemplate(int id, @Nonnull TemplateUpdatableFields template, @Nullable InputStream templateDraft) throws ApiException {
+
+        String draft;
+        if (templateDraft == null) {
+            draft = null;
+        } else {
+            try {
+                draft = IOUtils.toString(templateDraft, Charset.defaultCharset());
+            } catch (IOException e) {
+                // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
+                throw new RuntimeException(e);
+            }
+        }
+
+        templatesApi.updateTemplate(id,
+            template.getSystemName(),
+            template.getTitle(),
+            template.getPath(),
+            draft,
+            template.getSectionId(),
+            template.getLayoutName(),
+            template.getLayoutId(),
+            template.getLiquidEnabled(),
+            template.getHandler(),
+            template.getContentType());
     }
 
     @Override

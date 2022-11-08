@@ -109,7 +109,8 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
                                           @Nonnull Supplier<Integer> getTotalEntries) {
         int currentPage = Optional.ofNullable(getCurrentPage.get())
             .orElse(pageNumber);
-        int totalPages = Optional.ofNullable(getTotalPages.get())
+        Optional<Integer> totalPagesOptional = Optional.ofNullable(getTotalPages.get());
+        int totalPages = totalPagesOptional
             .orElse(Integer.MAX_VALUE);
         int perPage = Optional.ofNullable(getPerPage.get())
             .orElse(pageSize);
@@ -117,7 +118,8 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
         int expectedPageSize;
         if (currentPage > totalPages) {
             expectedPageSize = 0;
-        } else if (currentPage == totalPages) {
+        } else if (totalPagesOptional.isEmpty()
+            || currentPage == totalPages) {
             expectedPageSize = Optional.ofNullable(getTotalEntries.get())
                 .map(totalEntries -> totalEntries % perPage)
                 .orElseGet(resultPage::size);
