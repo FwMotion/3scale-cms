@@ -63,6 +63,7 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
 
             return resultPage;
         } catch (ApiException e) {
+            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
             throw new IllegalStateException("Unexpected exception while iterating CMS section list page " + pageNumber
                 + " (with page size of " + pageSize + ")", e);
         }

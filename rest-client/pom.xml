@@ -187,6 +187,7 @@
                 <disallowAdditionalPropertiesIfNotPresent>
                   false
                 </disallowAdditionalPropertiesIfNotPresent>
+                <enumUnknownDefaultCase>true</enumUnknownDefaultCase>
                 <sortModelPropertiesByRequiredFlag>
                   false
                 </sortModelPropertiesByRequiredFlag>

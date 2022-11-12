@@ -11,6 +11,7 @@ public class CmsPage implements CmsTemplate {
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
     private Integer id;
+    private Integer sectionId;
     private String contentType;
     private String handler;
     private Boolean liquidEnabled;
@@ -44,6 +45,14 @@ public class CmsPage implements CmsTemplate {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getSectionId() {
+        return sectionId;
+    }
+
+    public void setSectionId(Integer sectionId) {
+        this.sectionId = sectionId;
     }
 
     public String getContentType() {
