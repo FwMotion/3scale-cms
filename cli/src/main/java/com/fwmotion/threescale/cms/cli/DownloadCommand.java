@@ -2,11 +2,14 @@ package com.fwmotion.threescale.cms.cli;
 
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
-import com.fwmotion.threescale.cms.model.*;
+import com.fwmotion.threescale.cms.cli.support.PathRecursionSupport;
+import com.fwmotion.threescale.cms.model.CmsFile;
+import com.fwmotion.threescale.cms.model.CmsObject;
+import com.fwmotion.threescale.cms.model.CmsSection;
+import com.fwmotion.threescale.cms.model.CmsTemplate;
 import io.quarkus.logging.Log;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine;
 
@@ -18,10 +21,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @CommandLine.Command(
     header = "Download 3scale CMS Content",
@@ -31,16 +31,12 @@ import java.util.stream.Stream;
 )
 public class DownloadCommand extends CommandBase implements Callable<Integer> {
 
-    private static final Map<Class<? extends CmsObject>, Function<? super CmsObject, Integer>> GET_PARENT_ID_FUNCTIONS =
-        Map.of(
-            // TODO: See if there's a way to get section ID / parent ID from
-            //       other object types
-            CmsFile.class, file -> ((CmsFile) file).getSectionId(),
-            CmsSection.class, section -> ((CmsSection) section).getParentId()
-        );
 
     @Inject
     LocalRemoteObjectTreeComparator localRemoteObjectTreeComparator;
+
+    @Inject
+    PathRecursionSupport pathRecursionSupport;
 
     @CommandLine.ArgGroup
     MutuallyExclusiveGroup exclusiveOptions;
@@ -93,74 +89,17 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
                 localPathsToDelete = Collections.emptySet();
             }
         } else {
-            List<String> downloadPaths = exclusiveOptions.individualFilesDownloadGroup.downloadPaths;
+            remotePathsToDownload = pathRecursionSupport.calculateSpecifiedPaths(
+                exclusiveOptions.individualFilesDownloadGroup.downloadPaths,
+                recursionStyle(),
+                remoteObjectsByPath);
 
-            Set<String> nonMatchingPaths = downloadPaths.stream()
-                .filter(Predicate.not(treeDetails.getRemoteObjectsByCmsPath()::containsKey))
-                .collect(Collectors.toSet());
-
-            if (!nonMatchingPaths.isEmpty()) {
-                throw new IllegalArgumentException("Paths do not exist in 3scale CMS: " + String.join(", ", nonMatchingPaths));
-            }
-
-            remotePathsToDownload = exclusiveOptions.individualFilesDownloadGroup.downloadPaths.stream()
-                .flatMap(pathKey -> {
-                    CmsObject parentObject = remoteObjectsByPath.get(pathKey);
-
-                    RecursionOption recurseBy = recursionStyle();
-
-                    if (recurseBy == RecursionOption.NONE
-                        || parentObject.getType() != ThreescaleObjectType.SECTION) {
-                        return Stream.of(pathKey);
-                    }
-
-                    if (recurseBy == RecursionOption.PATH_PREFIX) {
-                        return remoteObjectsByPath.keySet().stream()
-                            .filter(subKey -> StringUtils.startsWith(subKey, pathKey));
-                    }
-
-                    if (recurseBy == RecursionOption.PARENT_ID) {
-                        LinkedList<Pair<String, CmsObject>> recursingList = new LinkedList<>();
-                        recursingList.add(Pair.of(pathKey, parentObject));
-
-                        ListIterator<Pair<String, CmsObject>> treeWalker = recursingList.listIterator();
-
-                        while (treeWalker.hasNext()) {
-                            Pair<String, CmsObject> currentPair = treeWalker.next();
-                            CmsObject currentObject = currentPair.getRight();
-
-                            if (currentObject.getType() != ThreescaleObjectType.SECTION) {
-                                continue;
-                            }
-
-                            Integer parentId = currentObject.getId();
-
-                            int addedChildren = Math.toIntExact(
-                                remoteObjectsByPath.entrySet()
-                                    .stream()
-                                    .filter(childEntry -> {
-                                        CmsObject childObject = childEntry.getValue();
-                                        Integer childParentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(childObject.getClass(), o -> Integer.MIN_VALUE)
-                                            .apply(childObject);
-
-                                        return parentId.equals(childParentId);
-                                    })
-                                    .peek(e -> treeWalker.add(Pair.of(e)))
-                                    .count());
-
-                            for (int i = 0; i < addedChildren; i++) {
-                                treeWalker.previous();
-                            }
-                        }
-
-                        return recursingList.stream()
-                            .map(Pair::getKey);
-                    }
-
-                    return Stream.of(pathKey);
-                })
-                .collect(Collectors.toSet());
             localPathsToDelete = Collections.emptySet();
+        }
+
+        if (localPathsToDelete.isEmpty() && remotePathsToDownload.isEmpty()) {
+            Log.info("Nothing to do.");
+            return 0;
         }
 
         List<File> deleteFiles = localPathsToDelete.stream()
@@ -233,11 +172,11 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
             .orElse(false);
     }
 
-    private RecursionOption recursionStyle() {
+    private PathRecursionSupport.RecursionOption recursionStyle() {
         return Optional.ofNullable(exclusiveOptions)
             .map(options -> options.individualFilesDownloadGroup)
             .map(individualFilesDownloadGroup -> individualFilesDownloadGroup.recurseBy)
-            .orElse(RecursionOption.PATH_PREFIX);
+            .orElse(PathRecursionSupport.RecursionOption.PATH_PREFIX);
     }
 
     private void performDownload(@Nonnull CmsObject cmsObject,
@@ -315,12 +254,6 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         FileUtils.copyInputStreamToFile(fileContent, targetFile);
     }
 
-    private enum RecursionOption {
-        PARENT_ID,
-        PATH_PREFIX,
-        NONE
-    }
-
     private static class MutuallyExclusiveGroup {
 
         @CommandLine.ArgGroup(exclusive = false)
@@ -367,7 +300,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
             },
             defaultValue = "PATH_PREFIX"
         )
-        RecursionOption recurseBy;
+        PathRecursionSupport.RecursionOption recurseBy;
 
         @CommandLine.Parameters(
             paramLabel = "PATH",

@@ -63,6 +63,10 @@ paths:
       responses:
         '201':
           $ref: '#/components/responses/FileResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: create-file
       summary: Create File
       description: Create file within the 3scale CMS
@@ -88,6 +92,10 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/FileResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: update-file
       summary: Update File
       description: Update an existing file
@@ -149,6 +157,10 @@ paths:
       responses:
         '201':
           $ref: '#/components/responses/SectionResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: create-section
       summary: Create Section
       description: Create section within the 3scale CMS
@@ -174,6 +186,10 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: update-section
       summary: Update Section
       description: Update section descriptor
@@ -182,6 +198,8 @@ paths:
       - Sections
       responses:
         '200':
+          $ref: '#/components/responses/EmptyResponse'
+        '423':
           $ref: '#/components/responses/EmptyResponse'
       operationId: delete-section
       summary: Delete Section
@@ -214,6 +232,10 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: update-section-by-system-name
       summary: Update Section by System Name
       description: Update section descriptor
@@ -275,6 +297,10 @@ paths:
       responses:
         '201':
           $ref: '#/components/responses/TemplateResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: create-template
       summary: Create Template
       description: Create template with the 3scale CMS
@@ -300,6 +326,10 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
+        '422':
+          $ref: '#/components/responses/ErrorListResponse'
+        '500':
+          $ref: '#/components/responses/ErrorHashResponse'
       operationId: update-template
       summary: Update Template
       description: 'Update a template draft (TODO: double-check response)'
@@ -403,6 +433,33 @@ components:
       - page
       - layout
       - partial
+    Error:
+      description: |
+        Description of an individual error that occurred while processing
+        an event.
+      type: string
+      xml:
+        name: error
+    ErrorHash:
+      description: Unhandled server error on 3scale
+      properties:
+        status:
+          type: integer
+        toXml:
+          type: string
+          xml:
+            name: to_xml
+        error:
+          type: string
+      xml:
+        name: hash
+    ErrorList:
+      description: List of errors that occurred in processing a request
+      type: array
+      items:
+        $ref: '#/components/Error'
+      xml:
+        name: errors
     File:
       description: File as held in the 3scale CMS
       allOf:
@@ -587,13 +644,16 @@ components:
         attachment:
           description: The full contents of the file
           type: string
-          format: byte
+          format: binary
     Layout:
       allOf:
       - $ref: '#/components/schemas/TemplateCommon'
       - properties:
           system_name:
             $ref: '#/components/schemas/SystemName'
+          title:
+            description: Title for the layout
+            type: string
       xml:
         name: layout
       example: |-
@@ -1571,6 +1631,18 @@ components:
             minLength: 0
             type: string
       description: Response indicating successful deletion
+    ErrorHashResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorHash'
+      description: Response containing an `ErrorHash`
+    ErrorListResponse:
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+      description: Response containing an `ErrorList`
     FileResponse:
       content:
         application/xml:

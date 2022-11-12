@@ -5,7 +5,9 @@ import com.redhat.threescale.rest.cms.model.ModelFile;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,11 +26,19 @@ public interface CmsFileMapper {
     @Mapping(target = "attachment", ignore = true)
     ModelFile toRest(CmsFile file);
 
-    default Set<String> tagsFromRest(String tagList) {
+    default Set<String> tagsFromRest(@Nullable String tagList) {
+        if (tagList == null) {
+            return Collections.emptySet();
+        }
+
         return new HashSet<>(Arrays.asList(tagList.split("\\s*,\\s*")));
     }
 
-    default String tagsToRest(Set<String> tags) {
+    default String tagsToRest(@Nullable Set<String> tags) {
+        if (tags == null) {
+            return "";
+        }
+
         return String.join(",", tags);
     }
 

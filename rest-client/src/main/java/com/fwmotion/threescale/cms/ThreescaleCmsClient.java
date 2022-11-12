@@ -4,6 +4,7 @@ import com.fwmotion.threescale.cms.model.*;
 import com.redhat.threescale.rest.cms.ApiException;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -109,9 +110,9 @@ public interface ThreescaleCmsClient {
 
     void save(@Nonnull CmsSection section) throws ApiException;
 
-    void save(@Nonnull CmsFile file, @Nonnull InputStream fileContent) throws ApiException;
+    void save(@Nonnull CmsFile file, @Nonnull File fileContent) throws ApiException;
 
-    void save(@Nonnull CmsTemplate template, @Nonnull InputStream draft) throws ApiException;
+    void save(@Nonnull CmsTemplate template, @Nonnull File draft) throws ApiException;
 
     void publish(@Nonnull CmsTemplate template) throws ApiException;
 

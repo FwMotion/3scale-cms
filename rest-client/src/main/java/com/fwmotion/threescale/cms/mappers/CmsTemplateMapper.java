@@ -29,36 +29,35 @@ public interface CmsTemplateMapper {
     CmsLayout fromRestLayout(Layout layout);
 
     @Mapping(target = "type", constant = "LAYOUT")
+    @Mapping(target = "contentType", ignore = true)
     @Mapping(target = "draft", ignore = true)
     @Mapping(target = "layoutId", ignore = true)
     @Mapping(target = "layoutName", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "sectionId", ignore = true)
-    @Mapping(target = "title", ignore = true)
     TemplateCreationRequest toRestLayoutCreation(CmsLayout layout);
 
+    @Mapping(target = "contentType", ignore = true)
     @Mapping(target = "draft", ignore = true)
     @Mapping(target = "layoutId", ignore = true)
     @Mapping(target = "layoutName", ignore = true)
     @Mapping(target = "path", ignore = true)
     @Mapping(target = "sectionId", ignore = true)
-    @Mapping(target = "title", ignore = true)
     TemplateUpdatableFields toRestLayoutUpdate(CmsLayout layout);
 
+    @Mapping(target = "sectionId", ignore = true)
     CmsPage fromRestPage(Page page);
 
     @Mapping(target = "type", constant = "PAGE")
     @Mapping(target = "layoutName", source = "layout")
     @Mapping(target = "draft", ignore = true)
     @Mapping(target = "layoutId", ignore = true)
-    @Mapping(target = "sectionId", ignore = true)
     @Mapping(target = "systemName", ignore = true)
     TemplateCreationRequest toRestPageCreation(CmsPage page);
 
     @Mapping(target = "layoutName", source = "layout")
     @Mapping(target = "draft", ignore = true)
     @Mapping(target = "layoutId", ignore = true)
-    @Mapping(target = "sectionId", ignore = true)
     @Mapping(target = "systemName", ignore = true)
     TemplateUpdatableFields toRestPageUpdate(CmsPage page);
 
@@ -80,5 +79,24 @@ public interface CmsTemplateMapper {
     @Mapping(target = "sectionId", ignore = true)
     @Mapping(target = "title", ignore = true)
     TemplateUpdatableFields toRestPartialUpdate(CmsPartial partial);
+
+    default String mapHandlerFromRest(EnumHandler handler) {
+        if (handler == null
+            || handler == EnumHandler.UNKNOWN_DEFAULT_OPEN_API) {
+            return null;
+        }
+
+        return handler.getValue();
+    }
+
+    default EnumHandler mapHandlerToRest(String handlerName) {
+        EnumHandler enumHandler = EnumHandler.fromValue(handlerName);
+
+        if (enumHandler == EnumHandler.UNKNOWN_DEFAULT_OPEN_API) {
+            return null;
+        }
+
+        return enumHandler;
+    }
 
 }

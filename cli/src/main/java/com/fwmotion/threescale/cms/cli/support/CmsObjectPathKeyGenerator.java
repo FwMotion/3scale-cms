@@ -16,8 +16,9 @@ public class CmsObjectPathKeyGenerator {
     public static final String LAYOUT_FILENAME_PREFIX = "l_";
     public static final String PARTIAL_FILENAME_PREFIX = "_";
 
-    private static final String DEFAULT_HANDLER_SUFFIX = ".liquid";
+    private static final String DEFAULT_HANDLER_SUFFIX = "";
     private static final String DEFAULT_BUILTIN_PAGE_SUFFIX = ".html";
+    private static final String LIQUID_SUFFIX = ".liquid";
 
     private static final Map<String, String> CONTENT_TYPE_TO_FILE_EXT =
         Map.of(
@@ -70,7 +71,9 @@ public class CmsObjectPathKeyGenerator {
             pathBuilder.append(DEFAULT_HANDLER_SUFFIX);
         }
 
-        return pathBuilder.toString();
+        return pathBuilder
+            .append(LIQUID_SUFFIX)
+            .toString();
     }
 
     @Nonnull
@@ -93,7 +96,8 @@ public class CmsObjectPathKeyGenerator {
             .append(filenamePrefix)
             .append(pathSections[pathSections.length - 1])
             .append(".html")
-            .append(DEFAULT_HANDLER_SUFFIX);
+            .append(DEFAULT_HANDLER_SUFFIX)
+            .append(LIQUID_SUFFIX);
 
         return pathBuilder.toString();
     }
@@ -115,12 +119,14 @@ public class CmsObjectPathKeyGenerator {
             Log.warn("Unknown file extension for content-type \"" + cmsPage.getContentType() + "\"");
         }
 
+        if (StringUtils.isNotBlank(cmsPage.getHandler())) {
+            pathBuilder.append('.').append(cmsPage.getHandler());
+        } else {
+            pathBuilder.append(DEFAULT_HANDLER_SUFFIX);
+        }
+
         if (Boolean.TRUE == cmsPage.getLiquidEnabled()) {
-            if (StringUtils.isNotBlank(cmsPage.getHandler())) {
-                pathBuilder.append('.').append(cmsPage.getHandler());
-            } else {
-                pathBuilder.append(DEFAULT_HANDLER_SUFFIX);
-            }
+            pathBuilder.append(LIQUID_SUFFIX);
         }
 
         return pathBuilder.toString();

@@ -12,6 +12,7 @@ public class CmsLayout implements CmsTemplate {
     private OffsetDateTime updatedAt;
     private Integer id;
     private String systemName;
+    private String title;
     private String contentType;
     private String handler;
     private Boolean liquidEnabled;
@@ -49,6 +50,14 @@ public class CmsLayout implements CmsTemplate {
 
     public void setSystemName(String systemName) {
         this.systemName = systemName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getContentType() {

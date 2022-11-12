@@ -6,9 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -39,6 +41,10 @@ public class LocalFileCmsObjectGenerator {
         "text/html",
         "text/javascript",
         "text/plain"
+    );
+
+    private static final Set<String> REMOVE_FILEEXT_CONTENT_TYPES = Collections.singleton(
+        "text/html"
     );
 
     private static final Pattern LAYOUT_PREFIX_PATTERN = Pattern.compile("(?<path>.*/)" + CmsObjectPathKeyGenerator.LAYOUT_FILENAME_PREFIX + "(?<layoutname>[^/]+)");
@@ -99,7 +105,8 @@ public class LocalFileCmsObjectGenerator {
         Matcher matcher = FILE_SUFFIX_PATTERN.matcher(path);
         if (matcher.matches()) {
             String fileExt = StringUtils.trimToEmpty(matcher.group("fileext"));
-            setContentType.accept(FILE_EXT_TO_CONTENT_TYPE.getOrDefault(fileExt, DEFAULT_CONTENT_TYPE));
+            String contentType = FILE_EXT_TO_CONTENT_TYPE.getOrDefault(fileExt, DEFAULT_CONTENT_TYPE);
+            setContentType.accept(contentType);
 
             String handler = StringUtils.trimToEmpty(matcher.group("handler"));
             setHandler.accept(handler);
@@ -108,7 +115,13 @@ public class LocalFileCmsObjectGenerator {
                 setLiquidEnabled.accept(true);
             }
 
-            setPath.accept(matcher.group("filename"));
+            String filename = matcher.group("filename");
+            if (StringUtils.isNotBlank(fileExt)
+                && !REMOVE_FILEEXT_CONTENT_TYPES.contains(contentType)) {
+                filename += fileExt;
+            }
+
+            setPath.accept(filename);
         } else {
             setPath.accept(path);
         }
@@ -119,6 +132,13 @@ public class LocalFileCmsObjectGenerator {
                                                @Nonnull File file) {
         CmsSection section = new CmsSection();
 
+        String basename = file.toPath().getFileName().toString();
+        if ("/".equals(relativePath)) {
+            basename = "root";
+        }
+
+        section.setSystemName(basename);
+        section.setTitle(basename);
         section.setPath(relativePath.replaceAll("/+$", ""));
         section.setPublic(true);
         section.setUpdatedAt(calculateUpdatedAt(file));
@@ -148,6 +168,12 @@ public class LocalFileCmsObjectGenerator {
                 .replaceFirst("^/layouts/", "/")));
 
         layout.setUpdatedAt(calculateUpdatedAt(file));
+
+        String layoutTitle = layout.getSystemName().replaceAll("_", " ");
+        if (!StringUtils.endsWithIgnoreCase(layoutTitle, " layout")) {
+            layoutTitle += " layout";
+        }
+        layout.setTitle(layoutTitle);
 
         return layout;
     }
@@ -189,6 +215,12 @@ public class LocalFileCmsObjectGenerator {
             path -> page.setPath(path.replaceFirst("/index$", "/")));
 
         page.setUpdatedAt(calculateUpdatedAt(file));
+
+        if ("/".equals(page.getPath())) {
+            page.setTitle("Home");
+        } else {
+            page.setTitle(Path.of(page.getPath()).getFileName().toString());
+        }
 
         return page;
     }

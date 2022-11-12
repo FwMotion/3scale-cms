@@ -13,6 +13,7 @@ import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
 import com.redhat.threescale.rest.cms.model.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -23,6 +24,7 @@ import org.mapstruct.factory.Mappers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -128,12 +130,19 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     public void save(@Nonnull CmsSection section) throws ApiException {
         Section restSection = SECTION_MAPPER.toRest(section);
         if (section.getId() == null) {
-            sectionsApi.createSection(
+            if (StringUtils.isBlank(restSection.getTitle())
+                && StringUtils.isNotBlank(restSection.getSystemName())) {
+                restSection.setTitle(restSection.getSystemName());
+            }
+
+            Section response = sectionsApi.createSection(
                 restSection.getPublic(),
                 restSection.getTitle(),
                 restSection.getParentId(),
                 restSection.getPartialPath(),
                 restSection.getSystemName());
+
+            section.setId(response.getId());
         } else {
             sectionsApi.updateSection(restSection.getId(),
                 restSection.getPublic(),
@@ -143,40 +152,30 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     }
 
     @Override
-    public void save(@Nonnull CmsFile file, @Nullable InputStream fileContent) throws ApiException {
+    public void save(@Nonnull CmsFile file, @Nullable File fileContent) throws ApiException {
         ModelFile restFile = FILE_MAPPER.toRest(file);
 
-        byte[] attachment;
-        if (fileContent == null) {
-            attachment = null;
-        } else {
-            try {
-                attachment = IOUtils.toByteArray(fileContent);
-            } catch (IOException e) {
-                // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
-                throw new RuntimeException(e);
-            }
-        }
-
         if (file.getId() == null) {
-            filesApi.createFile(
+            ModelFile response = filesApi.createFile(
                 restFile.getSectionId(),
                 restFile.getPath(),
-                attachment,
+                fileContent,
                 restFile.getTagList(),
                 restFile.getDownloadable());
+
+            file.setId(response.getId());
         } else {
             filesApi.updateFile(file.getId(),
                 restFile.getSectionId(),
                 restFile.getPath(),
                 restFile.getTagList(),
                 restFile.getDownloadable(),
-                attachment);
+                fileContent);
         }
     }
 
     @Override
-    public void save(@Nonnull CmsTemplate template, @Nullable InputStream templateDraft) throws ApiException {
+    public void save(@Nonnull CmsTemplate template, @Nullable File templateDraft) throws ApiException {
         if (template instanceof CmsBuiltinPage) {
             saveBuiltinPage((CmsBuiltinPage) template, templateDraft);
         } else if (template instanceof CmsBuiltinPartial) {
@@ -190,7 +189,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         }
     }
 
-    private void saveBuiltinPage(@Nonnull CmsBuiltinPage page, @Nullable InputStream templateDraft) throws ApiException {
+    private void saveBuiltinPage(@Nonnull CmsBuiltinPage page, @Nullable File templateDraft) throws ApiException {
         if (page.getId() == null) {
             throw new IllegalArgumentException("Built-in pages cannot be created.");
         }
@@ -200,7 +199,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
             templateDraft);
     }
 
-    private void saveBuiltinPartial(@Nonnull CmsBuiltinPartial partial, @Nullable InputStream templateDraft) throws ApiException {
+    private void saveBuiltinPartial(@Nonnull CmsBuiltinPartial partial, @Nullable File templateDraft) throws ApiException {
         if (partial.getId() == null) {
             throw new IllegalArgumentException("Built-in partials cannot be created.");
         }
@@ -210,11 +209,13 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
             templateDraft);
     }
 
-    private void saveLayout(@Nonnull CmsLayout layout, @Nullable InputStream templateDraft) throws ApiException {
+    private void saveLayout(@Nonnull CmsLayout layout, @Nullable File templateDraft) throws ApiException {
         if (layout.getId() == null) {
-            saveNewTemplate(
+            Template response = saveNewTemplate(
                 TEMPLATE_MAPPER.toRestLayoutCreation(layout),
                 templateDraft);
+
+            layout.setId(response.getId());
         } else {
             saveUpdatedTemplate(layout.getId(),
                 TEMPLATE_MAPPER.toRestLayoutUpdate(layout),
@@ -222,10 +223,12 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         }
     }
 
-    private void savePage(@Nonnull CmsPage page, @Nullable InputStream templateDraft) throws ApiException {
+    private void savePage(@Nonnull CmsPage page, @Nullable File templateDraft) throws ApiException {
         if (page.getId() == null) {
-            saveNewTemplate(
+            Template response = saveNewTemplate(
                 TEMPLATE_MAPPER.toRestPageCreation(page), templateDraft);
+
+            page.setId(response.getId());
         } else {
             saveUpdatedTemplate(page.getId(),
                 TEMPLATE_MAPPER.toRestPageUpdate(page),
@@ -233,11 +236,13 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         }
     }
 
-    private void savePartial(@Nonnull CmsPartial partial, @Nullable InputStream templateDraft) throws ApiException {
+    private void savePartial(@Nonnull CmsPartial partial, @Nullable File templateDraft) throws ApiException {
         if (partial.getId() == null) {
-            saveNewTemplate(
+            Template response = saveNewTemplate(
                 TEMPLATE_MAPPER.toRestPartialCreation(partial),
                 templateDraft);
+
+            partial.setId(response.getId());
         } else {
             saveUpdatedTemplate(partial.getId(),
                 TEMPLATE_MAPPER.toRestPartialUpdate(partial),
@@ -245,20 +250,20 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         }
     }
 
-    private void saveNewTemplate(@Nonnull TemplateCreationRequest template, @Nullable InputStream templateDraft) throws ApiException {
+    private Template saveNewTemplate(@Nonnull TemplateCreationRequest template, @Nullable File templateDraft) throws ApiException {
         if (templateDraft == null) {
             throw new IllegalArgumentException("New template must have draft content");
         }
 
         String draft;
         try {
-            draft = IOUtils.toString(templateDraft, Charset.defaultCharset());
+            draft = FileUtils.readFileToString(templateDraft, Charset.defaultCharset());
         } catch (IOException e) {
             // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
             throw new RuntimeException(e);
         }
 
-        templatesApi.createTemplate(template.getType(),
+        return templatesApi.createTemplate(template.getType(),
             template.getSystemName(),
             template.getTitle(),
             template.getPath(),
@@ -272,21 +277,21 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     }
 
-    private void saveUpdatedTemplate(int id, @Nonnull TemplateUpdatableFields template, @Nullable InputStream templateDraft) throws ApiException {
+    private Template saveUpdatedTemplate(int id, @Nonnull TemplateUpdatableFields template, @Nullable File templateDraft) throws ApiException {
 
         String draft;
         if (templateDraft == null) {
             draft = null;
         } else {
             try {
-                draft = IOUtils.toString(templateDraft, Charset.defaultCharset());
+                draft = FileUtils.readFileToString(templateDraft, Charset.defaultCharset());
             } catch (IOException e) {
                 // TODO: Create ThreescaleCmsException and throw it instead of RuntimeException
                 throw new RuntimeException(e);
             }
         }
 
-        templatesApi.updateTemplate(id,
+        return templatesApi.updateTemplate(id,
             template.getSystemName(),
             template.getTitle(),
             template.getPath(),
@@ -305,8 +310,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     }
 
     @Override
-    public void delete(@Nonnull ThreescaleObjectType type, int id) throws
-        ApiException {
+    public void delete(@Nonnull ThreescaleObjectType type, int id) throws ApiException {
         switch (type) {
             case SECTION:
                 sectionsApi.deleteSection(id);
