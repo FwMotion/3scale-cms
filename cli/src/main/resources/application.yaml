@@ -18,7 +18,7 @@ quarkus:
       'org.jboss.product.version': null
 
       vendor: FwMotion.com
-      maintainer: 'Robert Grimm <rgrimm@redhat.org>'
+      maintainer: 'Robert Grimm <rgrimm@redhat.com>'
       name: fwmotion/${quarkus.application.name}
       summary: >-
         Image for running jobs to interact with the 3scale Developer Portal CMS

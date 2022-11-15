@@ -35,7 +35,7 @@ spec:
     - name: copy-default-cmsignore
       value: 'true'
     - name: 3scale-cms-command
-      value: diff details
+      value: upload --delete-missing
     workspaces:
     - name: source
       workspace: working-dir

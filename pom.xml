@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>3scale-cms-tools-aggregate</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools (aggregate)</name>
@@ -18,6 +19,10 @@
     Management System API, and to handle build ordering and aggregate test
     reporting
   ]]></description>
+
+  <properties>
+    <project.build.outputTimestamp>1</project.build.outputTimestamp>
+  </properties>
 
   <scm>
     <url>https://github.com/FwMotion/3scale-cms/tree/master</url>
