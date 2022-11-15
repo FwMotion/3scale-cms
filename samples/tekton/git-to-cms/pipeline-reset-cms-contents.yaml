@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: reset-cms-contents
+spec:
+  workspaces:
+  - name: working-dir
+    optional: false
+  - name: provider-details
+    optional: false
+  tasks:
+  - name: clone-default-contents
+    taskRef:
+      kind: ClusterTask
+      name: git-clone
+    params:
+    - name: url
+      value: https://github.com/3scale/porta.git
+    - name: revision
+      value: master
+    - name: sparseCheckoutDirectories
+      value: /lib/developer_portal/app/views/developer_portal
+    workspaces:
+    - name: output
+      workspace: working-dir
+  - name: upload-cms
+    runAfter:
+    - clone-default-contents
+    taskRef:
+      kind: Task
+      name: 3scale-cms
+    params:
+    - name: context-directory
+      value: /lib/developer_portal/app/views/developer_portal
+    - name: copy-default-cmsignore
+      value: 'true'
+    - name: 3scale-cms-command
+      value: diff details
+    workspaces:
+    - name: source
+      workspace: working-dir
+    - name: provider-details
+      workspace: provider-details

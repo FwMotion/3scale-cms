@@ -13,6 +13,23 @@
     related projects
   ]]></description>
 
+  <inceptionYear>2022</inceptionYear>
+
+  <developers>
+    <developer>
+      <id>rmgrimm</id>
+      <name>Robert Grimm</name>
+      <url>https://github.com/rmgrimm</url>
+      <timezone>America/Chicago</timezone>
+      <organization>Red Hat, Inc.</organization>
+      <organizationUrl>https://www.redhat.com</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
+
   <properties>
     <quarkus.container-image.labels.version>${project.version}</quarkus.container-image.labels.version>
 
