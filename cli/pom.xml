@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>3scale-cms-tools-cli</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (command-line interface)</name>
@@ -18,6 +19,10 @@
     System. It is recommended to use this via the native-mode compiled
     container image `ghcr.io/fwmotion/3scale-cms`.
   ]]></description>
+
+  <properties>
+    <project.build.outputTimestamp>1</project.build.outputTimestamp>
+  </properties>
 
   <dependencies>
     <dependency>

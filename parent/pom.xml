@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd          http://www.w3.org/2001/XMLSchema-instance https://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd          http://www.w3.org/2001/XMLSchema-instance https://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.fwmotion</groupId>
@@ -19,11 +21,13 @@
     <developer>
       <id>rmgrimm</id>
       <name>Robert Grimm</name>
+      <email>rgrimm@redhat.com</email>
       <url>https://github.com/rmgrimm</url>
       <timezone>America/Chicago</timezone>
       <organization>Red Hat, Inc.</organization>
       <organizationUrl>https://www.redhat.com</organizationUrl>
       <roles>
+        <role>maintainer</role>
         <role>architect</role>
         <role>developer</role>
       </roles>
@@ -31,21 +35,27 @@
   </developers>
 
   <properties>
-    <quarkus.container-image.labels.version>${project.version}</quarkus.container-image.labels.version>
+    <quarkus.container-image.labels.version>
+      ${project.version}
+    </quarkus.container-image.labels.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.outputTimestamp>1</project.build.outputTimestamp>
 
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
 
     <!-- Support Quarkus knowing about multi-module project -->
-    <quarkus.bootstrap.workspace-discovery>true</quarkus.bootstrap.workspace-discovery>
+    <quarkus.bootstrap.workspace-discovery>
+      true
+    </quarkus.bootstrap.workspace-discovery>
 
     <!-- Maven First-party Plugins -->
     <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
     <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
+    <version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
     <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
     <version.maven-release-plugin>3.0.0-M6</version.maven-release-plugin>
 
@@ -229,6 +239,11 @@
               <compilerArg>-Amapstruct.unmappedTargetPolicy=ERROR</compilerArg>
             </compilerArgs>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${version.maven-jar-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

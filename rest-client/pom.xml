@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>3scale-cms-rest-client</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (REST client library)</name>
@@ -19,6 +20,10 @@
     Access Token that has been granted permission to the Account Management
     API and the hidden Content Management API
   ]]></description>
+
+  <properties>
+    <project.build.outputTimestamp>1</project.build.outputTimestamp>
+  </properties>
 
   <dependencies>
     <!-- Other dependencies -->

@@ -4,12 +4,15 @@ on:
   workflow_dispatch: { }
 
 jobs:
-  build:
-    name: Build, Push, Tag Repo
+  build-deploy-maven:
+    name: Build and Deploy Maven
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
+
+    outputs:
+      release-sha: ${{ steps.release-sha.outputs.value }}
 
     steps:
     - name: Checkout 3scale CMS
@@ -19,29 +22,17 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '11'
-        distribution: 'temurin'
-        cache: 'maven'
+        distribution: temurin
+        cache: maven
         settings-path: ${{ github.workspace }}
         server-id: github
 
-    - name: Make repository_owner lowercase for container image group
-      id: repo-owner-string
-      uses: ASzc/change-string-case-action@v3
-      with:
-        string: ${{ github.repository_owner }}
-
-    - name: Make repository name lowercase for container image name
-      id: repo-name-string
-      uses: ASzc/change-string-case-action@v3
-      with:
-        string: ${{ github.event.repository.name }}
-
-    - name: Config Git User
+    - name: Configure Git User
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
 
-    - name: Configure SCM Settings
+    - name: Configure SCM Settings in POM
       run: >-
         sed
         -i
@@ -50,7 +41,7 @@ jobs:
         -e 's;<developerConnection>.*</developerConnection>;<developerConnection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</developerConnection>;'
         pom.xml
 
-    - name: Prepare Maven Release (build code and image; push image)
+    - name: Prepare Maven Release (build code)
       run: >-
         ./mvnw
         --settings ${{ github.workspace }}/settings.xml
@@ -58,22 +49,10 @@ jobs:
         release:prepare
         -DcheckModificationExcludeList=pom.xml
         -Dusername=${{ github.token }}
+        -DpreparationGoals='clean verify'
         -Darguments='
         --settings ${{ github.workspace }}/settings.xml
         -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
-        -Dquarkus.jib.platforms=linux/amd64,linux/arm64
-        -Dquarkus.container-image.build=true
-        -Dquarkus.container-image.push=true
-        -Dquarkus.container-image.registry=ghcr.io
-        -Dquarkus.container-image.username=${{ github.actor }}
-        -Dquarkus.container-image.password=${{ github.token }}
-        -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
-        -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
-        -Dquarkus.container-image.additional-tags=latest
-        -Dquarkus.container-image.labels.name=${{ steps.repo-owner-string.outputs.lowercase }}/${{ steps.repo-name-string.outputs.lowercase }}
-        -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ github.sha }}
-        -Dquarkus.container-image.labels.vcs-type=git
-        -Dquarkus.container-image.labels.vcs-ref=${{ github.sha }}
         '
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -88,3 +67,66 @@ jobs:
         -Dgoals='deploy'
       env:
         GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Determine release commit SHA
+      id: release-sha
+      run: |
+        echo "value=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
+
+  container-image:
+    name: Build, Tag, Push Container Image
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+
+    needs:
+    - build-deploy-maven
+
+    steps:
+    - name: Checkout 3scale CMS
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ needs.build-deploy-maven.outputs.release-sha }}
+
+    - name: Set Up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: temurin
+        cache: maven
+        settings-path: ${{ github.workspace }}
+        server-id: github
+
+    - name: Calculate lowercase repository owner
+      id: repo-owner-string
+      uses: ASzc/change-string-case-action@v5
+      with:
+        string: ${{ github.repository_owner }}
+
+    - name: Calculate lowercase repository name
+      id: repo-name-string
+      uses: ASzc/change-string-case-action@v5
+      with:
+        string: ${{ github.event.repository.name }}
+
+    - name: Build and push CLI container image
+      run: >-
+        ./mvnw
+        --settings ${{ github.workspace }}/settings.xml
+        --batch-mode
+        verify
+        --projects cli
+        --also-make
+        -Dquarkus.jib.platforms=linux/amd64,linux/arm64
+        -Dquarkus.container-image.build=true
+        -Dquarkus.container-image.push=true
+        -Dquarkus.container-image.registry=ghcr.io
+        -Dquarkus.container-image.username=${{ github.actor }}
+        -Dquarkus.container-image.password=${{ github.token }}
+        -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
+        -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
+        -Dquarkus.container-image.additional-tags=latest
+        -Dquarkus.container-image.labels.name=${{ steps.repo-owner-string.outputs.lowercase }}/${{ steps.repo-name-string.outputs.lowercase }}
+        -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ needs.build-deploy-maven.outputs.release-sha }}
+        -Dquarkus.container-image.labels.vcs-type=git
+        -Dquarkus.container-image.labels.vcs-ref=${{ needs.build-deploy-maven.outputs.release-sha }}
