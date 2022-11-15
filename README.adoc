@@ -1,0 +1,115 @@
+== 3scale CMS Tools
+
+3scale CMS tools are intended to provide examples of interacting with 3scale's
+Content Management System in programmatic ways. The included CLI tool is a
+rewritten and enhanced version of the same tool written in Ruby, available at
+link:https://github.com/hguerrero/3scale-cms[hguerrero/3scale-cms].
+
+In addition to using Java and Quarkus for the rewrite, this tool also
+demonstrates API-first code generation.
+
+[WARNING]
+====
+It is important to know that these tools, as well as the 3scale Content
+Management API that they use, are not supported by Red Hat. These tools and the
+undocumented 3scale Content Management API may change at any moment without any
+guarantee of backward compatibility. Therefore, these tools aren't recommended
+for production use.
+====
+
+=== Included Artifacts
+
+This repository contains the following artifacts:
+
+==== OpenAPI Specification for 3scale CMS
+
+The document describing 3scale's Content Management API in OpenAPI Specification
+v3.0 format is available at the following location of the repository:
+link:rest-client/src/main/resources/api-spec/3scale-cms.yaml[].
+
+This document describes all available endpoints for managing CMS objects and
+the Account Management API's endpoint for lookup of Developer Portal base URL
+and Developer Portal access code.
+
+==== Java client JAR
+
+For inclusion into other projects, a client JAR is provided and available in the
+GitHub Packages maven repository. To make use of this, the following repository
+definition may be used:
+
+[source,xml]
+----
+<repositories>
+  <repository>
+    <id>threescale-cms-rest-client</id>
+    <name>Unofficial 3scale CMS REST Client</name>
+    <url>https://maven.pkg.github.com/fwmotion/3scale-cms</url>
+    <layout>default</layout>
+    <releases>
+      <enabled>true</enabled>
+      <updatePolicy>never</updatePolicy>
+    </releases>
+    <snapshots>
+      <enabled>false</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+----
+
+Then to include the client JAR, the following dependency may be used:
+
+[source,xml]
+----
+<dependency>
+  <groupId>com.fwmotion</groupId>
+  <artifactId>3scale-cms-rest-client</artifactId>
+  <version>1.0.0</version>
+</dependency>
+----
+
+==== Command-Line Interface / Container Image
+
+The CLI tool provides an easier method to perform one-off requests to the 3scale
+Content Management API. It is written using link:https://quarkus.io[Quarkus] and
+link:https://picocli.info[picocli], with a compiled and assembled container
+image provided in GitHub Packages.
+
+===== Usage with Podman
+
+Run the CLI tool using Podman:
+
+[source,bash]
+----
+podman run -it --rm -v .:/cms:Z ghcr.io/fwmotion/3scale-cms:latest --help
+----
+
+===== Usage with Docker
+
+Run the CLI tool using Docker:
+
+[source,bash]
+----
+docker run -it --rm -v .:/cms ghcr.io/fwmotion/3scale-cms:latest --help
+----
+
+===== Usage with Tekton
+
+Sample Tasks and Pipelines for Tekton are available under the samples directory
+of this repository:
+
+link:samples/tekton[]
+
+=== 3scale Content Management API Concepts
+
+The 3scale Developer Portal consists of 3 primary types of objects:
+
+==== Sections
+
+==== Files
+
+==== Templates
+
+=== Previous Documentation
+
+While this README is being rewritten, the previous version is still
+available in link:README.old.md[]

@@ -1,0 +1,116 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: 3scale-cms-copy
+spec:
+  description: >-
+    3scale-cms task to copy full contents between 3scale tenants/installations
+  params:
+  - name: 3scale-cms-image
+    type: string
+    description: Reference to the 3scale-cms image for execution
+    default: >-
+      ghcr.io/fwmotion/3scale-cms:latest
+  steps:
+  - name: download
+    image: $(params.3scale-cms-image)
+    env:
+    - name: THREESCALE_CMS_ROOT
+      value: /cms
+    - name: PROVIDER_DETAILS_PATH
+      value: $(workspaces.source-provider-details.path)
+    volumeMounts:
+    - name: cms-content
+      mountPath: /cms
+    workingDir: /home/jboss
+    script: >
+      #!/bin/bash
+
+      set -eu
+
+      # Don't `set -x` because that would expose credentials to the log
+
+      if [ -r "${PROVIDER_DETAILS_PATH}/insecure" ]; then
+        INSECURE_FLAG="--insecure=$(<${PROVIDER_DETAILS_PATH}/insecure)"
+      else
+        INSECURE_FLAG="--insecure=false"
+      fi
+
+      if [ -r "${PROVIDER_DETAILS_PATH}/access-token" ]; then
+        # When using access token, provider key is unused; however, it is still
+        # required to maintain parameter positions. Due to this, "abcd" is used.
+        PROVIDER_KEY="--access-token=$(<"${PROVIDER_DETAILS_PATH}/access-token") abcd"
+      else
+        PROVIDER_KEY="$(<${PROVIDER_DETAILS_PATH}/provider-key)"
+      fi
+
+      PROVIDER_DOMAIN="$(<${PROVIDER_DETAILS_PATH}/provider-domain)"
+
+      java \
+        -Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+        -jar quarkus-run.jar \
+        $INSECURE_FLAG \
+        $PROVIDER_KEY \
+        $PROVIDER_DOMAIN \
+        download
+  - name: upload
+    image: $(params.3scale-cms-image)
+    env:
+    - name: THREESCALE_CMS_ROOT
+      value: /cms
+    - name: PROVIDER_DETAILS_PATH
+      value: $(workspaces.target-provider-details.path)
+    volumeMounts:
+    - name: cms-content
+      mountPath: /cms
+    workingDir: /home/jboss
+    script: >
+      #!/bin/bash
+
+      set -eu
+
+      # Don't `set -x` because that would expose credentials to the log
+
+      if [ -r "${PROVIDER_DETAILS_PATH}/insecure" ]; then
+        INSECURE_FLAG="--insecure=$(<"${PROVIDER_DETAILS_PATH}/insecure")"
+      else
+        INSECURE_FLAG="--insecure=false"
+      fi
+
+      if [ -r "${PROVIDER_DETAILS_PATH}/access-token" ]; then
+        # When using access token, provider key is unused; however, it is still
+        # required to maintain parameter positions. Due to this, "abcd" is used.
+        PROVIDER_KEY="--access-token=$(<"${PROVIDER_DETAILS_PATH}/access-token") abcd"
+      else
+        PROVIDER_KEY="$(<"${PROVIDER_DETAILS_PATH}/provider-key")"
+      fi
+
+      PROVIDER_DOMAIN="$(<"${PROVIDER_DETAILS_PATH}/provider-domain")"
+
+      java \
+        -Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+        -jar quarkus-run.jar \
+        $INSECURE_FLAG \
+        $PROVIDER_KEY \
+        $PROVIDER_DOMAIN \
+        upload --delete-missing
+  volumes:
+  - name: cms-content
+    emptyDir: {}
+  workspaces:
+  - name: source-provider-details
+    description: >-
+      A Workspace containing the information required to interact with 3scale
+      for downloading CMS content. The information should include data such as
+      the Admin Portal base URL and either a Provider Key or a Personal Access
+      Token. (Note that when a Personal Access Token is used, it must have
+      permission to the Content Management API. Binding a Secret to this
+      Workspace is strongly recommended over other volume types.
+  - name: target-provider-details
+    description: >-
+      A Workspace containing the information required to interact with 3scale
+      for uploading CMS content. The information should include data such as
+      the Admin Portal base URL and either a Provider Key or a Personal Access
+      Token. (Note that when a Personal Access Token is used, it must have
+      permission to the Content Management API. Binding a Secret to this
+      Workspace is strongly recommended over other volume types.

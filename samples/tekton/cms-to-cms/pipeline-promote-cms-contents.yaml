@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: promote-cms-contents
+spec:
+  workspaces:
+  - name: source-provider-details
+    optional: false
+  - name: target-provider-details
+    optional: false
+  tasks:
+  - name: promote-cms
+    taskRef:
+      kind: Task
+      name: 3scale-cms-copy
+    params:
+    workspaces:
+    - name: source-provider-details
+      workspace: source-provider-details
+    - name: target-provider-details
+      workspace: target-provider-details
