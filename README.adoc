@@ -129,7 +129,7 @@ To use the `3scale-cms` command you need to provide a few parameters:
 - An **ACCESS_TOKEN**, which can be used instead of a PROVIDER_KEY. The access token must be granted permissions to both the Account Management API and the hidden Content Management API.
 - The **PROVIDER_KEY**, which can be found in the Account tab of your admin portal (only visible to the users with "admin" role). The PROVIDER_KEY will be ignored if an ACCESS_TOKEN is specified.
 - The **PROVIDER_DOMAIN** of your admin portal. e.g. `https://mycompany-admin.3scale.net`
-- The **DIRECTORY**, which specifies a local directory path for determining files to upload, download, or compare between the local filesystem and the 3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms` command will choose a working directory following the rules described in <<_command_details>>.
+- The **DIRECTORY**, which specifies a local directory path for determining files to upload, download, or compare between the local filesystem and the 3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms` command will choose a working directory following the rules described in this <<working_directory,note>>.
 
 === Workflow
 
@@ -156,6 +156,7 @@ The `3scale-cms` command has five actions:
 - **upload**    - upload all the local files (no parameter). Or specify a file or section (with its contents) to upload
 - **delete**    - delete all (that can be deleted) or a specific entry in the remote CMS
 
+[#working_directory]
 [NOTE]
 ====
 The `3scale-cms` command will determine the appropriate working directory based on the following rules:
