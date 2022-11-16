@@ -1,10 +1,7 @@
 package com.fwmotion.threescale.cms.cli;
 
 import com.fwmotion.threescale.cms.ThreescaleCmsClient;
-import com.fwmotion.threescale.cms.cli.support.CmsObjectPathKeyGenerator;
-import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
-import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
-import com.fwmotion.threescale.cms.cli.support.PathRecursionSupport;
+import com.fwmotion.threescale.cms.cli.support.*;
 import com.fwmotion.threescale.cms.model.*;
 import com.redhat.threescale.rest.cms.ApiException;
 import io.quarkus.logging.Log;
@@ -22,8 +19,8 @@ import java.util.stream.Collectors;
 @CommandLine.Command(
     header = "Upload 3scale CMS Content",
     name = "upload",
-    description = "Upload all content, specified file or all specified folder" +
-        "contents to CMS"
+    description = "Upload all content, specified file, or all specified " +
+        "folder contents to CMS"
 )
 public class UploadCommand extends CommandBase implements Callable<Integer> {
 
@@ -35,6 +32,9 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
 
     @Inject
     PathRecursionSupport pathRecursionSupport;
+
+    @Inject
+    CmsSectionToTopComparator sectionToTopComparator;
 
     @CommandLine.ArgGroup
     MutuallyExclusiveGroup exclusiveOptions;
@@ -59,7 +59,7 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
     @CommandLine.Option(
         names = {"-n", "--dry-run"},
         description = "Dry run: do not upload any files; instead, just list " +
-            "what operations would be performed"
+            "operations that would be performed"
     )
     private boolean noop;
 
@@ -126,10 +126,14 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
 
         List<CmsObject> deleteObjects = remotePathsToDelete.stream()
             .map(remoteObjectsByPath::get)
+            .sorted(sectionToTopComparator
+                .thenComparing(CmsObject::getId)
+                .reversed())
             .collect(Collectors.toList());
 
         List<Pair<CmsObject, File>> localObjectsToUpload = localPathsToUpload.stream()
             .sorted((o1, o2) -> {
+                // Sort the new layout to the top
                 if (newPageLayout.getId() == null) {
                     if (layoutFilename.equals(o1)) {
                         return -1;
@@ -153,20 +157,9 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
 
                 return localObjectPair;
             })
-            .sorted((o1, o2) -> {
-                boolean o1IsSection = o1.getLeft().getType() == ThreescaleObjectType.SECTION;
-                boolean o2IsSection = o2.getLeft().getType() == ThreescaleObjectType.SECTION;
-                if (o1IsSection) {
-                    if (o2IsSection) {
-                        return 0;
-                    }
-                    return -1;
-                } else if (o2IsSection) {
-                    return 1;
-                }
-
-                return 0;
-            })
+            .sorted(Comparator.comparing(
+                Pair::getLeft,
+                sectionToTopComparator.thenComparing(CmsObject::getId)))
             .collect(Collectors.toList());
 
         if (noop) {
@@ -192,10 +185,7 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         } else {
             ThreescaleCmsClient client = topLevelCommand.getClient();
 
-            for (CmsObject object : deleteObjects) {
-                Log.info("Deleting " + object.getType() + " " + pathKeyGenerator.generatePathKeyForObject(object) + "...");
-                client.delete(object);
-            }
+            DeleteCommand.deleteObjects(client, pathKeyGenerator, deleteObjects);
 
             for (Pair<CmsObject, File> pair : localObjectsToUpload) {
                 performUpload(client, pair.getLeft(), pair.getRight(), localObjectsByPath, remoteObjectsByPath);

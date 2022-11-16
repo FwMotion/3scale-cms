@@ -91,6 +91,7 @@ public class LocalRemoteObjectTreeComparator {
             Set.of(FileVisitOption.FOLLOW_LINKS),
             Integer.MAX_VALUE,
             new LocalFileVisitor(localFileCmsObjectGenerator,
+                cmsObjectPathKeyGenerator,
                 rootPath,
                 implicitSectionPaths,
                 localPathIgnored::add,

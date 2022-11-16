@@ -111,7 +111,9 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         // When there's no draft content, the "draft" should be the same as
         // the "published" content
         if (result.isEmpty()) {
-            return getTemplatePublished(templateId);
+            result = Optional.ofNullable(template.getPublished())
+                .map(StringUtils::trimToNull)
+                .map(input -> IOUtils.toInputStream(input, Charset.defaultCharset()));
         }
 
         return result;

@@ -23,6 +23,7 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
 
 
     private final LocalFileCmsObjectGenerator localFileCmsObjectGenerator;
+    private final CmsObjectPathKeyGenerator pathKeyGenerator;
     private final Path rootPath;
     private final Set<String> implicitSectionPaths;
     private final Consumer<String> ignorePath;
@@ -34,11 +35,13 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
     private int emptyDirDepth = 0;
 
     public LocalFileVisitor(@Nonnull LocalFileCmsObjectGenerator localFileCmsObjectGenerator,
+                            @Nonnull CmsObjectPathKeyGenerator pathKeyGenerator,
                             @Nonnull Path rootPath,
                             @Nonnull Set<String> implicitSectionPaths,
                             @Nonnull Consumer<String> ignorePath,
                             @Nonnull BiConsumer<String, Pair<CmsObject, File>> registerCmsObjectForPath) {
         this.localFileCmsObjectGenerator = localFileCmsObjectGenerator;
+        this.pathKeyGenerator = pathKeyGenerator;
         this.rootPath = rootPath;
         this.implicitSectionPaths = implicitSectionPaths;
         this.ignorePath = ignorePath;
@@ -70,10 +73,23 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
+    private void generateAndRegisterObject(@Nonnull String pathKey,
+                                           @Nonnull File file) {
+        // Generate object first
+        CmsObject cmsObject = localFileCmsObjectGenerator.generateObjectFromFile(pathKey, file);
+
+        // Regenerate the path key; objects may have better canonical paths than
+        // what is on the file system
+        pathKey = pathKeyGenerator.generatePathKeyForObject(cmsObject);
+
+        // Send the pathKey, object, and file for inclusion
+        registerCmsObjectForPath.accept(pathKey, Pair.of(cmsObject, file));
+    }
+
     @Nonnull
     @Override
     public FileVisitResult visitFile(@Nonnull Path path,
-                                     @Nonnull BasicFileAttributes attrs) throws IOException {
+                                     @Nonnull BasicFileAttributes attrs) {
 
         String pathKey = pathKeyFromPath(path, false);
 
@@ -84,9 +100,7 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
 
         emptyDirDepth = 0;
 
-        File file = path.toFile();
-        CmsObject cmsObject = localFileCmsObjectGenerator.generateObjectFromFile(pathKey, file);
-        registerCmsObjectForPath.accept(pathKey, Pair.of(cmsObject, file));
+        generateAndRegisterObject(pathKey, path.toFile());
 
         return FileVisitResult.CONTINUE;
     }
@@ -109,9 +123,7 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
             String pathKey = pathKeyFromPath(dir, true);
 
             if (!implicitSectionPaths.contains(pathKey)) {
-                File file = dir.toFile();
-                CmsObject cmsObject = localFileCmsObjectGenerator.generateObjectFromFile(pathKey, file);
-                registerCmsObjectForPath.accept(pathKey, Pair.of(cmsObject, file));
+                generateAndRegisterObject(pathKey, dir.toFile());
             }
         } else {
             emptyDirDepth--;

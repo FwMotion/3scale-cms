@@ -56,14 +56,14 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
         displayDefaultLayout(topLevelCommand.getDefaultLayout(),
             cmsObjectPathKeyGenerator.generatePathKeyForObject(topLevelCommand.getDefaultLayout()));
 
-        List<CmsObject> allObjects = topLevelCommand.getCmsObjects();
+        List<CmsObject> allRemoteObjects = topLevelCommand.getCmsObjects();
         LocalRemoteTreeComparisonDetails details = treeComparator.compareLocalAndRemoteCmsObjectTrees(
-            allObjects.stream(),
+            allRemoteObjects.stream(),
             topLevelCommand.getRootDirectory()
         );
 
-        Log.info(allObjects.size() + " items found in CMS");
-        if (includeDetails) {
+        Log.info(allRemoteObjects.size() + " items found in CMS");
+        if (includeDetails && !allRemoteObjects.isEmpty()) {
             int longestPath = details.getRemoteObjectsByCmsPath().keySet().stream()
                 .mapToInt(String::length)
                 .max()
@@ -77,20 +77,21 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
                     .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
                         + " "
                         + pair.getValue().getType())
-                    .collect(Collectors.joining("\n"))
-                    + "\n");
+                    .collect(Collectors.joining("\n")));
         }
+        Log.info("");
 
         Log.info(details.getLocalPathsIgnored().size()
             + " ignored local files (matching patterns in '.cmsignore')");
-        if (includeDetails) {
+        if (includeDetails && !details.getLocalPathsIgnored().isEmpty()) {
             Log.info(
                 listPaths(details.getLocalPathsIgnored().stream()));
         }
+        Log.info("");
 
         Log.info(details.getLocalObjectsByCmsPath().size()
             + " (non-ignored) local files");
-        if (includeDetails) {
+        if (includeDetails && !details.getLocalObjectsByCmsPath().isEmpty()) {
             int longestPath = details.getLocalObjectsByCmsPath().keySet().stream()
                 .mapToInt(String::length)
                 .max()
@@ -104,16 +105,18 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
                     .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
                         + " "
                         + pair.getValue().getLeft().getType())
-                    .collect(Collectors.joining("\n"))
-                    + "\n");
+                    .collect(Collectors.joining("\n")));
         }
+        Log.info("");
 
         Log.info(details.getImplicitSectionPaths().size()
             + " implicit folders due to file/template system_names containing '/'");
-        if (includeDetails) {
+        if (includeDetails && !details.getImplicitSectionPaths().isEmpty()) {
             Log.info(
                 listPaths(details.getImplicitSectionPaths().stream()));
         }
+        Log.info("");
+
     }
 
     static void displayCmsUrl(String providerDomain) throws URISyntaxException {
@@ -145,8 +148,7 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
             .sequential()
             .sorted(InfoCommand::comparePaths)
             .map(path -> "\t'" + path + "'")
-            .collect(Collectors.joining("\n"))
-            + "\n";
+            .collect(Collectors.joining("\n"));
     }
 
     static int comparePaths(@Nonnull String leftString,
