@@ -272,7 +272,7 @@ To have the `3scale-cms` command ignore these files, they can be added to the `.
 
 === New local page/layout files
 
-When a local file of type `.html` or `.html.liquid` is created that does not have the `_` (underscore) prefix to indicate it is a partial or the `l_` (l-underscore) prefix to indicate it is a layout, then the tool assumes that the new file is a page and uploads it as such.
+When a local file of type `.html` or `.html.liquid` is created that does not have the `\_` (underscore) prefix to indicate it is a partial or the `l_` (l-underscore) prefix to indicate it is a layout, then the tool assumes that the new file is a page and uploads it as such.
 
 [NOTE]
 ====
