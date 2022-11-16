@@ -276,7 +276,7 @@ When a local file of type `.html` or `.html.liquid` is created that does not hav
 
 [NOTE]
 ====
-By convention, partial filenames are expected to have the prefix `_` (underscore) and layout filenames are expected to have the prefix `l_` (l-underscore). The `3scale-cms` tool does not enforce these conventions at present. If partial or layout files are misnamed, they will have to be deleted and recreated, as file renaming is not supported by 3scale.
+By convention, partial filenames are expected to have the prefix `\_` (underscore) and layout filenames are expected to have the prefix `l_` (l-underscore). The `3scale-cms` tool does not enforce these conventions at present. If partial or layout files are misnamed, they will have to be deleted and recreated, as file renaming is not supported by 3scale.
 ====
 
 === Default layouts for new pages
