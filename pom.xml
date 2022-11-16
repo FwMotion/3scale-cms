@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.fwmotion</groupId>
     <artifactId>3scale-cms-tools-parent</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <relativePath>./parent</relativePath>
   </parent>
 
   <artifactId>3scale-cms-tools-aggregate</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools (aggregate)</name>
@@ -21,14 +21,14 @@
   ]]></description>
 
   <properties>
-    <project.build.outputTimestamp>1668548039</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1668630742</project.build.outputTimestamp>
   </properties>
 
   <scm>
-    <url>https://github.com/FwMotion/3scale-cms/tree/master</url>
+    <url>https://github.com/FwMotion/3scale-cms/tree/main</url>
     <connection>scm:git:https://github.com/FwMotion/3scale-cms.git</connection>
     <developerConnection>scm:git:https://github.com/FwMotion/3scale-cms.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v1.0.2</tag>
   </scm>
 
   <modules>
