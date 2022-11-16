@@ -1,9 +1,6 @@
 package com.fwmotion.threescale.cms.cli.support;
 
-import com.fwmotion.threescale.cms.model.CmsFile;
-import com.fwmotion.threescale.cms.model.CmsObject;
-import com.fwmotion.threescale.cms.model.CmsSection;
-import com.fwmotion.threescale.cms.model.ThreescaleObjectType;
+import com.fwmotion.threescale.cms.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -20,9 +17,10 @@ public class PathRecursionSupport {
 
     private static final Map<Class<? extends CmsObject>, Function<? super CmsObject, Integer>> GET_PARENT_ID_FUNCTIONS =
         Map.of(
-            // TODO: See if there's a way to get section ID / parent ID from
-            //       other object types
+            // TODO: Find a way to get section ID / parent ID from other object
+            //       types
             CmsFile.class, file -> ((CmsFile) file).getSectionId(),
+            CmsPage.class, page -> ((CmsPage) page).getSectionId(),
             CmsSection.class, section -> ((CmsSection) section).getParentId()
         );
 

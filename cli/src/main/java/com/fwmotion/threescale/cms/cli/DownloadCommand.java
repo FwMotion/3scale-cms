@@ -54,7 +54,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
     @CommandLine.Option(
         names = {"-n", "--dry-run"},
         description = "Dry run: do not download any files; instead, just list " +
-            "what operations would be performed"
+            "operations that would be performed"
     )
     private boolean noop;
 
@@ -151,34 +151,6 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         return 0;
     }
 
-    private boolean isDownloadAll() {
-        return exclusiveOptions == null
-            || exclusiveOptions.individualFilesDownloadGroup == null
-            || exclusiveOptions.individualFilesDownloadGroup.downloadPaths == null
-            || exclusiveOptions.individualFilesDownloadGroup.downloadPaths.isEmpty();
-    }
-
-    private boolean isIncludeUnchanged() {
-        return Optional.ofNullable(exclusiveOptions)
-            .map(options -> options.allFilesDownloadGroup)
-            .map(allFilesDownloadGroup -> allFilesDownloadGroup.includeUnchanged)
-            .orElse(false);
-    }
-
-    private boolean isDeleteMissing() {
-        return Optional.ofNullable(exclusiveOptions)
-            .map(options -> options.allFilesDownloadGroup)
-            .map(allFilesDownloadGroup -> allFilesDownloadGroup.deleteMissing)
-            .orElse(false);
-    }
-
-    private PathRecursionSupport.RecursionOption recursionStyle() {
-        return Optional.ofNullable(exclusiveOptions)
-            .map(options -> options.individualFilesDownloadGroup)
-            .map(individualFilesDownloadGroup -> individualFilesDownloadGroup.recurseBy)
-            .orElse(PathRecursionSupport.RecursionOption.PATH_PREFIX);
-    }
-
     private void performDownload(@Nonnull CmsObject cmsObject,
                                  @Nonnull Path targetPath) throws IOException {
         String draftIndicator;
@@ -254,6 +226,34 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         FileUtils.copyInputStreamToFile(fileContent, targetFile);
     }
 
+    private boolean isDownloadAll() {
+        return exclusiveOptions == null
+            || exclusiveOptions.individualFilesDownloadGroup == null
+            || exclusiveOptions.individualFilesDownloadGroup.downloadPaths == null
+            || exclusiveOptions.individualFilesDownloadGroup.downloadPaths.isEmpty();
+    }
+
+    private boolean isIncludeUnchanged() {
+        return Optional.ofNullable(exclusiveOptions)
+            .map(options -> options.allFilesDownloadGroup)
+            .map(allFilesDownloadGroup -> allFilesDownloadGroup.includeUnchanged)
+            .orElse(false);
+    }
+
+    private boolean isDeleteMissing() {
+        return Optional.ofNullable(exclusiveOptions)
+            .map(options -> options.allFilesDownloadGroup)
+            .map(allFilesDownloadGroup -> allFilesDownloadGroup.deleteMissing)
+            .orElse(false);
+    }
+
+    private PathRecursionSupport.RecursionOption recursionStyle() {
+        return Optional.ofNullable(exclusiveOptions)
+            .map(options -> options.individualFilesDownloadGroup)
+            .map(individualFilesDownloadGroup -> individualFilesDownloadGroup.recurseBy)
+            .orElse(PathRecursionSupport.RecursionOption.PATH_PREFIX);
+    }
+
     private static class MutuallyExclusiveGroup {
 
         @CommandLine.ArgGroup(exclusive = false)
@@ -295,7 +295,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
             names = {"-r", "--recurse-by"},
             description = {
                 "Method of recursing CMS objects when a section is specified " +
-                    "in PATH",
+                    "in PATH_KEY",
                 "Options: PARENT_ID, PATH_PREFIX, NONE"
             },
             defaultValue = "PATH_PREFIX"
@@ -303,7 +303,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         PathRecursionSupport.RecursionOption recurseBy;
 
         @CommandLine.Parameters(
-            paramLabel = "PATH",
+            paramLabel = "PATH_KEY",
             arity = "1..*",
             description = {
                 "Paths to download from 3scale CMS to local files",
