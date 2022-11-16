@@ -3,8 +3,8 @@
 :toc:
 
 == Overview
-The 3scale CMS tools project provides examples of interactions with 3scale's
-Content Management System in programmatic ways. The project also
+The 3scale CMS tools project provides the ability to interact with 3scale's
+Content Management System programmatically. The project also
 demonstrates API-first code generation.
 
 The included Command Line Interface (CLI) tool is a
@@ -129,7 +129,7 @@ To use the `3scale-cms` command you need to provide a few parameters:
 - An **ACCESS_TOKEN**, which can be used instead of a PROVIDER_KEY. The access token must be granted permissions to both the Account Management API and the hidden Content Management API.
 - The **PROVIDER_KEY**, which can be found in the Account tab of your admin portal (only visible to the users with "admin" role). The PROVIDER_KEY will be ignored if an ACCESS_TOKEN is specified.
 - The **PROVIDER_DOMAIN** of your admin portal. e.g. `https://mycompany-admin.3scale.net`
-- The **DIRECTORY**, which specifies a local directory path for determining files to upload, download, or compare between the local filesystem and the 3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms` command will default to the current working directory.
+- The **DIRECTORY**, which specifies a local directory path for determining files to upload, download, or compare between the local filesystem and the 3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms` command will choose a working directory following the rules described in <<_command_details>>.
 
 === Workflow
 
@@ -190,6 +190,7 @@ podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDE
 ```
 
 to get the list of specific files in each of those four categories:
+
 - CMS contents elements
 - Locally ignored files
 - Local files that are not being ignored
