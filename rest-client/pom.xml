@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.fwmotion</groupId>
     <artifactId>3scale-cms-tools-parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
 
   <artifactId>3scale-cms-rest-client</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (REST client library)</name>
@@ -22,7 +22,7 @@
   ]]></description>
 
   <properties>
-    <project.build.outputTimestamp>1668630742</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1668630773</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
