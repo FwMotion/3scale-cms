@@ -156,7 +156,14 @@ The `3scale-cms` command has five actions:
 - **upload**    - upload all the local files (no parameter). Or specify a file or section (with its contents) to upload
 - **delete**    - delete all (that can be deleted) or a specific entry in the remote CMS
 
-The `3scale-cms` command should be invoked from the root directory of the folder where your local copy of the CMS will be stored and worked on, unless the **DIRECTORY** parameter is specified in the command.
+[NOTE]
+====
+The `3scale-cms` command will determine the appropriate working directory based on the following rules:
+
+    - If the root of the local CMS content is specified by the command line parameter `-d` or `--directory`, then that directory is used.
+    - If the command line parameter is not specified but the environment variable `THREESCALE_CMS_ROOT` is defined, then that directory is used.
+    - If neither are specified, then the current working directory is used.
+====
 
 ==== 3scale-cms info
 This command displays information about contents of the CMS and the local files. It accepts the optional parameter: 'details'
@@ -223,7 +230,12 @@ If a filename is specified, then only that file is downloaded (if it exists in t
 
 If a directory name is specified, then it and all its contents (recursively down) are checked and any content that is found to exist in the CMS and is out of date is downloaded.
 
+[NOTE]
+====
+Existing files are overwritten on download, and missing files are ignored unless the `--delete-missing` flag is specified.
+
 Files matching patterns in `.cmsignore` are not currently skipped.
+====
 
 ==== 3scale-cms upload
 If used without an additional file/directory name parameter, this command uploads all local files found under the current working directory that are either out of date in the CMS (based on timestamps) or do not exist in the CMS.
