@@ -8,12 +8,28 @@
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools (parent)</name>
+  <url>https://fwmotion.github.io/3scale-cms/parent</url>
   <description><![CDATA[
     Maven project to provide common base configuration for inheritance by other
     related projects
   ]]></description>
 
+  <distributionManagement>
+    <site>
+      <id>fwmotion.github.io</id>
+      <url>https://fwmotion.github.io/3scale-cms/parent</url>
+    </site>
+  </distributionManagement>
+
   <inceptionYear>2022</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://raw.githubusercontent.com/FwMotion/3scale-cms/main/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <developers>
     <developer>
@@ -32,14 +48,20 @@
     </developer>
   </developers>
 
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/FwMotion/3scale-cms/issues</url>
+  </issueManagement>
+
   <properties>
+    <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
+
     <quarkus.container-image.labels.version>
       ${project.version}
     </quarkus.container-image.labels.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
 
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -63,6 +85,9 @@
     <version.maven-failsafe-plugin>3.1.2</version.maven-failsafe-plugin>
     <version.maven-install-plugin>3.1.1</version.maven-install-plugin>
     <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+    <version.maven-javadoc-plugin>3.4.1</version.maven-javadoc-plugin>
+    <version.maven-project-info-reports-plugin>3.4.1</version.maven-project-info-reports-plugin>
+    <version.maven-site-plugin>3.12.1</version.maven-site-plugin>
     <version.maven-release-plugin>3.0.1</version.maven-release-plugin>
     <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
     <version.maven-site-plugin>4.0.0-M10</version.maven-site-plugin>
@@ -71,7 +96,7 @@
 
     <!-- Third-party Maven Plugins -->
     <version.depgraph-maven-plugin>4.0.2</version.depgraph-maven-plugin>
-    <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
+    <version.dokka-maven-plugin>1.7.20</version.dokka-maven-plugin>
     <version.find-and-replace-maven-plugin>
       1.1.0
     </version.find-and-replace-maven-plugin>
@@ -100,7 +125,7 @@
 
     <!-- Default options for plugins -->
     <default.dokka-srclink-base>
-      https://github.com/FwMotion/3scale-cms/blob/master
+      https://github.com/FwMotion/3scale-cms/blob/main
     </default.dokka-srclink-base>
     <default.dokka-linesuffix>#L</default.dokka-linesuffix>
   </properties>
@@ -330,6 +355,15 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.maven-javadoc-plugin}</version>
+          <configuration>
+            <doclint>none</doclint>
+            <quiet>true</quiet>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>${version.maven-release-plugin}</version>
           <configuration>
@@ -345,6 +379,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>${version.maven-site-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>${version.maven-project-info-reports-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -453,6 +492,35 @@
           </executions>
         </plugin>
         <plugin>
+          <groupId>org.jetbrains.dokka</groupId>
+          <artifactId>dokka-maven-plugin</artifactId>
+          <version>${version.dokka-maven-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-javadocJar</id>
+              <phase>package</phase>
+              <goals>
+                <goal>javadocJar</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>default-javadoc</id>
+              <!--
+                Generate Dokka's javadoc during post-site. This allows
+                Javadoc to run its report as part of site stage, but then
+                replace Javadoc's render with Dokka's render
+              -->
+              <phase>post-site</phase>
+              <goals>
+                <goal>javadoc</goal>
+              </goals>
+              <configuration>
+                <outputDir>${project.reporting.outputDirectory}/apidocs</outputDir>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.openapitools</groupId>
           <artifactId>openapi-generator-maven-plugin</artifactId>
           <version>${version.openapi-generator-maven-plugin}</version>
@@ -505,6 +573,30 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <inherited>false</inherited>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>issue-management</report>
+              <report>licenses</report>
+              <report>plugins</report>
+              <report>scm</report>
+              <report>summary</report>
+              <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <repositories>
     <repository>

@@ -13,7 +13,8 @@
   <version>1.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>3scale CMS Tools (aggregate)</name>
+  <name>3scale CMS Tools</name>
+  <url>https://fwmotion.github.io/3scale-cms</url>
   <description><![CDATA[
     Maven project to group multiple submodules related to 3scale's Content
     Management System API, and to handle build ordering and aggregate test
@@ -31,10 +32,40 @@
     <tag>HEAD</tag>
   </scm>
 
+  <distributionManagement>
+    <site>
+      <id>fwmotion.github.io</id>
+      <url>https://fwmotion.github.io/3scale-cms</url>
+    </site>
+  </distributionManagement>
+
   <modules>
     <module>parent</module>
     <module>rest-client</module>
     <module>cli</module>
   </modules>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>licenses</report>
+              <report>modules</report>
+              <report>plugins</report>
+              <report>scm</report>
+              <report>summary</report>
+              <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>

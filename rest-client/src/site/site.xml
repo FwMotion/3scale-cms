@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+         http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd
+         http://www.w3.org/2001/XMLSchema-instance https://www.w3.org/2001/XMLSchema-instance"
+         name="3scale CMS Tools - REST Client">
+  <body>
+    <links>
+      <item name="GitHub Project" href="https://github.com/FwMotion/3scale-cms" />
+    </links>
+
+    <breadcrumbs>
+      <item href="../index.html" name="3scale CMS Tools"/>
+      <item href="/index.html" name="REST Client"/>
+    </breadcrumbs>
+
+    <menu ref="parent"/>
+    <menu ref="reports"/>
+    <menu name="GitHub Project Pages">
+      <item name="Home" href="https://github.com/FwMotion/3scale-cms"/>
+      <item name="Issues" href="https://github.com/FwMotion/3scale-cms/issues"/>
+      <item name="Packages" href="https://github.com/orgs/FwMotion/packages?repo_name=3scale-cms"/>
+    </menu>
+
+  </body>
+</project>
