@@ -141,6 +141,8 @@ jobs:
     permissions:
       contents: write
 
+    secrets: inherit
+
     needs:
       - maven-build-deploy
 
@@ -179,73 +181,19 @@ jobs:
       build-mode: jvm_and_native
       tag-as-latest: true
 
-  site-deploy:
+  render-and-deploy-site:
     name: Render and Deploy Site
-    runs-on: ubuntu-latest
+
     permissions:
       contents: read
       pages: write
       id-token: write
 
+    secrets: inherit
+
     needs:
-    - maven-build-deploy
+      - maven-build-deploy
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-    - name: Checkout 3scale CMS
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
-
-    - name: Set Up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: temurin
-        settings-path: ${{ github.workspace }}
-        server-id: github
-
-    - name: Determine Home Directory
-      id: find-home
-      run: |
-        echo "home=$HOME" >> $GITHUB_OUTPUT
-
-    - name: Cache Maven Local Repo
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.find-home.outputs.home }}/.m2/repository
-        key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ runner.arch }}-maven-
-
-    - name: Set Up Maven Repo Filters
-      run: |
-        mkdir -p ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
-        cp -av ${{ github.workspace }}/.mvn/filters/*.txt ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
-
-    - name: Set Up Pages
-      uses: actions/configure-pages@v2
-
-    - name: Run Maven Site
-      # compile needs to run so Maven figures out cross-module dependencies
-      # and stagingDirectory will have a value appended relative to parent for each module
-      run: >-
-        ./mvnw
-        --settings ${{ github.workspace }}/settings.xml
-        --batch-mode
-        compile
-        post-site
-        site:stage
-        -DstagingDirectory=${{ github.workspace }}/target/staging/parent
-
-    - name: Upload artifacts
-      uses: actions/upload-pages-artifact@v1
-      with:
-        path: ${{ github.workspace }}/target/staging
-
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v1
+    uses: ./.github/workflows/render-and-deploy-site.yml
+    with:
+      git-ref: ${{ needs.maven-build-deploy.outputs.release-sha }}
