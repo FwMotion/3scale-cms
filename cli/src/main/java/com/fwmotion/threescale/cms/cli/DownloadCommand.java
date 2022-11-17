@@ -64,8 +64,8 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         LocalRemoteTreeComparisonDetails treeDetails =
             localRemoteObjectTreeComparator.compareLocalAndRemoteCmsObjectTrees(
                 topLevelCommand.getCmsObjects().stream(),
-                topLevelCommand.getRootDirectory()
-            );
+                topLevelCommand.getRootDirectory(),
+                true);
 
         Map<String, CmsObject> remoteObjectsByPath = treeDetails.getRemoteObjectsByCmsPath();
         Path rootPath = topLevelCommand.getRootDirectory().toPath();

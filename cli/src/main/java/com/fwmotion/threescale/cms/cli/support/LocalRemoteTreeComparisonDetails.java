@@ -1,10 +1,12 @@
 package com.fwmotion.threescale.cms.cli.support;
 
+import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class LocalRemoteTreeComparisonDetails {
@@ -21,6 +23,8 @@ public class LocalRemoteTreeComparisonDetails {
 
     private Set<String> remoteObjectsNewerThanLocal;
     private Set<String> localObjectsNewerThanRemote;
+
+    private CmsLayout defaultLayout;
 
     public Set<String> getImplicitSectionPaths() {
         return implicitSectionPaths;
@@ -84,5 +88,13 @@ public class LocalRemoteTreeComparisonDetails {
 
     public void setLocalObjectsNewerThanRemote(Set<String> localObjectsNewerThanRemote) {
         this.localObjectsNewerThanRemote = localObjectsNewerThanRemote;
+    }
+
+    public Optional<CmsLayout> getDefaultLayout() {
+        return Optional.ofNullable(defaultLayout);
+    }
+
+    public void setDefaultLayout(CmsLayout defaultLayout) {
+        this.defaultLayout = defaultLayout;
     }
 }

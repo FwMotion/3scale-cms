@@ -51,7 +51,7 @@ spec:
         INSECURE_FLAG="--insecure=false"
       fi
 
-      if [ -r "${PROVIDER_DETAILS_PATH}/access-token" ]; then
+      if [ -r "${PROVIDER_DETAILS_PATH}/access-token" ] && [ -n "$(<"${PROVIDER_DETAILS_PATH}/access-token")" ]; then
         # When using access token, provider key is unused; however, it is still
         # required to maintain parameter positions. Due to this, "abcd" is used.
         PROVIDER_KEY="--access-token=$(<"${PROVIDER_DETAILS_PATH}/access-token") abcd"
