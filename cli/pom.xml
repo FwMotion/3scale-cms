@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.fwmotion</groupId>
     <artifactId>3scale-cms-tools-parent</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <relativePath>../parent</relativePath>
   </parent>
 
   <artifactId>3scale-cms-tools-cli</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (command-line interface)</name>
@@ -21,7 +21,7 @@
   ]]></description>
 
   <properties>
-    <project.build.outputTimestamp>1668630773</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1668725910</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
