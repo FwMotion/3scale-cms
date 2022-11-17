@@ -35,7 +35,7 @@ spec:
     - name: copy-default-cmsignore
       value: 'true'
     - name: 3scale-cms-command
-      value: upload --delete-missing
+      value: upload --delete-missing --layout=/l_main_layout.html.liquid
     workspaces:
     - name: source
       workspace: working-dir

@@ -50,7 +50,7 @@ public class DeleteCommand extends CommandBase implements Callable<Integer> {
 
     @Nonnull
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
 
         List<String> remotePathsToDelete;
         PathRecursionSupport.RecursionOption recursionStyle;
@@ -87,7 +87,6 @@ public class DeleteCommand extends CommandBase implements Callable<Integer> {
             .stream()
             .map(remoteObjectsByPath::get)
             .sorted(sectionToTopComparator
-                .thenComparing(CmsObject::getId)
                 .reversed())
             .collect(Collectors.toList());
 

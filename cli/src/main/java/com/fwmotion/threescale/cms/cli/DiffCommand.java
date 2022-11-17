@@ -3,6 +3,7 @@ package com.fwmotion.threescale.cms.cli;
 import com.fwmotion.threescale.cms.cli.support.CmsObjectPathKeyGenerator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
+import com.fwmotion.threescale.cms.model.CmsLayout;
 import io.quarkus.logging.Log;
 import picocli.CommandLine;
 
@@ -43,15 +44,21 @@ public class DiffCommand extends CommandBase implements Callable<Integer> {
 
     private void showDiff(boolean includeDetails) throws Exception {
         InfoCommand.displayCmsUrl(topLevelCommand.getProviderDomain());
-        InfoCommand.displayDefaultLayout(topLevelCommand.getDefaultLayout(),
-            cmsObjectPathKeyGenerator.generatePathKeyForObject(topLevelCommand.getDefaultLayout()));
-
-        Log.info("");
 
         LocalRemoteTreeComparisonDetails details = treeComparator.compareLocalAndRemoteCmsObjectTrees(
             topLevelCommand.getCmsObjects().stream(),
-            topLevelCommand.getRootDirectory()
-        );
+            topLevelCommand.getRootDirectory(),
+            true);
+
+        CmsLayout defaultLayout = details.getDefaultLayout().orElse(null);
+        if (defaultLayout == null) {
+            Log.info("No default layout found!");
+        } else {
+            InfoCommand.displayDefaultLayout(defaultLayout,
+                cmsObjectPathKeyGenerator.generatePathKeyForObject(defaultLayout));
+        }
+
+        Log.info("");
 
         if (includeDetails) {
             if (!details.getRemotePathsMissingInLocal().isEmpty()) {

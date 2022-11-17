@@ -53,69 +53,83 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
 
     private void showInfo(boolean includeDetails) throws Exception {
         displayCmsUrl(topLevelCommand.getProviderDomain());
-        displayDefaultLayout(topLevelCommand.getDefaultLayout(),
-            cmsObjectPathKeyGenerator.generatePathKeyForObject(topLevelCommand.getDefaultLayout()));
 
         List<CmsObject> allRemoteObjects = topLevelCommand.getCmsObjects();
         LocalRemoteTreeComparisonDetails details = treeComparator.compareLocalAndRemoteCmsObjectTrees(
             allRemoteObjects.stream(),
-            topLevelCommand.getRootDirectory()
-        );
+            topLevelCommand.getRootDirectory(),
+            true);
+
+        CmsLayout defaultLayout = details.getDefaultLayout().orElse(null);
+        if (defaultLayout == null) {
+            Log.info("No default layout found!");
+        } else {
+            InfoCommand.displayDefaultLayout(defaultLayout,
+                cmsObjectPathKeyGenerator.generatePathKeyForObject(defaultLayout));
+        }
 
         Log.info(allRemoteObjects.size() + " items found in CMS");
-        if (includeDetails && !allRemoteObjects.isEmpty()) {
-            int longestPath = details.getRemoteObjectsByCmsPath().keySet().stream()
-                .mapToInt(String::length)
-                .max()
-                .orElse(0);
+        if (includeDetails) {
+            if (!allRemoteObjects.isEmpty()) {
+                int longestPath = details.getRemoteObjectsByCmsPath().keySet().stream()
+                    .mapToInt(String::length)
+                    .max()
+                    .orElse(0);
 
-            Log.info(
-                details.getRemoteObjectsByCmsPath().entrySet()
-                    .stream()
-                    .sequential()
-                    .sorted((left, right) -> comparePaths(left.getKey(), right.getKey()))
-                    .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
-                        + " "
-                        + pair.getValue().getType())
-                    .collect(Collectors.joining("\n")));
+                Log.info(
+                    details.getRemoteObjectsByCmsPath().entrySet()
+                        .stream()
+                        .sequential()
+                        .sorted((left, right) -> comparePaths(left.getKey(), right.getKey()))
+                        .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
+                            + " "
+                            + pair.getValue().getType())
+                        .collect(Collectors.joining("\n")));
+            }
+            Log.info("");
         }
-        Log.info("");
 
         Log.info(details.getLocalPathsIgnored().size()
             + " ignored local files (matching patterns in '.cmsignore')");
-        if (includeDetails && !details.getLocalPathsIgnored().isEmpty()) {
-            Log.info(
-                listPaths(details.getLocalPathsIgnored().stream()));
+        if (includeDetails) {
+            if (!details.getLocalPathsIgnored().isEmpty()) {
+                Log.info(
+                    listPaths(details.getLocalPathsIgnored().stream()));
+            }
+            Log.info("");
         }
-        Log.info("");
 
         Log.info(details.getLocalObjectsByCmsPath().size()
             + " (non-ignored) local files");
-        if (includeDetails && !details.getLocalObjectsByCmsPath().isEmpty()) {
-            int longestPath = details.getLocalObjectsByCmsPath().keySet().stream()
-                .mapToInt(String::length)
-                .max()
-                .orElse(0);
+        if (includeDetails) {
+            if (!details.getLocalObjectsByCmsPath().isEmpty()) {
+                int longestPath = details.getLocalObjectsByCmsPath().keySet().stream()
+                    .mapToInt(String::length)
+                    .max()
+                    .orElse(0);
 
-            Log.info(
-                details.getLocalObjectsByCmsPath().entrySet()
-                    .stream()
-                    .sequential()
-                    .sorted((left, right) -> comparePaths(left.getKey(), right.getKey()))
-                    .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
-                        + " "
-                        + pair.getValue().getLeft().getType())
-                    .collect(Collectors.joining("\n")));
+                Log.info(
+                    details.getLocalObjectsByCmsPath().entrySet()
+                        .stream()
+                        .sequential()
+                        .sorted((left, right) -> comparePaths(left.getKey(), right.getKey()))
+                        .map(pair -> "\t'" + StringUtils.rightPad(pair.getKey() + "'", longestPath + 1)
+                            + " "
+                            + pair.getValue().getLeft().getType())
+                        .collect(Collectors.joining("\n")));
+            }
+            Log.info("");
         }
-        Log.info("");
 
         Log.info(details.getImplicitSectionPaths().size()
             + " implicit folders due to file/template system_names containing '/'");
-        if (includeDetails && !details.getImplicitSectionPaths().isEmpty()) {
-            Log.info(
-                listPaths(details.getImplicitSectionPaths().stream()));
+        if (includeDetails) {
+            if (!details.getImplicitSectionPaths().isEmpty()) {
+                Log.info(
+                    listPaths(details.getImplicitSectionPaths().stream()));
+            }
+            Log.info("");
         }
-        Log.info("");
 
     }
 

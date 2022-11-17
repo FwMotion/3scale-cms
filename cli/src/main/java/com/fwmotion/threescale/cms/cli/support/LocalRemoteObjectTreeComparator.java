@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.cli.support;
 
+import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.fwmotion.threescale.cms.model.ThreescaleObjectType;
@@ -35,13 +36,14 @@ public class LocalRemoteObjectTreeComparator {
     @Nonnull
     public LocalRemoteTreeComparisonDetails compareLocalAndRemoteCmsObjectTrees(
         @Nonnull Stream<CmsObject> remoteObjects,
-        @Nonnull File localRoot
-    ) throws Exception {
+        @Nonnull File localRoot,
+        boolean defaultLayoutCanBeRemoteOnly) throws Exception {
         LocalRemoteTreeComparisonDetails details = new LocalRemoteTreeComparisonDetails();
 
         calculateRemoteObjects(details, remoteObjects);
         calculateLocalObjects(details, localRoot);
         calculateDiffs(details);
+        calculateDefaultLayout(details, defaultLayoutCanBeRemoteOnly);
 
         return details;
     }
@@ -141,6 +143,37 @@ public class LocalRemoteObjectTreeComparator {
         details.setLocalObjectsNewerThanRemote(localObjectsNewerThanLocal);
         details.setRemotePathsMissingInLocal(remotePathsMissingInLocal);
         details.setLocalPathsMissingInRemote(new HashSet<>(localObjects.keySet()));
+    }
+
+    private void calculateDefaultLayout(LocalRemoteTreeComparisonDetails details, boolean defaultLayoutCanBeRemoteOnly) {
+        Stream<CmsObject> remoteObjectStream;
+        if (defaultLayoutCanBeRemoteOnly) {
+            remoteObjectStream = details.getRemoteObjectsByCmsPath()
+                .values()
+                .stream();
+        } else {
+            Set<String> remoteOnlyPaths = details.getRemotePathsMissingInLocal();
+            remoteObjectStream = details.getRemoteObjectsByCmsPath()
+                .entrySet()
+                .stream()
+                .filter(entry -> !remoteOnlyPaths.contains(entry.getKey()))
+                .map(Map.Entry::getValue);
+        }
+
+        details.setDefaultLayout(
+            Stream.concat(
+                    remoteObjectStream,
+                    details.getLocalObjectsByCmsPath()
+                        .values()
+                        .stream()
+                        .map(Pair::getLeft)
+                )
+                .filter(o -> o instanceof CmsLayout)
+                .map(o -> (CmsLayout) o)
+                .findFirst()
+                .orElse(null)
+        );
+
     }
 
 }

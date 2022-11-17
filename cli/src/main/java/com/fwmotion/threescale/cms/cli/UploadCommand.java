@@ -68,8 +68,8 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         LocalRemoteTreeComparisonDetails treeDetails =
             localRemoteObjectTreeComparator.compareLocalAndRemoteCmsObjectTrees(
                 topLevelCommand.getCmsObjects().stream(),
-                topLevelCommand.getRootDirectory()
-            );
+                topLevelCommand.getRootDirectory(),
+                !isDeleteMissing());
 
         Map<String, CmsObject> remoteObjectsByPath = treeDetails.getRemoteObjectsByCmsPath();
         Map<String, Pair<CmsObject, File>> localObjectsByPath = treeDetails.getLocalObjectsByCmsPath();
@@ -104,16 +104,20 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
             remotePathsToDelete = Collections.emptySet();
         }
 
-        CmsLayout newPageLayout;
-        if (StringUtils.isBlank(layoutFilename)) {
-            newPageLayout = topLevelCommand.getDefaultLayout();
+        String newPageLayoutSystemName;
+        if (layoutFilename == null) {
+            newPageLayoutSystemName = treeDetails.getDefaultLayout()
+                .map(CmsLayout::getSystemName)
+                .orElse("");
+        } else if (StringUtils.isBlank(layoutFilename)) {
+            newPageLayoutSystemName = "";
         } else {
             CmsObject layout = Optional.ofNullable(localObjectsByPath.get(layoutFilename))
                 .map(Pair::getLeft)
                 .orElseGet(() -> remoteObjectsByPath.get(layoutFilename));
 
             if (layout instanceof CmsLayout) {
-                newPageLayout = (CmsLayout) layout;
+                newPageLayoutSystemName = ((CmsLayout) layout).getSystemName();
             } else {
                 throw new IllegalArgumentException("Specified layout for new pages is not a layout!");
             }
@@ -127,39 +131,43 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         List<CmsObject> deleteObjects = remotePathsToDelete.stream()
             .map(remoteObjectsByPath::get)
             .sorted(sectionToTopComparator
-                .thenComparing(CmsObject::getId)
                 .reversed())
             .collect(Collectors.toList());
 
-        List<Pair<CmsObject, File>> localObjectsToUpload = localPathsToUpload.stream()
-            .sorted((o1, o2) -> {
-                // Sort the new layout to the top
-                if (newPageLayout.getId() == null) {
-                    if (layoutFilename.equals(o1)) {
-                        return -1;
-                    } else if (layoutFilename.equals(o2)) {
-                        return 1;
-                    }
-                }
+        Comparator<Pair<CmsObject, File>> uploadSortComparator;
+        if (StringUtils.isNotBlank(newPageLayoutSystemName)) {
+            uploadSortComparator = Comparator.comparing(Pair::getLeft,
+                sectionToTopComparator
+                    .thenComparing((o1, o2) -> {
+                        if (o1 instanceof CmsLayout && StringUtils.equals(newPageLayoutSystemName, ((CmsLayout) o1).getSystemName())) {
+                            return -1;
+                        }
 
-                return StringUtils.compare(o1, o2);
-            })
+                        if (o2 instanceof CmsLayout && StringUtils.equals(newPageLayoutSystemName, ((CmsLayout) o2).getSystemName())) {
+                            return 1;
+                        }
+
+                        return 0;
+                    }));
+        } else {
+            uploadSortComparator = Comparator.comparing(Pair::getLeft, sectionToTopComparator);
+        }
+
+        List<Pair<CmsObject, File>> localObjectsToUpload = localPathsToUpload.stream()
             .map(pathKey -> {
                 Pair<CmsObject, File> localObjectPair = localObjectsByPath.get(pathKey);
                 CmsObject remoteObject = remoteObjectsByPath.get(pathKey);
 
                 if (remoteObject == null) {
                     CmsObject localObject = localObjectPair.getLeft();
-                    setRequiredCreationProperties(localObject, newPageLayout);
+                    setRequiredCreationProperties(localObject, newPageLayoutSystemName);
                 } else {
                     updateObjectId(localObjectPair.getLeft(), remoteObject);
                 }
 
                 return localObjectPair;
             })
-            .sorted(Comparator.comparing(
-                Pair::getLeft,
-                sectionToTopComparator.thenComparing(CmsObject::getId)))
+            .sorted(uploadSortComparator)
             .collect(Collectors.toList());
 
         if (noop) {
@@ -237,8 +245,8 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
     }
 
     private Integer findParentId(@Nonnull String pathKey,
-                             @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
-                             @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
+                                 @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
+                                 @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
         String parentPathKey;
         if (pathKey.endsWith("/")) {
             parentPathKey = pathKey.substring(0, pathKey.lastIndexOf('/', pathKey.length() - 2) + 1);
@@ -265,12 +273,13 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         throw new IllegalStateException("Couldn't find any parent section ID... not even root");
     }
 
-    private void setRequiredCreationProperties(CmsObject localObject, CmsLayout newPageLayout) {
+    private void setRequiredCreationProperties(@Nonnull CmsObject localObject,
+                                               @Nonnull String newPageLayoutSystemName) {
         if (localObject instanceof CmsPage) {
             CmsPage localPage = (CmsPage) localObject;
 
             if ("text/html".equals(localPage.getContentType())) {
-                localPage.setLayout(newPageLayout.getSystemName());
+                localPage.setLayout(newPageLayoutSystemName);
             } else {
                 localPage.setLayout("");
             }

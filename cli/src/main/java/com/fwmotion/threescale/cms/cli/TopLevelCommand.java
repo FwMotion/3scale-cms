@@ -2,7 +2,6 @@ package com.fwmotion.threescale.cms.cli;
 
 import com.fwmotion.threescale.cms.ThreescaleCmsClient;
 import com.fwmotion.threescale.cms.ThreescaleCmsClientFactory;
-import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import org.apache.commons.lang3.StringUtils;
@@ -103,14 +102,6 @@ public class TopLevelCommand extends CommandBase {
         }
 
         return new ArrayList<>(cmsObjects);
-    }
-
-    public CmsLayout getDefaultLayout() {
-        return getCmsObjects().stream()
-            .filter(cmsObj -> cmsObj instanceof CmsLayout)
-            .findFirst()
-            .map(cmsObj -> (CmsLayout) cmsObj)
-            .orElseThrow(() -> new IllegalStateException("Couldn't find any layout to use as default"));
     }
 
     public String getProviderDomain() {
