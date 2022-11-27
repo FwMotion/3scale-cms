@@ -307,8 +307,8 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     }
 
     @Override
-    public void publish(@Nonnull CmsTemplate template) throws ApiException {
-        templatesApi.publishTemplate(template.getId());
+    public void publish(int templateId) throws ApiException {
+        templatesApi.publishTemplate(templateId);
     }
 
     @Override
