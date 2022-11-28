@@ -51,21 +51,21 @@
     </quarkus.bootstrap.workspace-discovery>
 
     <!-- Maven First-party Plugins -->
-    <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
-    <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
-    <version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
-    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
-    <version.maven-release-plugin>3.0.0-M6</version.maven-release-plugin>
+    <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
+    <version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
+    <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+    <version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
+    <version.maven-release-plugin>3.0.0-M7</version.maven-release-plugin>
 
     <!-- Third-party Maven Plugins -->
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
     <version.jacoco-maven-plugin>0.8.7</version.jacoco-maven-plugin>
     <version.jandex-maven-plugin>1.2.3</version.jandex-maven-plugin>
     <version.openapi-generator-maven-plugin>
-      6.2.0
+      6.2.1
     </version.openapi-generator-maven-plugin>
-    <version.pitest-maven>1.7.5</version.pitest-maven>
-    <version.pitest-junit5-plugin>0.15</version.pitest-junit5-plugin>
+    <version.pitest-maven>1.9.11</version.pitest-maven>
+    <version.pitest-junit5-plugin>1.1.0</version.pitest-junit5-plugin>
 
     <!-- Dependency Group IDs -->
     <groupId.swagger-parser>io.swagger.parser.v3</groupId.swagger-parser>
@@ -247,6 +247,32 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${version.maven-failsafe-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-integration-test</id>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>integration-test</goal>
+              </goals>
+              <configuration>
+                <includes>
+                  <include>**/*IntegrationTest.java</include>
+                </includes>
+              </configuration>
+            </execution>
+            <execution>
+              <id>default-verify</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${version.maven-jar-plugin}</version>
         </plugin>
@@ -257,6 +283,25 @@
           <configuration>
             <tagNameFormat>v@{project.version}</tagNameFormat>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-test</id>
+              <phase>test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+              <configuration>
+                <excludes>
+                  <exclude>**/*IntegrationTest.java</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.jboss.jandex</groupId>
@@ -277,6 +322,38 @@
           <artifactId>openapi-generator-maven-plugin</artifactId>
           <version>${version.openapi-generator-maven-plugin}</version>
         </plugin>
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>${version.pitest-maven}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.pitest</groupId>
+              <artifactId>pitest-junit5-plugin</artifactId>
+              <version>${version.pitest-junit5-plugin}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <withHistory>true</withHistory>
+            <!--
+              Ensure a minimum mutation threshold percentage (line threshold
+              will be checked by JaCoCo)
+            -->
+            <!-- TODO: Increase this percentage as tests cover additional code -->
+            <mutationThreshold>30</mutationThreshold>
+
+            <!--
+              Unless overridden by a Maven profile (below), do not include
+              integration tests into mutation testing. This avoids situations
+              where mutations introduce infinite loops in framework/context
+              initialization, which then cause pitest to wait several minutes
+              for such mutations to timeout.
+            -->
+            <excludedTestClasses>
+              <excludedTestClass>**.*IntegrationTest</excludedTestClass>
+            </excludedTestClasses>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -294,12 +371,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>${version.maven-failsafe-plugin}</version>
             <executions>
               <execution>
+                <id>default-integration-test</id>
+                <phase>integration-test</phase>
                 <goals>
                   <goal>integration-test</goal>
-                  <goal>verify</goal>
                 </goals>
                 <configuration>
                   <systemPropertyVariables>
@@ -321,6 +398,24 @@
       <properties>
         <quarkus.package.type>native</quarkus.package.type>
       </properties>
+    </profile>
+    <profile>
+      <!-- Profile to include integration tests in mutation testing -->
+      <id>pitest-include-it</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.pitest</groupId>
+              <artifactId>pitest-maven</artifactId>
+              <version>${version.pitest-maven}</version>
+              <configuration>
+                <excludedTestClasses combine.self="override"/>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 

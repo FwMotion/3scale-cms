@@ -124,6 +124,14 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.jboss.jandex</groupId>
         <artifactId>jandex-maven-plugin</artifactId>
       </plugin>
@@ -213,6 +221,30 @@
                   false
                 </sortModelPropertiesByRequiredFlag>
               </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <executions>
+          <execution>
+            <id>default-mutationCoverage</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>mutationCoverage</goal>
+            </goals>
+            <configuration>
+              <targetClasses>
+                <targetClass>com.fwmotion.threescale.cms.*</targetClass>
+              </targetClasses>
+              <excludedClasses>
+                <excludedClass>com.fwmotion.threescale.cms.mappers.*Impl</excludedClass>
+              </excludedClasses>
+              <targetTests>
+                <targetTest>com.fwmotion.threescale.cms.*</targetTest>
+              </targetTests>
             </configuration>
           </execution>
         </executions>
