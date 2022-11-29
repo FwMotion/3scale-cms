@@ -796,14 +796,6 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete() {
-    }
-
-    @Test
-    void testDelete() {
-    }
-
-    @Test
     void delete_File() throws Exception{
         // Given a CmsFile object with an ID already
         CmsFile newFile = new CmsFile();
