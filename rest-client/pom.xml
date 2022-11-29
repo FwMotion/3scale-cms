@@ -132,6 +132,26 @@
         <artifactId>maven-surefire-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <includes>
+            <!-- Agent uses package/class names -->
+            <include>com.fwmotion.threescale.cms</include>
+            <include>com.fwmotion.threescale.cms.*</include>
+            <include>com.redhat.threescale.rest.cms.XmlEnabledApiClient</include>
+
+            <!-- Report uses filenames -->
+            <include>com/fwmotion/threescale/cms/**/*</include>
+            <include>com/redhat/threescale/rest/cms/XmlEnabledApiClient.class</include>
+          </includes>
+          <excludes>
+            <!-- Exclude Mapstruct-generated classes -->
+            <exclude>com/fwmotion/threescale/cms/mappers/*Impl.class</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.jboss.jandex</groupId>
         <artifactId>jandex-maven-plugin</artifactId>
       </plugin>
