@@ -836,7 +836,7 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete_sectionById() throws Exception {
+    void delete_SectionById() throws Exception {
         // Given a CmsSection object with an ID already
         CmsSection cmsSection = new CmsSection();
         cmsSection.setParentId(30);
@@ -857,7 +857,7 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete_templateById() throws Exception {
+    void delete_TemplateById() throws Exception {
         // Given a CmsLayout (Template) object with an ID already
         CmsLayout layout = new CmsLayout();
         layout.setId(119);
