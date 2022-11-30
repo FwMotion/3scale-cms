@@ -817,37 +817,29 @@ class ThreescaleCmsClientImplUnitTest {
 
     @Test
     void delete_FileById() throws Exception{
-        // Given a CmsFile object with an ID already
-        CmsFile newFile = new CmsFile();
-        newFile.setId(16);
-        newFile.setPath("/file.jpg");
-        newFile.setSectionId(30);
-        newFile.setTags(Set.of("a", "b", "c"));
-        newFile.setDownloadable(true);
-
         // When the interface code is called
-        threescaleCmsClient.delete(newFile.getType(), newFile.getId());
+        threescaleCmsClient.delete(ThreescaleObjectType.FILE, 16);
 
         // Then only the file should have been deleted
         then(filesApi).should(only()).deleteFile(
-            eq(newFile.getId()));
+            eq(16));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
     }
 
     @Test
-    void delete_SectionById() throws Exception {
+    void delete_Section() throws Exception {
         // Given a CmsSection object with an ID already
         CmsSection cmsSection = new CmsSection();
         cmsSection.setParentId(30);
-        cmsSection.setId(null);
+        cmsSection.setId(31);
         cmsSection.setSystemName("new");
         cmsSection.setPath("/new");
         cmsSection.setTitle("new_section");
         cmsSection.setPublic(true);
 
         // When the interface code is called
-        threescaleCmsClient.delete(cmsSection.getType(), cmsSection.getId());
+        threescaleCmsClient.delete(cmsSection);
 
         // Then only the section should have been deleted
         then(filesApi).shouldHaveNoInteractions();
@@ -857,18 +849,42 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete_TemplateById() throws Exception {
+    void delete_SectionById() throws Exception {
+        // When the interface code is called
+        threescaleCmsClient.delete(ThreescaleObjectType.SECTION, 31);
+
+        // Then only the section should have been deleted
+        then(filesApi).shouldHaveNoInteractions();
+        then(sectionsApi).should(only()).deleteSection(
+            eq(31));
+        then(templatesApi).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void delete_Template() throws Exception {
         // Given a CmsLayout (Template) object with an ID already
         CmsLayout layout = new CmsLayout();
         layout.setId(119);
 
         // When the interface code is called
-        threescaleCmsClient.delete(layout.getType(), layout.getId());
+        threescaleCmsClient.delete(layout);
 
         // Then only the template should have been deleted
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).should(only()).deleteTemplate(
             eq(layout.getId()));
+    }
+
+    @Test
+    void delete_TemplateById() throws Exception {
+        // When the interface code is called
+        threescaleCmsClient.delete(ThreescaleObjectType.TEMPLATE, 119);
+
+        // Then only the template should have been deleted
+        then(filesApi).shouldHaveNoInteractions();
+        then(sectionsApi).shouldHaveNoInteractions();
+        then(templatesApi).should(only()).deleteTemplate(
+            eq(119));
     }
 }
