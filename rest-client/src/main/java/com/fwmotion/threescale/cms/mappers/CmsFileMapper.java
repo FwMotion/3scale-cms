@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface CmsFileMapper {
@@ -39,7 +40,10 @@ public interface CmsFileMapper {
             return "";
         }
 
-        return String.join(",", tags);
+        // Sort tags so they're in consistent order
+        return tags.stream()
+            .sorted()
+            .collect(Collectors.joining(","));
     }
 
 }

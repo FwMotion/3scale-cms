@@ -5,6 +5,7 @@ import com.fwmotion.threescale.cms.testsupport.FilesApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.SectionsApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.TemplatesApiTestSupport;
 import com.redhat.threescale.rest.cms.ApiClient;
+import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
 import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
@@ -17,14 +18,11 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.InputStream;
@@ -39,50 +37,52 @@ import java.util.stream.Collectors;
 import static com.fwmotion.threescale.cms.matchers.HeaderMatcher.header;
 import static com.fwmotion.threescale.cms.matchers.InputStreamContentsMatcher.inputStreamContents;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class ThreescaleCmsClientImplUnitTest {
 
-    @InjectMocks
     ThreescaleCmsClientImpl threescaleCmsClient;
-
-    @Mock
     FilesApi filesApi;
-
-    @Mock
     SectionsApi sectionsApi;
-
-    @Mock
     TemplatesApi templatesApi;
 
-    @Mock
-    ApiClient apiClientMock;
-
-    @Mock
-    CloseableHttpClient httpClientMock;
-
-    @Mock
-    CloseableHttpResponse httpResponseMock;
-
     SectionsApiTestSupport sectionsApiTestSupport;
-
     FilesApiTestSupport filesApiTestSupport;
-
     TemplatesApiTestSupport templatesApiTestSupport;
+
+    ApiClient apiClient;
+    CloseableHttpClient httpClientMock;
+    CloseableHttpResponse httpResponseMock;
 
     @BeforeEach
     void setUp() {
+        // Not using @InjectMocks because sometimes that introduces weird
+        // behaviors and ends up calling real methods... Could be a strange
+        // interaction with pitest when mutating?
+        filesApi = mock(FilesApi.class);
+        sectionsApi = mock(SectionsApi.class);
+        templatesApi = mock(TemplatesApi.class);
+
+        threescaleCmsClient = new ThreescaleCmsClientImpl(
+            filesApi,
+            sectionsApi,
+            templatesApi
+        );
+
         sectionsApiTestSupport = new SectionsApiTestSupport(sectionsApi);
         filesApiTestSupport = new FilesApiTestSupport(filesApi);
         templatesApiTestSupport = new TemplatesApiTestSupport(templatesApi);
+
+        httpClientMock = mock(CloseableHttpClient.class);
+        apiClient = new XmlEnabledApiClient(httpClientMock);
+        httpResponseMock = mock(CloseableHttpResponse.class);
     }
 
     @Test
@@ -179,8 +179,7 @@ class ThreescaleCmsClientImplUnitTest {
     @Test
     void getFileContent_ByIdNoAccessCode() throws Exception {
         // Given the HTTP client is accessible
-        given(filesApi.getApiClient()).willReturn(apiClientMock);
-        given(apiClientMock.getHttpClient()).willReturn(httpClientMock);
+        given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
         given(filesApi.getFile(eq(16)))
@@ -215,8 +214,6 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        //noinspection ResultOfMethodCallIgnored
-        then(apiClientMock).should(atLeastOnce()).getHttpClient();
         //noinspection resource
         then(httpClientMock).should(only()).execute(requestCaptor.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
@@ -232,7 +229,7 @@ class ThreescaleCmsClientImplUnitTest {
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, is("*/*")))
             ).and(
-                not(hasItemInArray(header("Cookie", startsWith("access_code="))))));
+                not(hasItemInArray(header("Cookie", Matchers.startsWith("access_code="))))));
 
         // And the response should have been closed
         then(httpResponseMock).should().close();
@@ -245,8 +242,7 @@ class ThreescaleCmsClientImplUnitTest {
     @Test
     void getFileContent_ByIdWithAccessCode() throws Exception {
         // Given the HTTP client is accessible
-        given(filesApi.getApiClient()).willReturn(apiClientMock);
-        given(apiClientMock.getHttpClient()).willReturn(httpClientMock);
+        given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
         given(filesApi.getFile(eq(16)))
@@ -281,8 +277,6 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        //noinspection ResultOfMethodCallIgnored
-        then(apiClientMock).should(atLeastOnce()).getHttpClient();
         //noinspection resource
         then(httpClientMock).should(only()).execute(requestCaptor.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
@@ -311,8 +305,7 @@ class ThreescaleCmsClientImplUnitTest {
     @Test
     void getFileContent_ByCmsFileNoAccessCode() throws Exception {
         // Given the HTTP client is accessible
-        given(filesApi.getApiClient()).willReturn(apiClientMock);
-        given(apiClientMock.getHttpClient()).willReturn(httpClientMock);
+        given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
         given(filesApi.getFile(eq(16)))
@@ -350,8 +343,6 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        //noinspection ResultOfMethodCallIgnored
-        then(apiClientMock).should(atLeastOnce()).getHttpClient();
         //noinspection resource
         then(httpClientMock).should(only()).execute(requestCaptor.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
@@ -367,7 +358,7 @@ class ThreescaleCmsClientImplUnitTest {
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, is("*/*")))
             ).and(
-                not(hasItemInArray(header("Cookie", startsWith("access_code="))))));
+                not(hasItemInArray(header("Cookie", Matchers.startsWith("access_code="))))));
 
         // And the response should have been closed
         then(httpResponseMock).should().close();
@@ -380,8 +371,7 @@ class ThreescaleCmsClientImplUnitTest {
     @Test
     void getFileContent_ByCmsFileWithAccessCode() throws Exception {
         // Given the HTTP client is accessible
-        given(filesApi.getApiClient()).willReturn(apiClientMock);
-        given(apiClientMock.getHttpClient()).willReturn(httpClientMock);
+        given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
         given(filesApi.getFile(eq(16)))
@@ -419,8 +409,6 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
-        //noinspection ResultOfMethodCallIgnored
-        then(apiClientMock).should(atLeastOnce()).getHttpClient();
         //noinspection resource
         then(httpClientMock).should(only()).execute(requestCaptor.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
@@ -708,6 +696,11 @@ class ThreescaleCmsClientImplUnitTest {
         newFile.setTags(Set.of("a", "b", "c"));
         newFile.setDownloadable(true);
 
+        String expectedTagString = newFile.getTags()
+            .stream()
+            .sorted()
+            .collect(Collectors.joining(","));
+
         // And a File
         File newFileContent = new File("/tmp/file.jpg");
 
@@ -716,7 +709,7 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getSectionId()),
             eq(newFile.getPath()),
             same(newFileContent),
-            eq(String.join(",", newFile.getTags())),
+            eq(expectedTagString),
             eq(newFile.getDownloadable())))
             .willReturn(new ModelFile()
                 // TODO
@@ -730,7 +723,7 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getSectionId()),
             eq(newFile.getPath()),
             same(newFileContent),
-            eq(String.join(",", newFile.getTags())),
+            eq(expectedTagString),
             eq(newFile.getDownloadable()));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
@@ -742,38 +735,44 @@ class ThreescaleCmsClientImplUnitTest {
     @Test
     void save_UpdatedFile() throws Exception {
         // Given a CmsFile object with an ID already
-        CmsFile newFile = new CmsFile();
-        newFile.setId(16);
-        newFile.setPath("/file.jpg");
-        newFile.setSectionId(30);
-        newFile.setTags(Set.of("a", "b", "c"));
-        newFile.setDownloadable(true);
+        CmsFile updateFile = new CmsFile();
+        updateFile.setId(16);
+        updateFile.setPath("/file.jpg");
+        updateFile.setSectionId(30);
+        updateFile.setTags(Set.of("a", "b", "c"));
+        updateFile.setDownloadable(true);
+
+        String expectedTagString = updateFile.getTags()
+            .stream()
+            .sorted()
+            .collect(Collectors.joining(","));
+
 
         // And a File
         File newFileContent = new File("/tmp/file.jpg");
 
         // And the generated API will respond with an object with an ID
         given(filesApi.updateFile(
-            eq(newFile.getId()),
-            eq(newFile.getSectionId()),
-            eq(newFile.getPath()),
-            eq(String.join(",", newFile.getTags())),
-            eq(newFile.getDownloadable()),
+            eq(updateFile.getId()),
+            eq(updateFile.getSectionId()),
+            eq(updateFile.getPath()),
+            eq(expectedTagString),
+            eq(updateFile.getDownloadable()),
             same(newFileContent)))
             .willReturn(new ModelFile()
                 // TODO
                 .id(17));
 
         // When the interface code is called
-        threescaleCmsClient.save(newFile, newFileContent);
+        threescaleCmsClient.save(updateFile, newFileContent);
 
         // Then only the file content should have been saved
         then(filesApi).should(only()).updateFile(
-            eq(newFile.getId()),
-            eq(newFile.getSectionId()),
-            eq(newFile.getPath()),
-            eq(String.join(",", newFile.getTags())),
-            eq(newFile.getDownloadable()),
+            eq(updateFile.getId()),
+            eq(updateFile.getSectionId()),
+            eq(updateFile.getPath()),
+            eq(expectedTagString),
+            eq(updateFile.getDownloadable()),
             same(newFileContent));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
