@@ -11,6 +11,7 @@ import org.hamcrest.Matcher;
 import org.mockito.InOrder;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,15 +21,15 @@ import static org.mockito.Mockito.inOrder;
 
 public class TemplatesApiTestSupport {
 
-    private static final Layout MAIN_LAYOUT = new Layout()
+    public static final Layout MAIN_LAYOUT = new Layout()
         .id(119)
         .systemName("main_layout")
         .contentType("text/html")
         .handler(null)
         .liquidEnabled(true)
         .title("Main layout")
-        .createdAt(OffsetDateTime.now())
-        .updatedAt(OffsetDateTime.now());
+        .createdAt(OffsetDateTime.of(2022, 3, 5, 4, 48, 27, 0, ZoneOffset.UTC))
+        .updatedAt(OffsetDateTime.of(2022, 3, 5, 4, 48, 27, 0, ZoneOffset.UTC));
     public static final Matcher<CmsObject> MAIN_LAYOUT_MATCHER = new CmsLayoutMatcher(MAIN_LAYOUT);
 
     private static final Template TEMPLATE_WITH_DRAFT = new Template()

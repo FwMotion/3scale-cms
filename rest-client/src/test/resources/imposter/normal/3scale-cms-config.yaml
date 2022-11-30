@@ -1,0 +1,82 @@
+plugin: openapi
+
+# relative to build path (./target/test-classes/imposter/...-config.yaml)
+specFile: ../../../classes/api-spec/3scale-cms.yaml
+
+validation:
+  request: fail
+
+security:
+  default: Deny
+
+  conditions:
+  - queryParams:
+      access_token: my access token
+    effect: Permit
+
+resources:
+# Pagination on files
+- path: /admin/api/cms/files.xml
+  method: get
+  queryParams:
+    page: 1
+  response:
+    file: ../responses/list-files-1.xml
+- path: /admin/api/cms/files.xml
+  method: get
+  queryParams:
+    page: 2
+  response:
+    file: ../responses/list-files-2.xml
+
+# Pagination on sections
+- path: /admin/api/cms/sections.xml
+  method: get
+  queryParams:
+    page: 1
+  response:
+    file: ../responses/list-sections-1.xml
+- path: /admin/api/cms/sections.xml
+  method: get
+  queryParams:
+    page: 2
+  response:
+    file: ../responses/list-sections-2.xml
+- path: /admin/api/cms/sections.xml
+  method: get
+  queryParams:
+    page: 3
+  response:
+    file: ../responses/list-sections-3.xml
+
+# Pagination on templates
+- path: /admin/api/cms/templates.xml
+  method: get
+  queryParams:
+    page: 1
+  response:
+    file: ../responses/list-templates-1.xml
+- path: /admin/api/cms/templates.xml
+  method: get
+  queryParams:
+    page: 2
+  response:
+    file: ../responses/list-templates-2.xml
+- path: /admin/api/cms/templates.xml
+  method: get
+  queryParams:
+    page: 3
+  response:
+    file: ../responses/list-templates-3.xml
+- path: /admin/api/cms/templates.xml
+  method: get
+  queryParams:
+    page: 4
+  response:
+    file: ../responses/list-templates-4.xml
+- path: /admin/api/cms/templates.xml
+  method: get
+  queryParams:
+    page: 5
+  response:
+    file: ../responses/list-templates-5.xml

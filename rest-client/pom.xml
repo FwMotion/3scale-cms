@@ -104,6 +104,27 @@
       <artifactId>httpmime</artifactId>
     </dependency>
 
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>io.gatehill.imposter</groupId>
+      <artifactId>config-dynamic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gatehill.imposter</groupId>
+      <artifactId>distro-embedded</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gatehill.imposter</groupId>
+      <artifactId>imposter-server</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gatehill.imposter</groupId>
+      <artifactId>mock-openapi</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>

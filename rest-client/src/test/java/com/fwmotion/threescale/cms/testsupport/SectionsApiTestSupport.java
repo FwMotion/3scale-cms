@@ -10,6 +10,7 @@ import org.hamcrest.Matcher;
 import org.mockito.InOrder;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -23,10 +24,11 @@ public class SectionsApiTestSupport {
         .id(30)
         .parentId(null)
         .systemName("root")
+        .title("Root")
         .partialPath("/")
         ._public(true)
-        .createdAt(OffsetDateTime.now())
-        .updatedAt(OffsetDateTime.now());
+        .createdAt(OffsetDateTime.of(2022, 3, 5, 4, 48, 27, 0, ZoneOffset.UTC))
+        .updatedAt(OffsetDateTime.of(2022, 3, 18, 6, 31, 57, 0, ZoneOffset.UTC));
 
     public static final Matcher<CmsObject> ROOT_SECTION_MATCHER = new CmsSectionMatcher(ROOT_SECTION);
 
