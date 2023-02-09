@@ -15,8 +15,6 @@ public class VersionProvider implements CommandLine.IVersionProvider {
                 .orElse(new VersionProperties("-unknown", "-unknown"));
         }
 
-        return new String[]{
-            config.getApplicationName() + " v" + config.getApplicationVersion(),
-        };
+        return new String[]{ String.format("%-15s v%s", config.getApplicationName(), config.getApplicationVersion()) };
     }
 }
