@@ -61,7 +61,7 @@ public class TopLevelCommand extends CommandBase {
         if (factory == null) {
             factory = new ThreescaleCmsClientFactory();
             factory.setBaseUrl(context.getCurrentContext().getProviderDomain().toASCIIString());
-            factory.setProviderKey(context.getCurrentContext().getAccessToken());
+            factory.setAccessToken(context.getCurrentContext().getAccessToken());
             factory.setUseInsecureConnections(useInsecureConnections);
         }
 
