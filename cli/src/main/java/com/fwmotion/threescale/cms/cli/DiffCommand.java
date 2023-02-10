@@ -3,6 +3,7 @@ package com.fwmotion.threescale.cms.cli;
 import com.fwmotion.threescale.cms.cli.support.CmsObjectPathKeyGenerator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
+import com.fwmotion.threescale.cms.cli.util.ConfigurationContext;
 import com.fwmotion.threescale.cms.model.CmsLayout;
 import io.quarkus.logging.Log;
 import picocli.CommandLine;
@@ -17,6 +18,9 @@ import java.util.concurrent.Callable;
 )
 public class DiffCommand extends CommandBase implements Callable<Integer> {
 
+    @Inject
+    ConfigurationContext configContext;
+    
     @Inject
     LocalRemoteObjectTreeComparator treeComparator;
 
@@ -43,7 +47,7 @@ public class DiffCommand extends CommandBase implements Callable<Integer> {
     }
 
     private void showDiff(boolean includeDetails) throws Exception {
-        InfoCommand.displayCmsUrl(topLevelCommand.getProviderDomain());
+        InfoCommand.displayCmsUrl(configContext.getCurrentContext().getProviderDomain().toASCIIString());
 
         LocalRemoteTreeComparisonDetails details = treeComparator.compareLocalAndRemoteCmsObjectTrees(
             topLevelCommand.getCmsObjects().stream(),

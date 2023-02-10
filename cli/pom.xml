@@ -22,6 +22,10 @@
 
   <properties>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
+    <java.version>17</java.version>
+    <executable-suffix/>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+    <maven.compiler.release>${java.version}</maven.compiler.release>    
   </properties>
 
   <dependencies>
@@ -68,6 +72,11 @@
       <groupId>org.jboss.logging</groupId>
       <artifactId>commons-logging-jboss-logging</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.freva</groupId>
+      <artifactId>ascii-table</artifactId>
+      <version>1.8.0</version>
+    </dependency>    
   </dependencies>
 
   <build>

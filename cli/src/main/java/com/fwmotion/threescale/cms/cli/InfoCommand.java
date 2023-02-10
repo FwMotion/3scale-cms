@@ -3,6 +3,7 @@ package com.fwmotion.threescale.cms.cli;
 import com.fwmotion.threescale.cms.cli.support.CmsObjectPathKeyGenerator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
+import com.fwmotion.threescale.cms.cli.util.ConfigurationContext;
 import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import io.quarkus.logging.Log;
@@ -26,6 +27,9 @@ import java.util.stream.Stream;
 )
 public class InfoCommand extends CommandBase implements Callable<Integer> {
 
+    @Inject
+    ConfigurationContext configContext;
+    
     @Inject
     LocalRemoteObjectTreeComparator treeComparator;
 
@@ -52,7 +56,7 @@ public class InfoCommand extends CommandBase implements Callable<Integer> {
     }
 
     private void showInfo(boolean includeDetails) throws Exception {
-        displayCmsUrl(topLevelCommand.getProviderDomain());
+        displayCmsUrl(configContext.getCurrentContext().getProviderDomain().toASCIIString());
 
         List<CmsObject> allRemoteObjects = topLevelCommand.getCmsObjects();
         LocalRemoteTreeComparisonDetails details = treeComparator.compareLocalAndRemoteCmsObjectTrees(

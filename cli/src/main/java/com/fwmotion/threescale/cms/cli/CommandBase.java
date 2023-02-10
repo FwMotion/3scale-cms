@@ -1,9 +1,14 @@
 package com.fwmotion.threescale.cms.cli;
 
+import com.fwmotion.threescale.cms.cli.support.ExecutionExceptionHandler;
+import com.fwmotion.threescale.cms.cli.util.ConfigurationContext;
 import com.fwmotion.threescale.cms.cli.version.VersionProperties;
 import com.fwmotion.threescale.cms.cli.version.VersionProvider;
+
+import io.quarkus.picocli.runtime.PicocliCommandLineFactory;
 import picocli.CommandLine;
 
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 @CommandLine.Command(
@@ -26,4 +31,11 @@ public class CommandBase {
     @Inject
     VersionProperties versionProperties;
 
+    @Inject
+    ConfigurationContext context;
+
+    @Produces
+    CommandLine getCommandLineInstance(PicocliCommandLineFactory factory) {
+        return factory.create().setExecutionExceptionHandler(new ExecutionExceptionHandler(context));
+    }
 }
