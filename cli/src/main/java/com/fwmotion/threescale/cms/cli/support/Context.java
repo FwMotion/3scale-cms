@@ -4,16 +4,16 @@ import java.net.URI;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record Context (URI domain, String accessToken) {
+public record Context (URI providerDomain, String accessToken) {
     public Context(
-            @JsonProperty("domain") URI domain,
+            @JsonProperty("providerDomain") URI providerDomain,
             @JsonProperty("accessToken") String accessToken) {
-        this.domain = domain;
+        this.providerDomain = providerDomain;
         this.accessToken = accessToken;
     }
 
     public URI getProviderDomain() {
-        return domain;
+        return providerDomain;
     }
 
     public String getAccessToken() {

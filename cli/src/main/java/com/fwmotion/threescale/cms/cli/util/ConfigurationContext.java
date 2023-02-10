@@ -59,7 +59,7 @@ public class ConfigurationContext {
 
     private void warnAboutMissingConfigFile() {
         System.out.println("No configuration context has been defined." +
-                " Run '3scale-cms config set-context <context_name> --domain=<provider_domain> --access-token=<access_token>].' to create a context.");
+                " Run '3scale-cms config set-context <context_name> --provider-domain=<provider_domain> --access-token=<access_token>].' to create a context.");
     }
 
     public Map<String, Context> getContexts() {
@@ -123,7 +123,7 @@ public class ConfigurationContext {
         }
         catch (IOException e) {
             throw new RuntimeException("Couldn't read configuration file ~/" + CONFIG_FILE + ". Create a new one by " +
-                    "running '3scale-cms config set-context <context_name> --domain=<provider_domain> --access-token=<access_token>].' to create a context. ",
+                    "running '3scale-cms config set-context <context_name> --provider-domain=<provider_domain> --access-token=<access_token>].' to create a context. ",
                     e);
         }
     }
@@ -134,7 +134,7 @@ public class ConfigurationContext {
         }
         catch (IOException e) {
             throw new RuntimeException("Couldn't write configuration file " + configFile + ". Create a new one by " +
-                    "running un '3scale-cms config set-context <context_name> --domain=<provider_domain> --access-token=<access_token>].' to create a context.",
+                    "running un '3scale-cms config set-context <context_name> --provider-domain=<provider_domain> --access-token=<access_token>].' to create a context.",
                     e);
         }
     }

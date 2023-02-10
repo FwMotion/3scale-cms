@@ -16,10 +16,10 @@ public class SetContextCommand implements Callable<Integer> {
     @Parameters(index = "0", description = "Context name")
     String contextName;
 
-    @Option(names = { "--domain" }, description = "Base URL of the 3scale admin portal to connect to; for example: https://3scale-admin.apps.example.com/")
+    @Option(names = { "-p" , "--provider-domain"}, required = true, description = "Base URL of the 3scale admin portal to connect to; for example: https://3scale-admin.apps.example.com/")
     String domain;
 
-    @Option(names = { "--access-token" }, description = "Access token for full control of the target tenant. The access token must be granted permissions to both Account Management API and the Content Management API")
+    @Option(names = { "-t", "--access-token" }, required = true, description = "Access token for full control of the target tenant. The access token must be granted permissions to both Account Management API and the Content Management API")
     String accessToken;
     
     @Override
