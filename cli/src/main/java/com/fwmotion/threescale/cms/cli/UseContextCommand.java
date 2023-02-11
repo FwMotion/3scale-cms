@@ -6,12 +6,12 @@ import com.fwmotion.threescale.cms.cli.util.ContextNameCompletions;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "use-context", description = "Configures 3scale-cmx to use the specified context")
+@Command(name = "use-context", description = "Configures 3scale-cms to use the specified context")
 public class UseContextCommand implements Runnable {
 
     @Parameters(index = "0", description = "Context name", completionCandidates = ContextNameCompletions.class)
     String contextName;
-    
+
     @Override
     public void run() {
         ConfigurationContext context = new ConfigurationContext();
@@ -31,5 +31,4 @@ public class UseContextCommand implements Runnable {
         }
     }
 
-    
 }
