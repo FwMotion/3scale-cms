@@ -51,21 +51,21 @@
     </quarkus.bootstrap.workspace-discovery>
 
     <!-- Maven First-party Plugins -->
-    <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
-    <version.maven-failsafe-plugin>3.0.0-M6</version.maven-failsafe-plugin>
-    <version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
-    <version.maven-surefire-plugin>3.0.0-M6</version.maven-surefire-plugin>
-    <version.maven-release-plugin>3.0.0-M6</version.maven-release-plugin>
+    <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
+    <version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
+    <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
+    <version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
+    <version.maven-release-plugin>3.0.0-M7</version.maven-release-plugin>
 
     <!-- Third-party Maven Plugins -->
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
-    <version.jacoco-maven-plugin>0.8.7</version.jacoco-maven-plugin>
+    <version.jacoco-maven-plugin>0.8.8</version.jacoco-maven-plugin>
     <version.jandex-maven-plugin>1.2.3</version.jandex-maven-plugin>
     <version.openapi-generator-maven-plugin>
-      6.2.0
+      6.2.1
     </version.openapi-generator-maven-plugin>
-    <version.pitest-maven>1.7.5</version.pitest-maven>
-    <version.pitest-junit5-plugin>0.15</version.pitest-junit5-plugin>
+    <version.pitest-maven>1.9.11</version.pitest-maven>
+    <version.pitest-junit5-plugin>1.1.0</version.pitest-junit5-plugin>
 
     <!-- Dependency Group IDs -->
     <groupId.swagger-parser>io.swagger.parser.v3</groupId.swagger-parser>
@@ -77,8 +77,10 @@
     <version.apache-commons-io>2.11.0</version.apache-commons-io>
     <version.apache-commons-lang>3.12.0</version.apache-commons-lang>
     <version.apache-httpclient>4.5.13</version.apache-httpclient>
-    <version.jackson>2.13.4</version.jackson>
-    <version.jackson-databind>2.13.4.2</version.jackson-databind>
+    <version.hamcrest>2.2</version.hamcrest>
+    <version.imposter>3.2.2</version.imposter>
+    <version.jackson>2.14.1</version.jackson>
+    <version.jackson-databind>2.14.1</version.jackson-databind>
     <version.jakarta-annotation>1.3.5</version.jakarta-annotation>
     <version.jsr305>3.0.2</version.jsr305>
     <version.junit>5.8.2</version.junit>
@@ -203,6 +205,38 @@
         <artifactId>httpmime</artifactId>
         <version>${version.apache-httpclient}</version>
       </dependency>
+
+      <!-- Test Dependencies -->
+      <dependency>
+        <groupId>io.gatehill.imposter</groupId>
+        <artifactId>config-dynamic</artifactId>
+        <version>${version.imposter}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.gatehill.imposter</groupId>
+        <artifactId>distro-embedded</artifactId>
+        <version>${version.imposter}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.gatehill.imposter</groupId>
+        <artifactId>imposter-server</artifactId>
+        <version>${version.imposter}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.gatehill.imposter</groupId>
+        <artifactId>mock-openapi</artifactId>
+        <version>${version.imposter}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>${version.hamcrest}</version>
+        <scope>test</scope>
+      </dependency>
       <dependency>
         <groupId>org.mapstruct</groupId>
         <artifactId>mapstruct</artifactId>
@@ -240,6 +274,34 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${version.maven-failsafe-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-integration-test</id>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>integration-test</goal>
+              </goals>
+              <configuration>
+                <!--suppress MavenModelInspection -->
+                <argLine>${jacoco.argLine-it}</argLine>
+                <includes>
+                  <include>**/*IntegrationTest.java</include>
+                </includes>
+              </configuration>
+            </execution>
+            <execution>
+              <id>default-verify</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>${version.maven-jar-plugin}</version>
         </plugin>
@@ -250,6 +312,107 @@
           <configuration>
             <tagNameFormat>v@{project.version}</tagNameFormat>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-test</id>
+              <phase>test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+              <configuration>
+                <!--suppress MavenModelInspection -->
+                <argLine>${jacoco.argLine}</argLine>
+                <excludes>
+                  <exclude>**/*IntegrationTest.java</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${version.jacoco-maven-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-prepare-agent</id>
+              <phase>initialize</phase>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <propertyName>jacoco.argLine</propertyName>
+                <destFile>${project.build.directory}/jacoco-ut.exec</destFile>
+              </configuration>
+            </execution>
+            <execution>
+              <id>default-prepare-agent-integration</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>prepare-agent-integration</goal>
+              </goals>
+              <configuration>
+                <propertyName>jacoco.argLine-it</propertyName>
+                <destFile>${project.build.directory}/jacoco-it.exec</destFile>
+              </configuration>
+            </execution>
+            <execution>
+              <id>default-merge</id>
+              <phase>post-integration-test</phase>
+              <goals>
+                <goal>merge</goal>
+              </goals>
+              <configuration>
+                <destFile>${project.build.directory}/jacoco.exec</destFile>
+                <fileSets>
+                  <fileSet>
+                    <directory>${project.build.directory}</directory>
+                    <includes>
+                      <include>jacoco-*.exec</include>
+                    </includes>
+                  </fileSet>
+                </fileSets>
+              </configuration>
+            </execution>
+            <execution>
+              <id>default-report</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>report-unit</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/jacoco-ut.exec</dataFile>
+                <outputDirectory>${project.build.directory}/site/jacoco-ut</outputDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>report-integration</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
+                <outputDirectory>${project.build.directory}/site/jacoco-it</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.jboss.jandex</groupId>
@@ -270,9 +433,63 @@
           <artifactId>openapi-generator-maven-plugin</artifactId>
           <version>${version.openapi-generator-maven-plugin}</version>
         </plugin>
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>${version.pitest-maven}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.pitest</groupId>
+              <artifactId>pitest-junit5-plugin</artifactId>
+              <version>${version.pitest-junit5-plugin}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <historyInputFile>${project.build.directory}/pitest-history.bin</historyInputFile>
+            <historyOutputFile>${project.build.directory}/pitest-history.bin</historyOutputFile>
+
+            <mutators>
+              <mutator>STRONGER</mutator>
+            </mutators>
+
+            <!--
+              Ensure a minimum mutation threshold percentage (line threshold
+              will be checked by JaCoCo)
+            -->
+            <!-- TODO: Increase this percentage as tests cover additional code -->
+            <mutationThreshold>30</mutationThreshold>
+
+            <!--
+              Unless overridden by a Maven profile (below), do not include
+              integration tests into mutation testing. This avoids situations
+              where mutations introduce infinite loops in framework/context
+              initialization, which then cause pitest to wait several minutes
+              for such mutations to timeout.
+            -->
+            <excludedTestClasses>
+              <excludedTestClass>**.*IntegrationTest</excludedTestClass>
+            </excludedTestClasses>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <repositories>
+    <repository>
+      <id>imposter</id>
+      <name>Imposter Release Repository</name>
+      <url>https://s3-eu-west-1.amazonaws.com/gatehillsoftware-maven/releases</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
   <profiles>
     <profile>
@@ -287,12 +504,12 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>${version.maven-failsafe-plugin}</version>
             <executions>
               <execution>
+                <id>default-integration-test</id>
+                <phase>integration-test</phase>
                 <goals>
                   <goal>integration-test</goal>
-                  <goal>verify</goal>
                 </goals>
                 <configuration>
                   <systemPropertyVariables>
@@ -314,6 +531,24 @@
       <properties>
         <quarkus.package.type>native</quarkus.package.type>
       </properties>
+    </profile>
+    <profile>
+      <!-- Profile to include integration tests in mutation testing -->
+      <id>pitest-include-it</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.pitest</groupId>
+              <artifactId>pitest-maven</artifactId>
+              <version>${version.pitest-maven}</version>
+              <configuration>
+                <excludedTestClasses combine.self="override"/>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 

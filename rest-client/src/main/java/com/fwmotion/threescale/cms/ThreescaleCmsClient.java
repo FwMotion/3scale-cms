@@ -114,7 +114,11 @@ public interface ThreescaleCmsClient {
 
     void save(@Nonnull CmsTemplate template, @Nonnull File draft) throws ApiException;
 
-    void publish(@Nonnull CmsTemplate template) throws ApiException;
+    void publish(int templateId) throws ApiException;
+
+    default void publish(@Nonnull CmsTemplate template) throws ApiException {
+        publish(template.getId());
+    }
 
     void delete(@Nonnull ThreescaleObjectType type, int id) throws ApiException;
 

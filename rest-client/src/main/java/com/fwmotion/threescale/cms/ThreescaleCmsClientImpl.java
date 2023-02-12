@@ -16,10 +16,11 @@ import com.redhat.threescale.rest.cms.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.mapstruct.factory.Mappers;
 
 import javax.annotation.Nonnull;
@@ -71,7 +72,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     @Nonnull
     @Override
     public Optional<InputStream> getFileContent(int fileId) throws ApiException {
-        HttpClient httpClient = filesApi.getApiClient().getHttpClient();
+        CloseableHttpClient httpClient = filesApi.getApiClient().getHttpClient();
         ModelFile file = filesApi.getFile(fileId);
         ProviderAccount account = filesApi.readProviderSettings();
 
@@ -81,12 +82,19 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
             request.addHeader("Cookie", "access_code=" + account.getSiteAccessCode());
         }
 
-        try {
-            HttpResponse response = httpClient.execute(request);
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            if (response == null) {
+                return Optional.empty();
+            }
 
             // TODO: Validate response headers, status code, etc
 
-            return Optional.of(response.getEntity().getContent());
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(entity.getContent());
         } catch (IOException e) {
             // TODO: Create ThreescaleCmsException and throw it instead of ApiException
             throw new ApiException(e);
@@ -307,8 +315,8 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     }
 
     @Override
-    public void publish(@Nonnull CmsTemplate template) throws ApiException {
-        templatesApi.publishTemplate(template.getId());
+    public void publish(int templateId) throws ApiException {
+        templatesApi.publishTemplate(templateId);
     }
 
     @Override

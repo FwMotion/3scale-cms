@@ -433,13 +433,6 @@ components:
       - page
       - layout
       - partial
-    Error:
-      description: |
-        Description of an individual error that occurred while processing
-        an event.
-      type: string
-      xml:
-        name: error
     ErrorHash:
       description: Unhandled server error on 3scale
       properties:
@@ -457,7 +450,12 @@ components:
       description: List of errors that occurred in processing a request
       type: array
       items:
-        $ref: '#/components/Error'
+        description: |
+          Description of an individual error that occurred while processing
+          an event.
+        type: string
+        xml:
+          name: error
       xml:
         name: errors
     File:
