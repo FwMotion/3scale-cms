@@ -45,7 +45,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
 
-    <!-- Support Quarkus knowing about multi-module project -->
+    <!-- Support Quarkus knowing about multimodule project -->
     <quarkus.bootstrap.workspace-discovery>
       true
     </quarkus.bootstrap.workspace-discovery>
