@@ -9,16 +9,93 @@ demonstrates API-first code generation.
 
 The included Command Line Interface (CLI) tool is a
 rewritten and enhanced version of the same tool written in Ruby, available at
-link:https://github.com/hguerrero/3scale-cms[hguerrero/3scale-cms]. The CLI tool has been re-implemented using Java and Quarkus.
+link:https://github.com/hguerrero/3scale-cms/tree/master[hguerrero/3scale-cms#master].
+This  CLI tool has been re-implemented using Java and Quarkus.
 
 [WARNING]
 ====
 *The 3scale CMS tools, as well as the 3scale Content
-Management API that they rely upon, are not supported by Red Hat. These tools and the
-undocumented 3scale Content Management API may change at any moment without any
-guarantee of backward compatibility. Therefore, these tools are not recommended
-for production use.*
+Management API that they rely upon, are not supported by Red Hat. These tools
+and the undocumented 3scale Content Management API may change at any moment
+without any guarantee of backward compatibility. Therefore, these tools are
+not recommended for production use.*
 ====
+
+== Building Locally
+
+Project builds are orchestrated by link:https://maven.apache.org/[Apache Maven],
+utilizing link:https://maven.apache.org/wrapper[Maven Wrapper] with the goal for
+a consistent compilation environment.
+
+=== Prerequisites
+
+The following is required to build 3scale-cms for any build type:
+
+1. Java JDK 11 or newer
+
+To perform a native-mode build, at least one of the following must
+also be installed:
+
+1. link:https://podman.io[Podman]
+2. link:https://www.docker.com[Docker]
+3. link:https://github.com/graalvm/mandrel[Mandrel], a GraalVM downstream
+   distribution that focuses solely on Quarkus support
+4. link:https://www.graalvm.org/[GraalVM]
+
+For more information on prerequisites and configuration for native-mode builds,
+refer to the
+link:https://quarkus.io/guides/building-native-image[Quarkus "Building a Native Executable" Guide].
+
+=== Building in JVM-mode
+
+To build 3scale-cms to run in JVM-mode, run the following Maven Wrapper phase:
+
+[source,bash]
+----
+./mvnw verify
+----
+
+Upon successful compilation, the 3scale-cms CLI may be executed via the
+following Java command:
+
+[source,bash]
+----
+java -jar cli/target/quarkus-app/quarkus-run.jar
+----
+
+=== Building in Native-mode
+
+Similar to JVM-mode builds, native-mode builds are also run with Maven Wrapper.
+The difference is by enabling the `native` profile:
+
+[source,bash]
+----
+./mvnw verify -Pnative
+----
+
+Upon successful completion, the 3scale-cms CLI may be executed via the newly
+compiled executable:
+
+[source,bash]
+----
+cli/target/3scale-cms-tools-cli-VERSION-runner
+----
+
+[NOTE]
+====
+Replace `VERSION` with the version number of 3scale-cms that was just compiled.
+====
+
+=== Running in Quarkus Dev-Mode
+
+To run 3scale-cms CLI in Quarkus dev-mode, the following Maven Wrapper command
+may be invoked from the project root:
+
+[source,bash]
+----
+./mvnw -pl cli -am verify quarkus:dev
+----
+
 
 == Included Artifacts
 
@@ -26,18 +103,19 @@ This repository contains the following artifacts:
 
 === OpenAPI Specification for 3scale CMS
 
-The 3scale CMS tools project provides documentation for the 3scale Content Management API, which can be found in the repository at:
+The 3scale CMS tools project provides documentation for the 3scale Content
+Management API, which can be found in the repository at:
 link:rest-client/src/main/resources/api-spec/3scale-cms.yaml[].
 
-The documentation uses the *OpenAPI Specification
-v3.0* format. It describes the available endpoints for managing CMS objects, along with the endpoint of
-the Account Management API, which is used for lookup of the Developer Portal base URL
-and the Developer Portal access code.
+The documentation uses the *OpenAPI Specification v3.0* format. It describes
+the available endpoints for managing CMS objects, along with the endpoint of
+the Account Management API, which is used for lookup of the Developer Portal
+base URL and the Developer Portal access code.
 
 === REST Client JAR
 
-The 3scale CMS tools project provides a standalone REST client JAR. The JAR is available in the
-GitHub Packages maven repository.
+The 3scale CMS tools project provides a standalone REST client JAR. The JAR is
+available in the GitHub Packages maven repository.
 
 To use the JAR in a Maven project, first include the following repository
 definition:
@@ -61,7 +139,8 @@ definition:
 </repositories>
 ----
 
-To include the client JAR as a dependency, use the following dependency definition:
+To include the client JAR as a dependency, use the following dependency
+definition:
 
 [source,xml]
 ----
@@ -74,14 +153,15 @@ To include the client JAR as a dependency, use the following dependency definiti
 
 === Command-Line Interface / Container Image
 
-The 3scale CMS tools project provides a CLI tool that provides a convenient mechanism for interacting with the 3scale
-Content Management API. It is implemented using link:https://quarkus.io[Quarkus] and
+The 3scale CMS tools project provides a CLI tool that provides a convenient
+mechanism for interacting with the 3scale Content Management API. It is
+implemented using link:https://quarkus.io[Quarkus] and
 link:https://picocli.info[picocli], with a compiled and assembled container
 image provided in GitHub Packages.
 
 ==== Usage with Podman
 
-Run the CLI tool using Podman:
+Run the CLI tool using link:https://podman.io[Podman]:
 
 [source,bash]
 ----
@@ -90,7 +170,7 @@ podman run -it --rm -v .:/cms:Z ghcr.io/fwmotion/3scale-cms:latest --help
 
 ==== Usage with Docker
 
-Run the CLI tool using Docker:
+Run the CLI tool using link:https://www.docker.com[Docker]:
 
 [source,bash]
 ----
@@ -123,26 +203,42 @@ templated for server-side rendering as needed.
 
 === Prerequisites
 
-You must have an account in 3scale. The CMS contents can be viewed in the **Developer Portal** section of the admin portal for that account.
+You must have an account in 3scale. The CMS contents can be viewed in the
+**Developer Portal** section of the admin portal for that account.
 To use the `3scale-cms` command you need to provide a few parameters:
 
-- An **ACCESS_TOKEN**, which can be used instead of a PROVIDER_KEY. The access token must be granted permissions to both the Account Management API and the hidden Content Management API.
-- The **PROVIDER_KEY**, which can be found in the Account tab of your admin portal (only visible to the users with "admin" role). The PROVIDER_KEY will be ignored if an ACCESS_TOKEN is specified.
-- The **PROVIDER_DOMAIN** of your admin portal. e.g. `https://mycompany-admin.3scale.net`
-- The **DIRECTORY**, which specifies a local directory path for determining files to upload, download, or compare between the local filesystem and the 3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms` command will choose a working directory following the rules described in this <<working_directory,note>>.
+- An **ACCESS_TOKEN**, which can be used instead of a PROVIDER_KEY. The access
+token must be granted permissions to both the Account Management API and the
+hidden Content Management API.
+- The **PROVIDER_KEY**, which can be found in the Account tab of your admin
+portal (only visible to the users with "admin" role). The PROVIDER_KEY will be
+ignored if an ACCESS_TOKEN is specified.
+- The **PROVIDER_DOMAIN** of your admin portal. e.g.
+`https://mycompany-admin.3scale.net`
+- The **DIRECTORY**, which specifies a local directory path for determining
+files to upload, download, or compare between the local filesystem and the
+3scale CMS content. This is an optional parameter. If omitted, the `3scale-cms`
+command will choose a working directory following the rules described in this
+<<working_directory,note>>.
 
 === Workflow
 
 ==== Getting started
 Create a directory where you will work on your CMS locally:
 
-    cd ~
-    mkdir my_cms
-    cd my_cms
+[source,bash]
+----
+cd ~
+mkdir my_cms
+cd my_cms
+----
 
 ==== Create your `.cmsignore` file
 
-    touch .cmsignore
+[source,bash]
+----
+touch .cmsignore
+----
 
 You can edit this file at any time.
 
@@ -150,65 +246,78 @@ You can edit this file at any time.
 
 The `3scale-cms` command has five actions:
 
-- **info**      - show information about contents of the CMS and the local files. It accepts the optional parameter: 'details'
-- **diff**      - show the difference in contents between the CMS and the local files. It accepts the optional parameter: 'details'
-- **download**  - download all the contents of the CMS (no parameter). Or specify a file or section (with its contents) to download
-- **upload**    - upload all the local files (no parameter). Or specify a file or section (with its contents) to upload
-- **delete**    - delete all (that can be deleted) or a specific entry in the remote CMS
+- **info**      - show information about contents of the CMS and the local
+files. It accepts the optional parameter: 'details'
+- **diff**      - show the difference in contents between the CMS and the local
+files. It accepts the optional parameter: 'details'
+- **download**  - download all the contents of the CMS (no parameter). Or
+specify a file or section (with its contents) to download
+- **upload**    - upload all the local files (no parameter). Or specify a file
+or section (with its contents) to upload
+- **delete**    - delete all (that can be deleted) or a specific entry in the
+remote CMS
 
 [#working_directory]
 [NOTE]
 ====
-The `3scale-cms` command will determine the appropriate working directory based on the following rules:
+The `3scale-cms` command will determine the appropriate working directory based
+on the following rules:
 
-    - If the root of the local CMS content is specified by the command line parameter `-d` or `--directory`, then that directory is used.
-    - If the command line parameter is not specified but the environment variable `THREESCALE_CMS_ROOT` is defined, then that directory is used.
-    - If neither are specified, then the current working directory is used.
+- If the root of the local CMS content is specified by the command line
+parameter `-d` or `--directory`, then that directory is used.
+- If the command line parameter is not specified but the environment variable
+`THREESCALE_CMS_ROOT` is defined, then that directory is used.
+- If neither are specified, then the current working directory is used.
 ====
 
 ==== 3scale-cms info
-This command displays information about contents of the CMS and the local files. It accepts the optional parameter: 'details'
+This command displays information about contents of the CMS and the local files.
+It accepts the optional parameter: 'details'
 
-```bash
+[source,bash]
+----
 podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info
-```
+----
 
 Output should resemble:
-
-```
+[source]
+----
 Contacting CMS at PROVIDER_DOMAIN/admin/api/cms to get content list
 The layout 'main_layout' in file '/l_main_layout.html.liquid' was selected as the default layout for uploading new pages
 118 items found in CMS
 7 ignored local files (matching patterns in '.cmsignore')
 152 (non-ignored) local files
 8 implicit folders due to file/template system_names containing '/'
-```
+----
 
-Use
-
-```bash
-podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
-```
-
-to get the list of specific files in each of those four categories:
+Use the following to get a list of specific files in each of these four
+categories:
 
 - CMS contents elements
 - Locally ignored files
 - Local files that are not being ignored
 - List of folders created due to CMS elements with '/' in the name
 
+[source,bash]
+----
+podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN info details
+----
+
 ==== 3scale-cms diff
-This command displays the differences in contents (taking into account ignored files and implicit folders) between the CMS and the local
-files.
+This command displays the differences in contents (taking into account ignored
+files and implicit folders) between the CMS and the local files.
 
 Use
 
-```bash
+[source,bash]
+----
 podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff
-```
+----
 
 Output should resemble:
-```
+
+[source]
+----
 Contacting CMS at PROVIDER_DOMAIN/admin/api/cms to get content list
 The layout 'main_layout' was selected as the default layout for uploading new pages
 
@@ -217,47 +326,64 @@ Summary:
 0 files to be updated locally
 17 files to be created on CMS
 1 files to be updated on CMS
-```
+----
 
-to get the list of specific files to be applied on 'download' and 'upload' use:
+To get the list of specific files to be applied on 'download' and 'upload' use:
 
-```bash
+[source,bash]
+----
 podman run --rm -it -v .:/cms:Z ghcr.io/fwmotion/3scale-cms PROVIDER_KEY PROVIDER_DOMAIN diff details
-```
+----
 
 ==== 3scale-cms download
-If used without an additional file/directory name parameter, this command downloads the entire contents of the CMS that either doesn't exist locally, or is out of date locally (based on timestamps of files/folders).
+If used without an additional file/directory name parameter, this command
+downloads the entire contents of the CMS that either doesn't exist locally, or
+is out of date locally (based on timestamps of files/folders).
 
-If a filename is specified, then only that file is downloaded (if it exists in the CMS and is out of date locally).
+If a filename is specified, then only that file is downloaded (if it exists in
+the CMS and is out of date locally).
 
-If a directory name is specified, then it and all its contents (recursively down) are checked and any content that is found to exist in the CMS and is out of date is downloaded.
+If a directory name is specified, then it and all its contents (recursively
+down) are checked and any content that is found to exist in the CMS and is out
+of date is downloaded.
 
 [NOTE]
 ====
-Existing files are overwritten on download, and missing files are ignored unless the `--delete-missing` flag is specified.
+Existing files are overwritten on download, and missing files are ignored unless
+the `--delete-missing` flag is specified.
 
 Files matching patterns in `.cmsignore` are not currently skipped.
 ====
 
 ==== 3scale-cms upload
-If used without an additional file/directory name parameter, this command uploads all local files found under the current working directory that are either out of date in the CMS (based on timestamps) or do not exist in the CMS.
+If used without an additional file/directory name parameter, this command
+uploads all local files found under the current working directory that are
+either out of date in the CMS (based on timestamps) or do not exist in the CMS.
 
-If a filename is specified, then only that file is uploaded (if it exists in the CMS and is out of date, or does not exist in the CMS).
+If a filename is specified, then only that file is uploaded (if it exists in
+the CMS and is out of date, or does not exist in the CMS).
 
-If a directory name is specified, then it and all its contents (recursively down) are checked and any content that is found to not exist in the CMS or is out of date in the CMS is uploaded.
+If a directory name is specified, then it and all its contents (recursively
+down) are checked and any content that is found to not exist in the CMS or is
+out of date in the CMS is uploaded.
 
 Files matching patterns in `.cmsignore` are skipped.
 
 ==== 3scale-cms delete
-If used without an additional parameter this command will attempt to delete all content under the `root` section on the remote CMS (indicated via domain parameter).
+If used without an additional parameter this command will attempt to delete all
+content under the `root` section on the remote CMS (indicated via domain
+parameter).
 
-If used with a specific filename it will attempt to delete that entry in the remote CMS.
+If used with a specific filename it will attempt to delete that entry in the
+remote CMS.
 
-If used with a folder name, it will attempt to delete that section and all sections and content under it in the CMS.
+If used with a folder name, it will attempt to delete that section and all
+sections and content under it in the CMS.
 
 [WARNING]
 ====
-*This action cannot be undone, and should be used with caution. Double-check the domain parameter you intend to use.*
+*This action cannot be undone, and should be used with caution. Double-check
+the domain parameter you intend to use.*
 ====
 
 == Usage Notes
@@ -265,43 +391,68 @@ If used with a folder name, it will attempt to delete that section and all secti
 The `3scale-cms` command enables you to do offline editing, changes or
 version control of the contents of a CMS in your admin portal in 3scale.
 
-In the CMS it is possible to create a file, a template or a section. Examples of files are an image, a JS script, or a CSS stylesheet. A template is generally
+In the CMS it is possible to create a file, a template or a section. Examples
+of files are an image, a JS script, or a CSS stylesheet. A template is generally
 content in an `.html.liquid` file. A section is a hierarchical folder in the CMS
 for storing other elements.
 
 === Mirroring CMS contents locally
 
-The mirror used locally is a hierarchy of folders that mirrors the content organization in the CMS. Thus _sections_ in the CMS are mirrored as directories on your local file system, and the elements below that section in the CMS are placed inside that directory.
+The mirror used locally is a hierarchy of folders that mirrors the content
+organization in the CMS. Thus _sections_ in the CMS are mirrored as directories
+on your local file system, and the elements below that section in the CMS are
+placed inside that directory.
 
 [NOTE]
 ====
-It is possible to create a file/template in the CMS that is served from a path other than its location in the CMS. e.g. a file called `image.jpg` that is in the root section of the CMS, but is served from `other_path/image.jpg`. This file will be mirrored locally into `./other_path/image.jpg`, with the directory `other_path` being created to store it. However, this directory is tracked as one of the _implicit folders_, to avoid a section for it being created by mistake on any later upload.
+It is possible to create a file/template in the CMS that is served from a path
+other than its location in the CMS. e.g. a file called `image.jpg` that is in
+the root section of the CMS, but is served from `other_path/image.jpg`. This
+file will be mirrored locally into `./other_path/image.jpg`, with the directory
+`other_path` being created to store it. However, this directory is tracked as
+one of the _implicit folders_, to avoid a section for it being created by
+mistake on any later upload.
 ====
 
 === CMS Ignore File
 
-It is often desirable to have some files in the local directory that you do not want to upload to the CMS. Examples could be files used in the version control of your CMS contents (e.g. a `.git` folder), or files used in the testing or Continuous Integration of your contents (e.g. `travis.yml` file).
+It is often desirable to have some files in the local directory that you do not
+want to upload to the CMS. Examples could be files used in the version control
+of your CMS contents (e.g. a `.git` folder), or files used in the testing or
+Continuous Integration of your contents (e.g. `travis.yml` file).
 
-To have the `3scale-cms` command ignore these files, they can be added to the `.cmsignore` file in any directory of the CMS mirror. These files use the 'glob' format to allow specifying patterns of files and directories, not just specific files.
+To have the `3scale-cms` command ignore these files, they can be added to the
+`.cmsignore` file in any directory of the CMS mirror. These files use the
+'glob' format to allow specifying patterns of files and directories, not just
+specific files.
 
 === New local page/layout files
 
-When a local file of type `.html` or `.html.liquid` is created that does not have the `\_` (underscore) prefix to indicate it is a partial or the `l_` (l-underscore) prefix to indicate it is a layout, then the tool assumes that the new file is a page and uploads it as such.
+When a local file of type `.html` or `.html.liquid` is created that does not
+have the `\_` (underscore) prefix to indicate it is a partial or the `l_`
+(l-underscore) prefix to indicate it is a layout, then the tool assumes that the
+new file is a page and uploads it as such.
 
 [NOTE]
 ====
-By convention, partial filenames are expected to have the prefix `\_` (underscore) and layout filenames are expected to have the prefix `l_` (l-underscore). The `3scale-cms` tool does not enforce these conventions at present. If partial or layout files are misnamed, they will have to be deleted and recreated, as file renaming is not supported by 3scale.
+By convention, partial filenames are expected to have the prefix `\_`
+(underscore) and layout filenames are expected to have the prefix `l_`
+(l-underscore). The `3scale-cms` tool does not enforce these conventions at
+present. If partial or layout files are misnamed, they will have to be deleted
+and recreated, as file renaming is not supported by 3scale.
 ====
 
 === Default layouts for new pages
 
-When a page is created in the CMS, the layout to apply to it must be specified. To allow for automatic use of the tool
-without user intervention the tool chooses a default layout from the layouts in the CMS to use for new files it creates.
+When a page is created in the CMS, the layout to apply to it must be specified.
+To allow for automatic use of the tool without user intervention the tool
+chooses a default layout from the layouts in the CMS to use for new files it
+creates.
 
-Upon start-up the tool examines the list of layouts in the CMS and chooses one as the default layout for new pages that
-will be created.
+Upon start-up the tool examines the list of layouts in the CMS and chooses one
+as the default layout for new pages that will be created.
 
 If no layouts are available in the CMS, the tool will not run.
 
-If you wish to use a different layout for a newly created page, you currently have to go to the CMS in the admin portal
-and change it manually.
+If you wish to use a different layout for a newly created page, you currently
+have to go to the CMS in the admin portal and change it manually.
