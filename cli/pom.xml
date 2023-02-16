@@ -17,8 +17,8 @@
   <url>https://fwmotion.github.io/3scale-cms/cli</url>
   <description><![CDATA[
     A Quarkus-based command-line interface to the 3scale Content Management
-    System. It is recommended to use this via the native-mode compiled
-    container image `ghcr.io/fwmotion/3scale-cms`.
+    System. It is recommended to use this via the assembled container image
+    `ghcr.io/fwmotion/3scale-cms`.
   ]]></description>
 
   <distributionManagement>
