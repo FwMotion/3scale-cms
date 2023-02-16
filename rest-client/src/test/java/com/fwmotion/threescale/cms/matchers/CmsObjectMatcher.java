@@ -9,11 +9,11 @@ import java.time.OffsetDateTime;
 
 public abstract class CmsObjectMatcher extends TypeSafeMatcher<CmsObject> {
 
-    private final Integer expectedId;
+    private final Long expectedId;
     private final OffsetDateTime expectedCreatedAt;
     private final OffsetDateTime expectedUpdatedAt;
 
-    protected CmsObjectMatcher(@Nullable Integer expectedId,
+    protected CmsObjectMatcher(@Nullable Long expectedId,
                                @Nullable OffsetDateTime expectedCreatedAt,
                                @Nullable OffsetDateTime expectedUpdatedAt) {
         this.expectedId = expectedId;

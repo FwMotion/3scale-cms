@@ -10,7 +10,7 @@ public class CmsBuiltinPage implements CmsTemplate {
 
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private Integer id;
+    private Long id;
     private String systemName;
     private String contentType;
     private String handler;
@@ -39,11 +39,11 @@ public class CmsBuiltinPage implements CmsTemplate {
     }
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -10,8 +10,8 @@ public class CmsPage implements CmsTemplate {
 
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private Integer id;
-    private Integer sectionId;
+    private Long id;
+    private Long sectionId;
     private String contentType;
     private String handler;
     private Boolean liquidEnabled;
@@ -39,19 +39,19 @@ public class CmsPage implements CmsTemplate {
     }
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Integer getSectionId() {
+    public Long getSectionId() {
         return sectionId;
     }
 
-    public void setSectionId(Integer sectionId) {
+    public void setSectionId(Long sectionId) {
         this.sectionId = sectionId;
     }
 
