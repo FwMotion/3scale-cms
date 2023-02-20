@@ -20,8 +20,8 @@ import static org.mockito.Mockito.inOrder;
 public class FilesApiTestSupport {
 
     public static final ModelFile FAVICON_FILE = new ModelFile()
-        .id(16)
-        .sectionId(33)
+        .id(16L)
+        .sectionId(33L)
         .path("/favicon.ico")
         .url("http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/favicon-e94f1a378c59231c.ico?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=deb0c4a3741a76adf739c3865c978aa0a062410685efa0b16e2827c977ea3143")
         .tagList("")

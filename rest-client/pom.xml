@@ -126,6 +126,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.gatehill.imposter</groupId>
+      <artifactId>mock-rest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <scope>test</scope>

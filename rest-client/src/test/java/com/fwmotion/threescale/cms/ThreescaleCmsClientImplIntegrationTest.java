@@ -4,19 +4,24 @@ import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.testsupport.FilesApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.SectionsApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.TemplatesApiTestSupport;
+import io.gatehill.imposter.embedded.ImposterBuilder;
 import io.gatehill.imposter.embedded.MockEngine;
-import io.gatehill.imposter.openapi.embedded.OpenApiImposterBuilder;
+import io.gatehill.imposter.plugin.openapi.OpenApiPluginImpl;
+import io.gatehill.imposter.plugin.rest.RestPluginImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import static com.fwmotion.threescale.cms.matchers.InputStreamContentsMatcher.inputStreamContents;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ThreescaleCmsClientImplIntegrationTest {
 
@@ -33,7 +38,9 @@ public class ThreescaleCmsClientImplIntegrationTest {
                 .getResource("/imposter/normal")
             ).toURI());
 
-        threescaleAdminImposter = new OpenApiImposterBuilder<>()
+        threescaleAdminImposter = new ImposterBuilder<>()
+            .withPluginClass(OpenApiPluginImpl.class)
+            .withPluginClass(RestPluginImpl.class)
             .withConfigurationDir(configDir)
             .startBlocking();
 
@@ -63,5 +70,14 @@ public class ThreescaleCmsClientImplIntegrationTest {
             SectionsApiTestSupport.ROOT_SECTION_MATCHER,
             TemplatesApiTestSupport.MAIN_LAYOUT_MATCHER
         ));
+    }
+
+    @Test
+    void getFileContent() throws Exception {
+        Optional<InputStream> result = cmsClient.getFileContent(16);
+
+        assertFalse(result.isEmpty());
+
+        assertThat(result.get(), inputStreamContents(equalTo("This is a test value.\n")));
     }
 }

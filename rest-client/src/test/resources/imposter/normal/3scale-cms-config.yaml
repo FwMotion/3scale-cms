@@ -80,3 +80,16 @@ resources:
     page: 5
   response:
     file: ../responses/list-templates-5.xml
+
+  # Templated provider settings
+  # (This will point Developer Portal URL at Imposter-managed files described
+  # in dev-portal-config.yaml)
+- path: /admin/api/provider.xml
+  method: get
+  capture:
+    host:
+      requestHeader: Host
+      store: request
+  response:
+    template: true
+    file: ../responses/templated-provider-settings.xml

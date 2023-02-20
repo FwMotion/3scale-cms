@@ -244,7 +244,7 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         }
     }
 
-    private Integer findParentId(@Nonnull String pathKey,
+    private Long findParentId(@Nonnull String pathKey,
                                  @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
                                  @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
         String parentPathKey;

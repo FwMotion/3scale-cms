@@ -1,0 +1,17 @@
+plugin: rest
+
+resources:
+- path: /devportal/images/desk.jpg
+  method: get
+  security:
+    default: Deny
+
+    conditions:
+      - requestHeaders:
+          Cookie: access_code=abcd
+        effect: Permit
+  response:
+    statusCode: 200
+
+    content: |
+      This is a test value.

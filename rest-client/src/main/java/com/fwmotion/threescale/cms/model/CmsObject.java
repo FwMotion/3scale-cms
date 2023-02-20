@@ -6,7 +6,7 @@ public interface CmsObject {
 
     ThreescaleObjectType getType();
 
-    Integer getId();
+    Long getId();
 
     OffsetDateTime getCreatedAt();
 

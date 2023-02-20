@@ -22,7 +22,7 @@ import static org.mockito.Mockito.inOrder;
 public class TemplatesApiTestSupport {
 
     public static final Layout MAIN_LAYOUT = new Layout()
-        .id(119)
+        .id(119L)
         .systemName("main_layout")
         .contentType("text/html")
         .handler(null)
@@ -77,12 +77,12 @@ public class TemplatesApiTestSupport {
                 .totalEntries(1));
     }
 
-    public void givenGetTemplateWithoutDraft(int expectedId) throws ApiException {
+    public void givenGetTemplateWithoutDraft(long expectedId) throws ApiException {
         given(templatesApi.getTemplate(expectedId))
             .willReturn(TEMPLATE_WITHOUT_DRAFT);
     }
 
-    public void givenGetTemplateWithDraft(int expectedId) throws ApiException {
+    public void givenGetTemplateWithDraft(long expectedId) throws ApiException {
         given(templatesApi.getTemplate(expectedId))
             .willReturn(TEMPLATE_WITH_DRAFT);
     }

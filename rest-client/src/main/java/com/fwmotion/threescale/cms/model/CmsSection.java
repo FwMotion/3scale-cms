@@ -10,9 +10,9 @@ public class CmsSection implements CmsObject{
 
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private Integer id;
+    private Long id;
     private String systemName;
-    private Integer parentId;
+    private Long parentId;
     private String title;
     private Boolean _public;
     private String path;
@@ -41,11 +41,11 @@ public class CmsSection implements CmsObject{
     }
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -57,11 +57,11 @@ public class CmsSection implements CmsObject{
         this.systemName = systemName;
     }
 
-    public Integer getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(Integer parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 

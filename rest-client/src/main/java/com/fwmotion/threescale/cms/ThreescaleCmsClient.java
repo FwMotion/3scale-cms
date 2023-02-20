@@ -49,7 +49,7 @@ public interface ThreescaleCmsClient {
     }
 
     @Nonnull
-    Optional<InputStream> getFileContent(int fileId) throws ApiException;
+    Optional<InputStream> getFileContent(long fileId) throws ApiException;
 
     @Nonnull
     default Optional<InputStream> getFileContent(@Nonnull CmsFile file) {
@@ -75,7 +75,7 @@ public interface ThreescaleCmsClient {
     }
 
     @Nonnull
-    Optional<InputStream> getTemplateDraft(int templateId) throws ApiException;
+    Optional<InputStream> getTemplateDraft(long templateId) throws ApiException;
 
     @Nonnull
     default Optional<InputStream> getTemplateDraft(@Nonnull CmsTemplate template) {
@@ -92,7 +92,7 @@ public interface ThreescaleCmsClient {
     }
 
     @Nonnull
-    Optional<InputStream> getTemplatePublished(int templateId) throws ApiException;
+    Optional<InputStream> getTemplatePublished(long templateId) throws ApiException;
 
     @Nonnull
     default Optional<InputStream> getTemplatePublished(@Nonnull CmsTemplate template) {
@@ -114,13 +114,13 @@ public interface ThreescaleCmsClient {
 
     void save(@Nonnull CmsTemplate template, @Nonnull File draft) throws ApiException;
 
-    void publish(int templateId) throws ApiException;
+    void publish(long templateId) throws ApiException;
 
     default void publish(@Nonnull CmsTemplate template) throws ApiException {
         publish(template.getId());
     }
 
-    void delete(@Nonnull ThreescaleObjectType type, int id) throws ApiException;
+    void delete(@Nonnull ThreescaleObjectType type, long id) throws ApiException;
 
     default void delete(@Nonnull CmsObject object) throws ApiException {
         if (object.getId() != null) {

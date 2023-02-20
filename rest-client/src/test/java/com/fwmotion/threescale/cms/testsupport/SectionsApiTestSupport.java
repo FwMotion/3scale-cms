@@ -21,7 +21,7 @@ import static org.mockito.Mockito.inOrder;
 public class SectionsApiTestSupport {
 
     public static final Section ROOT_SECTION = new Section()
-        .id(30)
+        .id(30L)
         .parentId(null)
         .systemName("root")
         .title("Root")

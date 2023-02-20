@@ -182,7 +182,7 @@ class ThreescaleCmsClientImplUnitTest {
         given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
-        given(filesApi.getFile(eq(16)))
+        given(filesApi.getFile(eq(16L)))
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
@@ -204,7 +204,7 @@ class ThreescaleCmsClientImplUnitTest {
         Optional<InputStream> resultOptional = threescaleCmsClient.getFileContent(16);
 
         // Then only the Files API should have interactions
-        then(filesApi).should().getFile(eq(16));
+        then(filesApi).should().getFile(eq(16L));
         then(filesApi).should().readProviderSettings();
         //noinspection ResultOfMethodCallIgnored
         then(filesApi).should(atLeastOnce()).getApiClient();
@@ -245,7 +245,7 @@ class ThreescaleCmsClientImplUnitTest {
         given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
-        given(filesApi.getFile(eq(16)))
+        given(filesApi.getFile(eq(16L)))
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
@@ -267,7 +267,7 @@ class ThreescaleCmsClientImplUnitTest {
         Optional<InputStream> resultOptional = threescaleCmsClient.getFileContent(16);
 
         // Then only the Files API should have interactions
-        then(filesApi).should().getFile(eq(16));
+        then(filesApi).should().getFile(eq(16L));
         then(filesApi).should().readProviderSettings();
         //noinspection ResultOfMethodCallIgnored
         then(filesApi).should(atLeastOnce()).getApiClient();
@@ -308,7 +308,7 @@ class ThreescaleCmsClientImplUnitTest {
         given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
-        given(filesApi.getFile(eq(16)))
+        given(filesApi.getFile(eq(16L)))
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
@@ -328,12 +328,12 @@ class ThreescaleCmsClientImplUnitTest {
 
         // When file content is requested
         CmsFile cmsFile = new CmsFile();
-        cmsFile.setId(16);
+        cmsFile.setId(16L);
 
         Optional<InputStream> resultOptional = threescaleCmsClient.getFileContent(cmsFile);
 
         // Then only the Files API should have interactions
-        then(filesApi).should().getFile(eq(16));
+        then(filesApi).should().getFile(eq(16L));
         then(filesApi).should().readProviderSettings();
         //noinspection ResultOfMethodCallIgnored
         then(filesApi).should(atLeastOnce()).getApiClient();
@@ -374,7 +374,7 @@ class ThreescaleCmsClientImplUnitTest {
         given(filesApi.getApiClient()).willReturn(apiClient);
 
         // And the Files API will return information about the file
-        given(filesApi.getFile(eq(16)))
+        given(filesApi.getFile(eq(16L)))
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
@@ -394,12 +394,12 @@ class ThreescaleCmsClientImplUnitTest {
 
         // When file content is requested
         CmsFile cmsFile = new CmsFile();
-        cmsFile.setId(16);
+        cmsFile.setId(16L);
 
         Optional<InputStream> resultOptional = threescaleCmsClient.getFileContent(cmsFile);
 
         // Then only the Files API should have interactions
-        then(filesApi).should().getFile(eq(16));
+        then(filesApi).should().getFile(eq(16L));
         then(filesApi).should().readProviderSettings();
         //noinspection ResultOfMethodCallIgnored
         then(filesApi).should(atLeastOnce()).getApiClient();
@@ -469,7 +469,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout published content")));
@@ -483,7 +483,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout draft content")));
@@ -494,13 +494,13 @@ class ThreescaleCmsClientImplUnitTest {
         templatesApiTestSupport.givenGetTemplateWithoutDraft(119);
 
         CmsLayout layout = new CmsLayout();
-        layout.setId(119);
+        layout.setId(119L);
 
         Optional<InputStream> result = threescaleCmsClient.getTemplateDraft(layout);
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout published content")));
@@ -511,13 +511,13 @@ class ThreescaleCmsClientImplUnitTest {
         templatesApiTestSupport.givenGetTemplateWithDraft(119);
 
         CmsLayout layout = new CmsLayout();
-        layout.setId(119);
+        layout.setId(119L);
 
         Optional<InputStream> result = threescaleCmsClient.getTemplateDraft(layout);
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout draft content")));
@@ -531,7 +531,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout published content")));
@@ -542,13 +542,13 @@ class ThreescaleCmsClientImplUnitTest {
         templatesApiTestSupport.givenGetTemplateWithDraft(119);
 
         CmsLayout layout = new CmsLayout();
-        layout.setId(119);
+        layout.setId(119L);
 
         Optional<InputStream> result = threescaleCmsClient.getTemplatePublished(layout);
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
-        then(templatesApi).should(only()).getTemplate(119);
+        then(templatesApi).should(only()).getTemplate(119L);
 
         assertTrue(result.isPresent());
         assertThat(result.get(), inputStreamContents(is("Main layout published content")));
@@ -558,7 +558,7 @@ class ThreescaleCmsClientImplUnitTest {
     void save_NewSectionNoTitle() throws Exception {
         // Given a new CmsSection object to create with no title set
         CmsSection newSection = new CmsSection();
-        newSection.setParentId(30);
+        newSection.setParentId(30L);
         newSection.setId(null);
         newSection.setSystemName("new");
         newSection.setPath("/new");
@@ -574,7 +574,7 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newSection.getSystemName())))
             .willReturn(new Section()
                 .parentId(newSection.getParentId())
-                .id(31)
+                .id(31L)
                 .systemName(newSection.getSystemName())
                 .partialPath(newSection.getPath())
                 .title(newSection.getSystemName())
@@ -596,14 +596,14 @@ class ThreescaleCmsClientImplUnitTest {
         then(templatesApi).shouldHaveNoInteractions();
 
         // And the new section object should have an ID
-        assertThat(newSection.getId(), is(31));
+        assertThat(newSection.getId(), is(31L));
     }
 
     @Test
     void save_NewSectionWithTitle() throws Exception {
         // Given a new CmsSection object to create with a title
         CmsSection newSection = new CmsSection();
-        newSection.setParentId(30);
+        newSection.setParentId(30L);
         newSection.setId(null);
         newSection.setSystemName("new");
         newSection.setPath("/new");
@@ -619,7 +619,7 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newSection.getSystemName())))
             .willReturn(new Section()
                 .parentId(newSection.getParentId())
-                .id(32)
+                .id(32L)
                 .systemName(newSection.getSystemName())
                 .partialPath(newSection.getPath())
                 .title(newSection.getTitle())
@@ -641,15 +641,15 @@ class ThreescaleCmsClientImplUnitTest {
         then(templatesApi).shouldHaveNoInteractions();
 
         // And the new section should have an ID
-        assertThat(newSection.getId(), is(32));
+        assertThat(newSection.getId(), is(32L));
     }
 
     @Test
     void save_UpdatedSection() throws Exception {
         // Given a CmsSection object with an ID already
         CmsSection updatedSection = new CmsSection();
-        updatedSection.setParentId(30);
-        updatedSection.setId(31);
+        updatedSection.setParentId(30L);
+        updatedSection.setId(31L);
         updatedSection.setSystemName("new");
         updatedSection.setPath("/new");
         updatedSection.setTitle("new_section");
@@ -692,7 +692,7 @@ class ThreescaleCmsClientImplUnitTest {
         CmsFile newFile = new CmsFile();
         newFile.setId(null);
         newFile.setPath("/file.jpg");
-        newFile.setSectionId(30);
+        newFile.setSectionId(30L);
         newFile.setTags(Set.of("a", "b", "c"));
         newFile.setDownloadable(true);
 
@@ -713,7 +713,7 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getDownloadable())))
             .willReturn(new ModelFile()
                 // TODO
-                .id(17));
+                .id(17L));
 
         // When the interface code is called
         threescaleCmsClient.save(newFile, newFileContent);
@@ -729,16 +729,16 @@ class ThreescaleCmsClientImplUnitTest {
         then(templatesApi).shouldHaveNoInteractions();
 
         // And the file should have had its ID updated
-        assertThat(newFile.getId(), is(17));
+        assertThat(newFile.getId(), is(17L));
     }
 
     @Test
     void save_UpdatedFile() throws Exception {
         // Given a CmsFile object with an ID already
         CmsFile updateFile = new CmsFile();
-        updateFile.setId(16);
+        updateFile.setId(16L);
         updateFile.setPath("/file.jpg");
-        updateFile.setSectionId(30);
+        updateFile.setSectionId(30L);
         updateFile.setTags(Set.of("a", "b", "c"));
         updateFile.setDownloadable(true);
 
@@ -761,7 +761,7 @@ class ThreescaleCmsClientImplUnitTest {
             same(newFileContent)))
             .willReturn(new ModelFile()
                 // TODO
-                .id(17));
+                .id(17L));
 
         // When the interface code is called
         threescaleCmsClient.save(updateFile, newFileContent);
@@ -798,9 +798,9 @@ class ThreescaleCmsClientImplUnitTest {
     void delete_File() throws Exception{
         // Given a CmsFile object with an ID already
         CmsFile newFile = new CmsFile();
-        newFile.setId(16);
+        newFile.setId(16L);
         newFile.setPath("/file.jpg");
-        newFile.setSectionId(30);
+        newFile.setSectionId(30L);
         newFile.setTags(Set.of("a", "b", "c"));
         newFile.setDownloadable(true);
 
@@ -821,7 +821,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         // Then only the file should have been deleted
         then(filesApi).should(only()).deleteFile(
-            eq(16));
+            eq(16L));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
     }
@@ -830,8 +830,8 @@ class ThreescaleCmsClientImplUnitTest {
     void delete_Section() throws Exception {
         // Given a CmsSection object with an ID already
         CmsSection cmsSection = new CmsSection();
-        cmsSection.setParentId(30);
-        cmsSection.setId(31);
+        cmsSection.setParentId(30L);
+        cmsSection.setId(31L);
         cmsSection.setSystemName("new");
         cmsSection.setPath("/new");
         cmsSection.setTitle("new_section");
@@ -855,7 +855,7 @@ class ThreescaleCmsClientImplUnitTest {
         // Then only the section should have been deleted
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).should(only()).deleteSection(
-            eq(31));
+            eq(31L));
         then(templatesApi).shouldHaveNoInteractions();
     }
 
@@ -863,7 +863,7 @@ class ThreescaleCmsClientImplUnitTest {
     void delete_Template() throws Exception {
         // Given a CmsLayout (Template) object with an ID already
         CmsLayout layout = new CmsLayout();
-        layout.setId(119);
+        layout.setId(119L);
 
         // When the interface code is called
         threescaleCmsClient.delete(layout);
@@ -884,6 +884,6 @@ class ThreescaleCmsClientImplUnitTest {
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).should(only()).deleteTemplate(
-            eq(119));
+            eq(119L));
     }
 }

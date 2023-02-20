@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 @ApplicationScoped
 public class PathRecursionSupport {
 
-    private static final Map<Class<? extends CmsObject>, Function<? super CmsObject, Integer>> GET_PARENT_ID_FUNCTIONS =
+    private static final Map<Class<? extends CmsObject>, Function<? super CmsObject, Long>> GET_PARENT_ID_FUNCTIONS =
         Map.of(
             // TODO: Find a way to get section ID / parent ID from other object
             //       types
@@ -35,14 +35,14 @@ public class PathRecursionSupport {
                 continue;
             }
 
-            Integer parentId = currentObject.getId();
+            Long parentId = currentObject.getId();
 
             int addedChildren = Math.toIntExact(
                 objectsByPath.entrySet()
                     .stream()
                     .filter(childEntry -> {
                         CmsObject childObject = childEntry.getValue();
-                        Integer childParentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(childObject.getClass(), o -> Integer.MIN_VALUE)
+                        Long childParentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(childObject.getClass(), o -> Long.MIN_VALUE)
                             .apply(childObject);
 
                         return parentId.equals(childParentId);

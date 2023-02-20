@@ -25,6 +25,7 @@ import org.mapstruct.factory.Mappers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +72,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Nonnull
     @Override
-    public Optional<InputStream> getFileContent(int fileId) throws ApiException {
+    public Optional<InputStream> getFileContent(long fileId) throws ApiException {
         CloseableHttpClient httpClient = filesApi.getApiClient().getHttpClient();
         ModelFile file = filesApi.getFile(fileId);
         ProviderAccount account = filesApi.readProviderSettings();
@@ -94,7 +95,9 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
                 return Optional.empty();
             }
 
-            return Optional.of(entity.getContent());
+            return Optional.of(
+                new ByteArrayInputStream(entity.getContent().readAllBytes())
+            );
         } catch (IOException e) {
             // TODO: Create ThreescaleCmsException and throw it instead of ApiException
             throw new ApiException(e);
@@ -109,7 +112,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Nonnull
     @Override
-    public Optional<InputStream> getTemplateDraft(int templateId) throws ApiException {
+    public Optional<InputStream> getTemplateDraft(long templateId) throws ApiException {
         Template template = templatesApi.getTemplate(templateId);
 
         Optional<InputStream> result = Optional.ofNullable(template.getDraft())
@@ -129,7 +132,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Nonnull
     @Override
-    public Optional<InputStream> getTemplatePublished(int templateId) throws ApiException {
+    public Optional<InputStream> getTemplatePublished(long templateId) throws ApiException {
         Template template = templatesApi.getTemplate(templateId);
 
         return Optional.ofNullable(template.getPublished())
@@ -287,7 +290,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     }
 
-    private Template saveUpdatedTemplate(int id, @Nonnull TemplateUpdatableFields template, @Nullable File templateDraft) throws ApiException {
+    private Template saveUpdatedTemplate(long id, @Nonnull TemplateUpdatableFields template, @Nullable File templateDraft) throws ApiException {
 
         String draft;
         if (templateDraft == null) {
@@ -315,12 +318,12 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     }
 
     @Override
-    public void publish(int templateId) throws ApiException {
+    public void publish(long templateId) throws ApiException {
         templatesApi.publishTemplate(templateId);
     }
 
     @Override
-    public void delete(@Nonnull ThreescaleObjectType type, int id) throws ApiException {
+    public void delete(@Nonnull ThreescaleObjectType type, long id) throws ApiException {
         switch (type) {
             case SECTION:
                 sectionsApi.deleteSection(id);

@@ -504,6 +504,7 @@ components:
     FileId:
       description: Unique identifier for a `File` object
       type: integer
+      format: int64
       example: '9'
     FileList:
       description: List of `File` objects
@@ -886,6 +887,7 @@ components:
         </account>
     ProviderAccountId:
       type: integer
+      format: int64
       example: '2'
     ProviderPlan:
       properties:
@@ -927,6 +929,7 @@ components:
             name: cancellation_period
         apiProductId:
           type: integer
+          format: int64
           xml:
             name: service_id
       example: |-
@@ -944,6 +947,7 @@ components:
         </plan>
     ProviderPlanId:
       type: integer
+      format: int64
       example: '4'
     ProviderUser:
       properties:
@@ -962,6 +966,7 @@ components:
         accountId:
           description: The same as ProviderAccountId
           type: integer
+          format: int64
           xml:
             name: account_id
         state:
@@ -989,6 +994,7 @@ components:
         </user>
     ProviderUserId:
       type: integer
+      format: int64
       example: 3
     Section:
       description: Section within 3scale CMS
@@ -1034,6 +1040,7 @@ components:
     SectionId:
       description: Unique identifier for a `Section`
       type: integer
+      format: int64
       example: '30'
     SectionList:
       description: List of sections
@@ -1321,6 +1328,7 @@ components:
             $ref: '#/components/schemas/EnumTemplateType'
     TemplateId:
       type: integer
+      format: int64
       example: '119'
     TemplateList:
       allOf:
