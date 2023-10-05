@@ -87,7 +87,7 @@
     <version.log4j>2.17.2</version.log4j>
     <version.mapstruct>1.5.5.Final</version.mapstruct>
     <version.mockito>4.4.0</version.mockito>
-    <version.quarkus>2.12.3.Final</version.quarkus>
+    <version.quarkus>3.4.2</version.quarkus>
     <version.slf4j>1.7.36</version.slf4j>
     <version.swagger-annotations>1.6.11</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
