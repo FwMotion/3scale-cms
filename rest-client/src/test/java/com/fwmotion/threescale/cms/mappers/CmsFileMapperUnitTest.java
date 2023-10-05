@@ -1,21 +1,16 @@
 package com.fwmotion.threescale.cms.mappers;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mapstruct.factory.Mappers;
 
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@ExtendWith(MockitoExtension.class)
 class CmsFileMapperUnitTest {
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS, stubOnly = true)
-    CmsFileMapper fileMapper;
+    CmsFileMapper fileMapper = Mappers.getMapper(CmsFileMapper.class);
 
     @Test
     void tagsFromRest_Null() {

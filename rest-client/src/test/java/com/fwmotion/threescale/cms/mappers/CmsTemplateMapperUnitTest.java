@@ -2,20 +2,15 @@ package com.fwmotion.threescale.cms.mappers;
 
 import com.redhat.threescale.rest.cms.model.EnumHandler;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mapstruct.factory.Mappers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ExtendWith(MockitoExtension.class)
 class CmsTemplateMapperUnitTest {
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS, stubOnly = true)
-    CmsTemplateMapper templateMapper;
+    CmsTemplateMapper templateMapper = Mappers.getMapper(CmsTemplateMapper.class);
 
     @Test
     void mapHandlerFromRest_Null() {
