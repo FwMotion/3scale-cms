@@ -65,7 +65,7 @@
       6.2.1
     </version.openapi-generator-maven-plugin>
     <version.pitest-maven>1.9.11</version.pitest-maven>
-    <version.pitest-junit5-plugin>1.1.0</version.pitest-junit5-plugin>
+    <version.pitest-junit5-plugin>1.2.0</version.pitest-junit5-plugin>
 
     <!-- Dependency Group IDs -->
     <groupId.swagger-parser>io.swagger.parser.v3</groupId.swagger-parser>
