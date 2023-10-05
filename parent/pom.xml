@@ -61,9 +61,7 @@
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
     <version.jacoco-maven-plugin>0.8.10</version.jacoco-maven-plugin>
     <version.jandex-maven-plugin>1.2.3</version.jandex-maven-plugin>
-    <version.openapi-generator-maven-plugin>
-      6.2.1
-    </version.openapi-generator-maven-plugin>
+    <version.openapi-generator-maven-plugin>7.0.1</version.openapi-generator-maven-plugin>
     <version.pitest-maven>1.9.11</version.pitest-maven>
     <version.pitest-junit5-plugin>1.2.0</version.pitest-junit5-plugin>
 
