@@ -89,7 +89,7 @@
     <version.slf4j>1.7.36</version.slf4j>
     <version.swagger-annotations>1.6.11</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
-    <version.threeten-jaxb>1.2</version.threeten-jaxb>
+    <version.threeten-jaxb>2.1.0</version.threeten-jaxb>
     <version.woodstox>6.4.0</version.woodstox>
 
     <!-- Default options for plugins -->
