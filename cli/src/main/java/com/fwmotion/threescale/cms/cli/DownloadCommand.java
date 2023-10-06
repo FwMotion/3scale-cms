@@ -8,13 +8,13 @@ import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.fwmotion.threescale.cms.model.CmsTemplate;
 import io.quarkus.logging.Log;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

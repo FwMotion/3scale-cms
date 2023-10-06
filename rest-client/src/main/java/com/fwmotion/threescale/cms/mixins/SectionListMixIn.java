@@ -3,8 +3,8 @@ package com.fwmotion.threescale.cms.mixins;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.redhat.threescale.rest.cms.model.Section;
+import jakarta.xml.bind.annotation.XmlElement;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 /**

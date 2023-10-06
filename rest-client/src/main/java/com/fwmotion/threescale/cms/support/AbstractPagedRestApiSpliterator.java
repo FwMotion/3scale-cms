@@ -1,8 +1,10 @@
 package com.fwmotion.threescale.cms.support;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -17,9 +19,9 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
     private int currentPageNumber;
     private boolean didSplit = false;
 
-    protected AbstractPagedRestApiSpliterator(@Nonnegative int requestedPageSize,
+    protected AbstractPagedRestApiSpliterator(@Positive int requestedPageSize,
                                               @Nonnull Collection<T> currentPage,
-                                              @Nonnegative int currentPageNumber) {
+                                              @PositiveOrZero int currentPageNumber) {
         this.requestedPageSize = requestedPageSize;
         this.currentPageIterator = currentPage.iterator();
         this.currentPageSize = currentPage.size();
@@ -27,19 +29,19 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
     }
 
     protected AbstractPagedRestApiSpliterator(@Nonnull Collection<T> currentPage,
-                                              @Nonnegative int currentPageNumber) {
+                                              @PositiveOrZero int currentPageNumber) {
         this(DEFAULT_REQUESTED_PAGE_SIZE, currentPage, currentPageNumber);
     }
 
     @Nullable
-    abstract protected Collection<T> getPage(@Nonnegative int pageNumber,
-                                             @Nonnegative int pageSize);
+    abstract protected Collection<T> getPage(@PositiveOrZero int pageNumber,
+                                             @Positive int pageSize);
 
     @Nonnull
     abstract protected AbstractPagedRestApiSpliterator<T> doSplit(
-        @Nonnegative int requestedPageSize,
+        @Positive int requestedPageSize,
         @Nonnull Collection<T> currentPage,
-        @Nonnegative int currentPageNumber);
+        @PositiveOrZero int currentPageNumber);
 
     @Nonnull
     @Override
@@ -93,15 +95,15 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
         return doSplit(requestedPageSize, nextPage, currentPageNumber + 1);
     }
 
-    @Nonnegative
+    @PositiveOrZero
     @Override
     public long estimateSize() {
         return Long.MAX_VALUE;
     }
 
     protected void validateResultPageSize(@Nonnull String type,
-                                          @Nonnegative int pageNumber,
-                                          @Nonnegative int pageSize,
+                                          @PositiveOrZero int pageNumber,
+                                          @Positive int pageSize,
                                           @Nonnull Collection<T> resultPage,
                                           @Nonnull Supplier<Integer> getCurrentPage,
                                           @Nonnull Supplier<Integer> getTotalPages,

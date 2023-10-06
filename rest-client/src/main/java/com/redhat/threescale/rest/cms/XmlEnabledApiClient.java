@@ -7,12 +7,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.ParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +57,7 @@ public class XmlEnabledApiClient extends ApiClient {
     }
 
     @Override
-    public <T> T deserialize(HttpResponse response, TypeReference<T> valueType) throws ApiException, IOException {
+    public <T> T deserialize(CloseableHttpResponse response, TypeReference<T> valueType) throws ApiException, IOException, ParseException {
         if (valueType == null) {
             return null;
         }
@@ -72,13 +71,12 @@ public class XmlEnabledApiClient extends ApiClient {
         boolean isXml = false;
         HttpEntity entity = response.getEntity();
 
-        Header contentTypeHeader = entity.getContentType();
-        ContentType contentType = null;
+        String contentTypeHeader = entity.getContentType();
+        ContentType contentType;
         if (contentTypeHeader != null) {
-
             try {
-                contentType = ContentType.parse(contentTypeHeader.getValue());
-            } catch (ParseException e) {
+                contentType = ContentType.parse(contentTypeHeader);
+            } catch (Exception e) {
                 // Problem parsing; pass it through to the superclass's method
                 // (which may just throw an exception itself too)
                 return super.deserialize(response, valueType);
@@ -87,6 +85,8 @@ public class XmlEnabledApiClient extends ApiClient {
             if (this.isXmlMime(contentType.getMimeType())) {
                 isXml = true;
             }
+        } else {
+            contentType = null;
         }
 
         if (String.class.equals(valueRawType)) {

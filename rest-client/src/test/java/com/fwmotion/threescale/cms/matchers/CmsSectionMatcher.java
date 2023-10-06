@@ -3,9 +3,8 @@ package com.fwmotion.threescale.cms.matchers;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.redhat.threescale.rest.cms.model.Section;
+import jakarta.annotation.Nonnull;
 import org.hamcrest.Description;
-
-import javax.annotation.Nonnull;
 
 public class CmsSectionMatcher extends CmsObjectMatcher {
 

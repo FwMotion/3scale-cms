@@ -29,6 +29,11 @@ quarkus:
       'io.k8s.description': ${quarkus.container-image.labels.summary}
       'org.opencontainers.image.description': ${quarkus.container-image.labels.description}
 
+  jib:
+    environment-variables:
+      # Default to path /cms when in a container (otherwise defaults to .)
+      THREESCALE_CMS_ROOT: /cms
+
   log:
     console:
       format: '%s%e%n'
@@ -39,15 +44,18 @@ quarkus:
         level: TRACE
     min-level: TRACE
 
-  jib:
-
-    environment-variables:
-      # Default to path /cms when in a container (otherwise defaults to .)
-      THREESCALE_CMS_ROOT: /cms
-
   native:
     additional-build-args:
-    - --report-unsupported-elements-at-runtime
-    - --initialize-at-run-time=com.redhat.threescale.rest.cms.Configuration
+      - --report-unsupported-elements-at-runtime
+
+      - --initialize-at-run-time=org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
+      - --initialize-at-run-time=org.apache.hc.client5.http.impl.auth.NTLMEngineImpl
+      - --initialize-at-run-time=com.redhat.threescale.rest.cms.Configuration
+
     enable-http-url-handler: true
     enable-https-url-handler: true
+
+    compression:
+      level: 7
+      additional-args:
+        - --no-lzma

@@ -13,16 +13,19 @@ import com.redhat.threescale.rest.cms.model.ModelFile;
 import com.redhat.threescale.rest.cms.model.ProviderAccount;
 import com.redhat.threescale.rest.cms.model.Section;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.BasicHttpEntity;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.InputStream;
@@ -37,20 +40,25 @@ import java.util.stream.Collectors;
 import static com.fwmotion.threescale.cms.matchers.HeaderMatcher.header;
 import static com.fwmotion.threescale.cms.matchers.InputStreamContentsMatcher.inputStreamContents;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.only;
 
+@ExtendWith(MockitoExtension.class)
 class ThreescaleCmsClientImplUnitTest {
 
+    @InjectMocks
     ThreescaleCmsClientImpl threescaleCmsClient;
+    @Mock
     FilesApi filesApi;
+    @Mock
     SectionsApi sectionsApi;
+    @Mock
     TemplatesApi templatesApi;
 
     SectionsApiTestSupport sectionsApiTestSupport;
@@ -58,31 +66,23 @@ class ThreescaleCmsClientImplUnitTest {
     TemplatesApiTestSupport templatesApiTestSupport;
 
     ApiClient apiClient;
+
+    @Mock
     CloseableHttpClient httpClientMock;
+
+    @Mock
     CloseableHttpResponse httpResponseMock;
+
+    @Captor
+    ArgumentCaptor<HttpClientResponseHandler<?>> responseHandlerMatcher;
 
     @BeforeEach
     void setUp() {
-        // Not using @InjectMocks because sometimes that introduces weird
-        // behaviors and ends up calling real methods... Could be a strange
-        // interaction with pitest when mutating?
-        filesApi = mock(FilesApi.class);
-        sectionsApi = mock(SectionsApi.class);
-        templatesApi = mock(TemplatesApi.class);
-
-        threescaleCmsClient = new ThreescaleCmsClientImpl(
-            filesApi,
-            sectionsApi,
-            templatesApi
-        );
-
         sectionsApiTestSupport = new SectionsApiTestSupport(sectionsApi);
         filesApiTestSupport = new FilesApiTestSupport(filesApi);
         templatesApiTestSupport = new TemplatesApiTestSupport(templatesApi);
 
-        httpClientMock = mock(CloseableHttpClient.class);
         apiClient = new XmlEnabledApiClient(httpClientMock);
-        httpResponseMock = mock(CloseableHttpResponse.class);
     }
 
     @Test
@@ -193,11 +193,13 @@ class ThreescaleCmsClientImplUnitTest {
                 .siteAccessCode(""));
 
         // And any direct HTTP request will return a result
-        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class)))
-            .willReturn(httpResponseMock);
+        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+                .handleResponse(httpResponseMock));
 
-        BasicHttpEntity responseEntity = new BasicHttpEntity();
-        responseEntity.setContent(IOUtils.toInputStream("response data", Charset.defaultCharset()));
+        BasicHttpEntity responseEntity = new BasicHttpEntity(
+            IOUtils.toInputStream("response data", Charset.defaultCharset()),
+            ContentType.APPLICATION_JSON);
         given(httpResponseMock.getEntity()).willReturn(responseEntity);
 
         // When file content is requested
@@ -215,24 +217,21 @@ class ThreescaleCmsClientImplUnitTest {
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
         //noinspection resource
-        then(httpClientMock).should(only()).execute(requestCaptor.capture());
+        then(httpClientMock).should(only()).execute(requestCaptor.capture(), responseHandlerMatcher.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
 
         // And the request should have been GET
         assertThat(actualRequest.getMethod(), is("GET"));
 
         // And the URI should match expected result
-        assertThat(actualRequest.getURI(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
+        assertThat(actualRequest.getUri(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
 
         // And no access code header should have been included in the request
-        assertThat(actualRequest.getAllHeaders(),
+        assertThat(actualRequest.getHeaders(),
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, is("*/*")))
             ).and(
                 not(hasItemInArray(header("Cookie", Matchers.startsWith("access_code="))))));
-
-        // And the response should have been closed
-        then(httpResponseMock).should().close();
 
         // And the actual response data should match what was returned by the stubbed http request
         assertTrue(resultOptional.isPresent());
@@ -256,11 +255,13 @@ class ThreescaleCmsClientImplUnitTest {
                 .siteAccessCode("this is my access code"));
 
         // And any direct HTTP request will return a result
-        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class)))
-            .willReturn(httpResponseMock);
+        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+                .handleResponse(httpResponseMock));
 
-        BasicHttpEntity responseEntity = new BasicHttpEntity();
-        responseEntity.setContent(IOUtils.toInputStream("response data", Charset.defaultCharset()));
+        BasicHttpEntity responseEntity = new BasicHttpEntity(
+            IOUtils.toInputStream("response data", Charset.defaultCharset()),
+            ContentType.APPLICATION_JSON);
         given(httpResponseMock.getEntity()).willReturn(responseEntity);
 
         // When file content is requested
@@ -278,24 +279,21 @@ class ThreescaleCmsClientImplUnitTest {
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
         //noinspection resource
-        then(httpClientMock).should(only()).execute(requestCaptor.capture());
+        then(httpClientMock).should(only()).execute(requestCaptor.capture(), responseHandlerMatcher.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
 
         // And the request should have been GET
         assertThat(actualRequest.getMethod(), is("GET"));
 
         // And the URI should match expected result
-        assertThat(actualRequest.getURI(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
+        assertThat(actualRequest.getUri(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
 
         // And the correct access code header should have been included in the request
-        assertThat(actualRequest.getAllHeaders(),
+        assertThat(actualRequest.getHeaders(),
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, equalTo("*/*")))
             ).and(
                 hasItemInArray(header("Cookie", equalTo("access_code=this is my access code")))));
-
-        // And the response should have been closed
-        then(httpResponseMock).should().close();
 
         // And the actual response data should match what was returned by the stubbed http request
         assertTrue(resultOptional.isPresent());
@@ -319,11 +317,13 @@ class ThreescaleCmsClientImplUnitTest {
                 .siteAccessCode(""));
 
         // And any direct HTTP request will return a result
-        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class)))
-            .willReturn(httpResponseMock);
+        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+                .handleResponse(httpResponseMock));
 
-        BasicHttpEntity responseEntity = new BasicHttpEntity();
-        responseEntity.setContent(IOUtils.toInputStream("response data", Charset.defaultCharset()));
+        BasicHttpEntity responseEntity = new BasicHttpEntity(
+            IOUtils.toInputStream("response data", Charset.defaultCharset()),
+            ContentType.APPLICATION_JSON);
         given(httpResponseMock.getEntity()).willReturn(responseEntity);
 
         // When file content is requested
@@ -344,24 +344,21 @@ class ThreescaleCmsClientImplUnitTest {
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
         //noinspection resource
-        then(httpClientMock).should(only()).execute(requestCaptor.capture());
+        then(httpClientMock).should(only()).execute(requestCaptor.capture(), responseHandlerMatcher.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
 
         // And the request should have been GET
         assertThat(actualRequest.getMethod(), is("GET"));
 
         // And the URI should match expected result
-        assertThat(actualRequest.getURI(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
+        assertThat(actualRequest.getUri(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
 
         // And no access code header should have been included in the request
-        assertThat(actualRequest.getAllHeaders(),
+        assertThat(actualRequest.getHeaders(),
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, is("*/*")))
             ).and(
                 not(hasItemInArray(header("Cookie", Matchers.startsWith("access_code="))))));
-
-        // And the response should have been closed
-        then(httpResponseMock).should().close();
 
         // And the actual response data should match what was returned by the stubbed http request
         assertTrue(resultOptional.isPresent());
@@ -385,11 +382,13 @@ class ThreescaleCmsClientImplUnitTest {
                 .siteAccessCode("this is my access code"));
 
         // And any direct HTTP request will return a result
-        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class)))
-            .willReturn(httpResponseMock);
+        given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+                .handleResponse(httpResponseMock));
 
-        BasicHttpEntity responseEntity = new BasicHttpEntity();
-        responseEntity.setContent(IOUtils.toInputStream("response data", Charset.defaultCharset()));
+        BasicHttpEntity responseEntity = new BasicHttpEntity(
+            IOUtils.toInputStream("response data", Charset.defaultCharset()),
+            ContentType.APPLICATION_JSON);
         given(httpResponseMock.getEntity()).willReturn(responseEntity);
 
         // When file content is requested
@@ -410,24 +409,21 @@ class ThreescaleCmsClientImplUnitTest {
         // And the HTTP client should have a valid request to pull file content
         ArgumentCaptor<HttpUriRequest> requestCaptor = ArgumentCaptor.forClass(HttpUriRequest.class);
         //noinspection resource
-        then(httpClientMock).should(only()).execute(requestCaptor.capture());
+        then(httpClientMock).should(only()).execute(requestCaptor.capture(), responseHandlerMatcher.capture());
         HttpUriRequest actualRequest = requestCaptor.getValue();
 
         // And the request should have been GET
         assertThat(actualRequest.getMethod(), is("GET"));
 
         // And the URI should match expected result
-        assertThat(actualRequest.getURI(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
+        assertThat(actualRequest.getUri(), is(URI.create("https://3scale.example.com" + FilesApiTestSupport.FAVICON_FILE.getPath())));
 
         // And the correct access code header should have been included in the request
-        assertThat(actualRequest.getAllHeaders(),
+        assertThat(actualRequest.getHeaders(),
             both(
                 hasItemInArray(header(HttpHeaders.ACCEPT, equalTo("*/*")))
             ).and(
                 hasItemInArray(header("Cookie", equalTo("access_code=this is my access code")))));
-
-        // And the response should have been closed
-        then(httpResponseMock).should().close();
 
         // And the actual response data should match what was returned by the stubbed http request
         assertTrue(resultOptional.isPresent());
@@ -795,7 +791,7 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete_File() throws Exception{
+    void delete_File() throws Exception {
         // Given a CmsFile object with an ID already
         CmsFile newFile = new CmsFile();
         newFile.setId(16L);
@@ -815,7 +811,7 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void delete_FileById() throws Exception{
+    void delete_FileById() throws Exception {
         // When the interface code is called
         threescaleCmsClient.delete(ThreescaleObjectType.FILE, 16);
 

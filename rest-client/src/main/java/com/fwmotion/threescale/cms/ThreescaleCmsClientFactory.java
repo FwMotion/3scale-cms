@@ -4,14 +4,16 @@ import com.fwmotion.threescale.cms.support.ApiClientBuilder;
 import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
 import com.redhat.threescale.rest.cms.auth.ApiKeyAuth;
 import com.redhat.threescale.rest.cms.auth.Authentication;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustAllStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
+import jakarta.annotation.Nonnull;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.ssl.SSLContexts;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -24,6 +26,7 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
     private String providerKey;
     private String accessToken;
 
+    private HttpClientConnectionManager httpClientConnectionManager;
     private CloseableHttpClient httpClient;
 
     private void tryCloseHttpClient() {
@@ -42,11 +45,16 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
         if (httpClient == null) {
             if (isUseInsecureConnections()) {
                 try {
+                    SSLConnectionSocketFactory connectionSocketFactory = new SSLConnectionSocketFactory(SSLContexts.custom()
+                        .loadTrustMaterial(null, new TrustAllStrategy())
+                        .build(),
+                        NoopHostnameVerifier.INSTANCE);
+
+                    httpClientConnectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                        .setSSLSocketFactory(connectionSocketFactory)
+                        .build();
                     httpClient = HttpClients.custom()
-                        .setSSLSocketFactory(new SSLConnectionSocketFactory(SSLContexts.custom()
-                            .loadTrustMaterial(null, new TrustAllStrategy())
-                            .build(),
-                            NoopHostnameVerifier.INSTANCE))
+                        .setConnectionManager(httpClientConnectionManager)
                         .build();
                 } catch (NoSuchAlgorithmException | KeyManagementException |
                          KeyStoreException e) {
@@ -68,10 +76,10 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
 
         if (providerKey != null) {
             Authentication providerKeyAuth = apiClient.getAuthentication("provider_key");
-            ((ApiKeyAuth) providerKeyAuth).setApiKey(providerKey);
+            ((ApiKeyAuth) providerKeyAuth).setApiKey(apiClient.escapeString(providerKey));
         } else if (accessToken != null) {
             Authentication accessTokenAuth = apiClient.getAuthentication("access_token");
-            ((ApiKeyAuth) accessTokenAuth).setApiKey(accessToken);
+            ((ApiKeyAuth) accessTokenAuth).setApiKey(apiClient.escapeString(accessToken));
         } else {
             // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
             throw new IllegalStateException("Authentication not set for 3scale CMS client; must provide one of: providerKey, accessToken");
@@ -124,6 +132,9 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
+        if (httpClientConnectionManager != null) {
+            httpClientConnectionManager.close();
+        }
         if (httpClient != null) {
             httpClient.close();
         }

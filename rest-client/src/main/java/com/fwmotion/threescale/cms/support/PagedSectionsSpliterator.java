@@ -5,12 +5,13 @@ import com.fwmotion.threescale.cms.model.CmsSection;
 import com.redhat.threescale.rest.cms.ApiException;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.model.SectionList;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.collections4.ListUtils;
 import org.mapstruct.factory.Mappers;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,23 +27,23 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
     }
 
     public PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi,
-                                    @Nonnegative int requestedPageSize) {
+                                    @Positive int requestedPageSize) {
         super(requestedPageSize, Collections.emptySet(), 0);
         this.sectionsApi = sectionsApi;
     }
 
     private PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi,
-                                     @Nonnegative int requestedPageSize,
+                                     @Positive int requestedPageSize,
                                      @Nonnull Collection<CmsSection> currentPage,
-                                     @Nonnegative int currentPageNumber) {
+                                     @PositiveOrZero int currentPageNumber) {
         super(requestedPageSize, currentPage, currentPageNumber);
         this.sectionsApi = sectionsApi;
     }
 
     @Nullable
     @Override
-    protected Collection<CmsSection> getPage(@Nonnegative int pageNumber,
-                                             @Nonnegative int pageSize) {
+    protected Collection<CmsSection> getPage(@PositiveOrZero int pageNumber,
+                                             @Positive int pageSize) {
         try {
             SectionList sectionList = sectionsApi.listSections(pageNumber, pageSize);
 
@@ -72,9 +73,9 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
     @Nonnull
     @Override
     protected AbstractPagedRestApiSpliterator<CmsSection> doSplit(
-        @Nonnegative int requestedPageSize,
+        @Positive int requestedPageSize,
         @Nonnull Collection<CmsSection> currentPage,
-        @Nonnegative int currentPageNumber) {
+        @PositiveOrZero int currentPageNumber) {
         return new PagedSectionsSpliterator(sectionsApi, requestedPageSize, currentPage, currentPageNumber);
     }
 

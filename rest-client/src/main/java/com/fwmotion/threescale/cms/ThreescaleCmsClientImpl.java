@@ -13,18 +13,17 @@ import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
 import com.redhat.threescale.rest.cms.model.*;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.mapstruct.factory.Mappers;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -83,21 +82,23 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
             request.addHeader("Cookie", "access_code=" + account.getSiteAccessCode());
         }
 
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-            if (response == null) {
-                return Optional.empty();
-            }
+        try {
+            return httpClient.execute(request, response -> {
+                if (response == null) {
+                    return Optional.empty();
+                }
 
-            // TODO: Validate response headers, status code, etc
+                // TODO: Validate response headers, status code, etc
 
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                return Optional.empty();
-            }
+                HttpEntity entity = response.getEntity();
+                if (entity == null) {
+                    return Optional.empty();
+                }
 
-            return Optional.of(
-                new ByteArrayInputStream(entity.getContent().readAllBytes())
-            );
+                return Optional.of(
+                    new ByteArrayInputStream(entity.getContent().readAllBytes())
+                );
+            });
         } catch (IOException e) {
             // TODO: Create ThreescaleCmsException and throw it instead of ApiException
             throw new ApiException(e);

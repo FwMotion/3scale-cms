@@ -31,7 +31,8 @@ a consistent compilation environment.
 
 The following is required to build 3scale-cms for any build type:
 
-1. Java JDK 11 or newer
+1. Java JDK 17 or newer
+2. Maven 3.9.2 or newer - this is automatic when using link:https://maven.apache.org/wrapper/[Maven Wrapper]
 
 To perform a native-mode build, at least one of the following must
 also be installed:

@@ -2,11 +2,11 @@ package com.fwmotion.threescale.cms.cli.support;
 
 import com.fwmotion.threescale.cms.model.*;
 import io.quarkus.logging.Log;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.function.Function;
 

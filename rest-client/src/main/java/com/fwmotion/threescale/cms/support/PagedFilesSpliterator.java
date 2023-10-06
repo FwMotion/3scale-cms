@@ -5,12 +5,13 @@ import com.fwmotion.threescale.cms.model.CmsFile;
 import com.redhat.threescale.rest.cms.ApiException;
 import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.model.FileList;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.collections4.ListUtils;
 import org.mapstruct.factory.Mappers;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,23 +27,23 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
     }
 
     public PagedFilesSpliterator(@Nonnull FilesApi filesApi,
-                                 @Nonnegative int requestedPageSize) {
+                                 @Positive int requestedPageSize) {
         super(requestedPageSize, Collections.emptySet(), 0);
         this.filesApi = filesApi;
     }
 
     private PagedFilesSpliterator(@Nonnull FilesApi filesApi,
-                                  @Nonnegative int requestedPageSize,
+                                  @Positive int requestedPageSize,
                                   @Nonnull Collection<CmsFile> currentPage,
-                                  @Nonnegative int currentPageNumber) {
+                                  @PositiveOrZero int currentPageNumber) {
         super(requestedPageSize, currentPage, currentPageNumber);
         this.filesApi = filesApi;
     }
 
     @Nullable
     @Override
-    protected Collection<CmsFile> getPage(@Nonnegative int pageNumber,
-                                          @Nonnegative int pageSize) {
+    protected Collection<CmsFile> getPage(@PositiveOrZero int pageNumber,
+                                          @Positive int pageSize) {
 
         try {
             FileList fileList = filesApi.listFiles(pageNumber, pageSize, null);
@@ -73,9 +74,9 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
     @Nonnull
     @Override
     protected AbstractPagedRestApiSpliterator<CmsFile> doSplit(
-        @Nonnegative int requestedPageSize,
+        @Positive int requestedPageSize,
         @Nonnull Collection<CmsFile> currentPage,
-        @Nonnegative int currentPageNumber) {
+        @PositiveOrZero int currentPageNumber) {
         return new PagedFilesSpliterator(filesApi, requestedPageSize, currentPage, currentPageNumber);
     }
 

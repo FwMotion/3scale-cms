@@ -10,7 +10,7 @@ import com.redhat.threescale.rest.cms.model.EnumHandler;
 import com.redhat.threescale.rest.cms.model.FileList;
 import com.redhat.threescale.rest.cms.model.SectionList;
 import com.redhat.threescale.rest.cms.model.TemplateList;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 
 public final class ApiClientBuilder {
 

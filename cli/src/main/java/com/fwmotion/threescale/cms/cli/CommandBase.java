@@ -2,9 +2,8 @@ package com.fwmotion.threescale.cms.cli;
 
 import com.fwmotion.threescale.cms.cli.version.VersionProperties;
 import com.fwmotion.threescale.cms.cli.version.VersionProvider;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
-
-import javax.inject.Inject;
 
 @CommandLine.Command(
     headerHeading = "%n",
