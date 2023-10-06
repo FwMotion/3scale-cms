@@ -1,13 +1,12 @@
 package com.fwmotion.threescale.cms.matchers;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class HeaderMatcher extends TypeSafeMatcher<Header> {
 

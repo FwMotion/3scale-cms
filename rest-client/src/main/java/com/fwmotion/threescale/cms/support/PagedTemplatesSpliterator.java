@@ -5,12 +5,13 @@ import com.fwmotion.threescale.cms.model.CmsTemplate;
 import com.redhat.threescale.rest.cms.ApiException;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
 import com.redhat.threescale.rest.cms.model.TemplateList;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import org.apache.commons.collections4.ListUtils;
 import org.mapstruct.factory.Mappers;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,23 +28,23 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
     }
 
     public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
-                                     @Nonnegative int requestedPageSize) {
+                                     @Positive int requestedPageSize) {
         super(requestedPageSize, Collections.emptySet(), 0);
         this.templatesApi = templatesApi;
     }
 
     private PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
-                                      @Nonnegative int requestedPageSize,
+                                      @Positive int requestedPageSize,
                                       @Nonnull Collection<CmsTemplate> currentPage,
-                                      @Nonnegative int currentPageNumber) {
+                                      @PositiveOrZero int currentPageNumber) {
         super(requestedPageSize, currentPage, currentPageNumber);
         this.templatesApi = templatesApi;
     }
 
     @Nullable
     @Override
-    protected Collection<CmsTemplate> getPage(@Nonnegative int pageNumber,
-                                              @Nonnegative int pageSize) {
+    protected Collection<CmsTemplate> getPage(@PositiveOrZero int pageNumber,
+                                              @Positive int pageSize) {
         try {
             TemplateList templateList = templatesApi.listTemplates(pageNumber, pageSize);
 
@@ -83,9 +84,9 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
     @Nonnull
     @Override
     protected AbstractPagedRestApiSpliterator<CmsTemplate> doSplit(
-        @Nonnegative int requestedPageSize,
+        @Positive int requestedPageSize,
         @Nonnull Collection<CmsTemplate> currentPage,
-        @Nonnegative int currentPageNumber) {
+        @PositiveOrZero int currentPageNumber) {
         return new PagedTemplatesSpliterator(templatesApi, requestedPageSize, currentPage, currentPageNumber);
     }
 

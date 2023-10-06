@@ -3,8 +3,8 @@ package com.fwmotion.threescale.cms.cli.support;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.fwmotion.threescale.cms.model.ThreescaleObjectType;
+import jakarta.enterprise.context.ApplicationScoped;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.util.Comparator;
 
 @ApplicationScoped

@@ -1,10 +1,10 @@
 package com.fwmotion.threescale.cms.matchers;
 
 import com.fwmotion.threescale.cms.model.CmsObject;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.hamcrest.TypeSafeMatcher;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.OffsetDateTime;
 
 public abstract class CmsObjectMatcher extends TypeSafeMatcher<CmsObject> {

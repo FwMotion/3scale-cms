@@ -1,11 +1,11 @@
 package com.fwmotion.threescale.cms.cli.support;
 
 import com.fwmotion.threescale.cms.model.CmsObject;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;

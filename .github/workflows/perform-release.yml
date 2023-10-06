@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-deploy-maven:
-    name: Build and Deploy Maven
+    name: Build and Deploy Maven Artifacts
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -21,8 +21,8 @@ jobs:
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
         distribution: temurin
+        java-version: '17'
         cache: maven
         settings-path: ${{ github.workspace }}
         server-id: github
@@ -91,8 +91,8 @@ jobs:
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
         distribution: temurin
+        java-version: '17'
         cache: maven
         settings-path: ${{ github.workspace }}
         server-id: github

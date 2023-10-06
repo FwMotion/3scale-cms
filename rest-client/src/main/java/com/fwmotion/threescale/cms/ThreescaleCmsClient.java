@@ -2,8 +2,8 @@ package com.fwmotion.threescale.cms;
 
 import com.fwmotion.threescale.cms.model.*;
 import com.redhat.threescale.rest.cms.ApiException;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;

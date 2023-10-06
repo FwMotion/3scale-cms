@@ -2,10 +2,10 @@ package com.fwmotion.threescale.cms.mappers;
 
 import com.fwmotion.threescale.cms.model.CmsFile;
 import com.redhat.threescale.rest.cms.model.ModelFile;
+import jakarta.annotation.Nullable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;

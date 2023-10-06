@@ -1,11 +1,11 @@
 package com.fwmotion.threescale.cms.cli.support;
 
 import com.fwmotion.threescale.cms.model.*;
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;

@@ -6,12 +6,12 @@ import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
 import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import io.quarkus.logging.Log;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import picocli.CommandLine;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;

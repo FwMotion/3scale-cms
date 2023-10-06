@@ -6,10 +6,10 @@ import com.fwmotion.threescale.cms.cli.support.CmsSectionToTopComparator;
 import com.fwmotion.threescale.cms.cli.support.PathRecursionSupport;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import io.quarkus.logging.Log;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

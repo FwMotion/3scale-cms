@@ -41,9 +41,13 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
 
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.release>11</maven.compiler.release>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <!-- Requirements -->
+    <requirements.java-version>[17,)</requirements.java-version>
+    <requirements.maven-version>[3.9.2,)</requirements.maven-version>
 
     <!-- Support Quarkus knowing about multimodule project -->
     <quarkus.bootstrap.workspace-discovery>
@@ -52,6 +56,7 @@
 
     <!-- Maven First-party Plugins -->
     <version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
+    <version.maven-enforcer-plugin>3.3.0</version.maven-enforcer-plugin>
     <version.maven-failsafe-plugin>3.0.0-M7</version.maven-failsafe-plugin>
     <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
     <version.maven-surefire-plugin>3.0.0-M7</version.maven-surefire-plugin>
@@ -59,10 +64,13 @@
 
     <!-- Third-party Maven Plugins -->
     <version.dokka-maven-plugin>1.6.10</version.dokka-maven-plugin>
+    <version.find-and-replace-maven-plugin>
+      1.1.0
+    </version.find-and-replace-maven-plugin>
     <version.jacoco-maven-plugin>0.8.10</version.jacoco-maven-plugin>
-    <version.jandex-maven-plugin>1.2.3</version.jandex-maven-plugin>
+    <version.jandex-maven-plugin>3.1.5</version.jandex-maven-plugin>
     <version.openapi-generator-maven-plugin>7.0.1</version.openapi-generator-maven-plugin>
-    <version.pitest-maven>1.9.11</version.pitest-maven>
+    <version.pitest-maven>1.15.0</version.pitest-maven>
     <version.pitest-junit5-plugin>1.2.0</version.pitest-junit5-plugin>
 
     <!-- Dependency Group IDs -->
@@ -70,26 +78,16 @@
     <groupId.quarkus>io.quarkus.platform</groupId.quarkus>
 
     <!-- Dependency Versions -->
-    <version.apache-commons-codec>1.15</version.apache-commons-codec>
     <version.apache-commons-collections>4.4</version.apache-commons-collections>
-    <version.apache-commons-io>2.11.0</version.apache-commons-io>
-    <version.apache-commons-lang>3.13.0</version.apache-commons-lang>
-    <version.apache-httpclient>4.5.14</version.apache-httpclient>
+    <version.apache-httpclient5>5.2.1</version.apache-httpclient5>
+    <version.brotli-dec>0.1.2</version.brotli-dec>
     <version.hamcrest>2.2</version.hamcrest>
-    <version.imposter>3.2.2</version.imposter>
-    <version.jackson>2.15.2</version.jackson>
-    <version.jackson-databind>2.14.1</version.jackson-databind>
-    <version.jakarta-annotation>1.3.5</version.jakarta-annotation>
-    <version.jsr305>3.0.2</version.jsr305>
-    <version.junit>5.8.2</version.junit>
-    <version.log4j>2.17.2</version.log4j>
+    <version.imposter>3.31.2</version.imposter>
     <version.mapstruct>1.5.5.Final</version.mapstruct>
-    <version.mockito>4.4.0</version.mockito>
     <version.quarkus>3.4.2</version.quarkus>
-    <version.slf4j>1.7.36</version.slf4j>
     <version.swagger-annotations>1.6.11</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
-    <version.threeten-jaxb>1.2</version.threeten-jaxb>
+    <version.threeten-jaxb>2.1.0</version.threeten-jaxb>
     <version.woodstox>6.4.0</version.woodstox>
 
     <!-- Default options for plugins -->
@@ -119,51 +117,6 @@
 
       <!-- Other dependencies -->
       <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>${version.apache-commons-codec}</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${version.apache-commons-io}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>jsr305</artifactId>
-        <version>${version.jsr305}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${version.jackson-databind}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.jaxrs</groupId>
-        <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-xml</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
         <groupId>com.fasterxml.woodstox</groupId>
         <artifactId>woodstox-core</artifactId>
         <version>${version.woodstox}</version>
@@ -179,29 +132,19 @@
         <version>${version.swagger-annotations}</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.annotation</groupId>
-        <artifactId>jakarta.annotation-api</artifactId>
-        <version>${version.jakarta-annotation}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-collections4</artifactId>
         <version>${version.apache-commons-collections}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${version.apache-commons-lang}</version>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
+        <version>${version.apache-httpclient5}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>${version.apache-httpclient}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpmime</artifactId>
-        <version>${version.apache-httpclient}</version>
+        <groupId>org.brotli</groupId>
+        <artifactId>dec</artifactId>
+        <version>${version.brotli-dec}</version>
       </dependency>
 
       <!-- Test Dependencies -->
@@ -258,6 +201,25 @@
           <version>${version.quarkus}</version>
         </plugin>
         <plugin>
+          <groupId>io.github.floverfelt</groupId>
+          <artifactId>find-and-replace-maven-plugin</artifactId>
+          <version>${version.find-and-replace-maven-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>io.smallrye</groupId>
+          <artifactId>jandex-maven-plugin</artifactId>
+          <version>${version.jandex-maven-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-jandex</id>
+              <phase>package</phase>
+              <goals>
+                <goal>jandex</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${version.maven-compiler-plugin}</version>
@@ -275,6 +237,30 @@
               <compilerArg>-Amapstruct.unmappedTargetPolicy=ERROR</compilerArg>
             </compilerArgs>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${version.maven-enforcer-plugin}</version>
+          <executions>
+            <execution>
+              <id>default-enforce</id>
+              <phase>initialize</phase>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireJavaVersion>
+                    <version>${requirements.java-version}</version>
+                  </requireJavaVersion>
+                  <requireMavenVersion>
+                    <version>${requirements.maven-version}</version>
+                  </requireMavenVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -419,20 +405,6 @@
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.jboss.jandex</groupId>
-          <artifactId>jandex-maven-plugin</artifactId>
-          <version>${version.jandex-maven-plugin}</version>
-          <executions>
-            <execution>
-              <id>default-jandex</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jandex</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.openapitools</groupId>
           <artifactId>openapi-generator-maven-plugin</artifactId>
           <version>${version.openapi-generator-maven-plugin}</version>
@@ -477,6 +449,13 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <repositories>

@@ -1,10 +1,10 @@
 package com.fwmotion.threescale.cms.cli.support;
 
 import com.fwmotion.threescale.cms.model.*;
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;

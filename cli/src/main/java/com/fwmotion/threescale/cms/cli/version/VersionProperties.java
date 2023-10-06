@@ -1,8 +1,7 @@
 package com.fwmotion.threescale.cms.cli.version;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class VersionProperties {

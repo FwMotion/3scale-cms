@@ -5,12 +5,12 @@ import com.fwmotion.threescale.cms.cli.support.*;
 import com.fwmotion.threescale.cms.model.*;
 import com.redhat.threescale.rest.cms.ApiException;
 import io.quarkus.logging.Log;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import picocli.CommandLine;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;

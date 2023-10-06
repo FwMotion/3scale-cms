@@ -4,12 +4,12 @@ import com.fwmotion.threescale.cms.model.CmsLayout;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.fwmotion.threescale.cms.model.ThreescaleObjectType;
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;

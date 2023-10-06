@@ -1,11 +1,11 @@
 package com.fwmotion.threescale.cms.matchers;
 
+import jakarta.annotation.Nonnull;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

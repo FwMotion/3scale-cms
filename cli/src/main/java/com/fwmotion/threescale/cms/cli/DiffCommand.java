@@ -5,9 +5,9 @@ import com.fwmotion.threescale.cms.cli.support.LocalRemoteObjectTreeComparator;
 import com.fwmotion.threescale.cms.cli.support.LocalRemoteTreeComparisonDetails;
 import com.fwmotion.threescale.cms.model.CmsLayout;
 import io.quarkus.logging.Log;
+import jakarta.inject.Inject;
 import picocli.CommandLine;
 
-import javax.inject.Inject;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
