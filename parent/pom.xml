@@ -88,7 +88,7 @@
     <version.swagger-annotations>1.6.11</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
     <version.threeten-jaxb>2.1.0</version.threeten-jaxb>
-    <version.woodstox>6.4.0</version.woodstox>
+    <version.woodstox>6.5.1</version.woodstox>
 
     <!-- Default options for plugins -->
     <default.dokka-srclink-base>
