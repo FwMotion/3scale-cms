@@ -25,6 +25,9 @@ jobs:
     name: Build and Run Tests
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,6 +38,22 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Run Maven Build and Verify
+      - name: Determine Home Directory
+        id: find-home
         run: |
-          ./mvnw --batch-mode clean verify
+          echo "home=$HOME" >> $GITHUB_OUTPUT
+
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Run Maven Build and Verify
+        run: >-
+          ./mvnw
+          --batch-mode
+          clean
+          verify
