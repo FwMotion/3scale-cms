@@ -1,0 +1,128 @@
+name: Build Container Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref
+        required: true
+        type: string
+      build-mode:
+        description: Build Mode
+        required: false
+        type: choice
+        default: only_jvm
+        options:
+          - only_jvm
+          - only_native
+          - jvm_and_native
+      tag-as-latest:
+        description: Tag as Latest
+        required: false
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      git-ref:
+        required: true
+        type: string
+      build-mode:
+        required: false
+        type: string
+        default: only_jvm
+      tag-as-latest:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  container-image:
+    name: Build, Tag, Push Container Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git-ref }}
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+          settings-path: ${{ github.workspace }}
+          server-id: github
+
+      - name: Determine Home Directory
+        id: find-home
+        run: |
+          echo "home=$HOME" >> $GITHUB_OUTPUT
+
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Lowercase Repository Owner
+        id: repo-owner-string
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ github.repository_owner }}
+
+      - name: Lowercase Repository Name
+        id: repo-name-string
+        uses: ASzc/change-string-case-action@v5
+        with:
+          string: ${{ github.event.repository.name }}
+
+      - name: Build and Push Image (JVM-mode)
+        if: ${{ success() && contains(fromJSON('["only_jvm","jvm_and_native"]'), inputs.build-mode) }}
+        run: >-
+          ./mvnw
+          --settings ${{ github.workspace }}/settings.xml
+          --batch-mode
+          verify
+          -Dquarkus.jib.platforms=linux/amd64,linux/arm64
+          -Dquarkus.container-image.build=true
+          -Dquarkus.container-image.push=true
+          -Dquarkus.container-image.registry=ghcr.io
+          -Dquarkus.container-image.username=${{ github.actor }}
+          -Dquarkus.container-image.password=${{ github.token }}
+          -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
+          -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
+          -Dquarkus.container-image.tag=${{ inputs.git-ref }}
+          ${{ inputs.tag-as-latest == true && '-Dquarkus.container-image.additional-tags=latest' || '' }}
+          -Dquarkus.container-image.labels.\"org.opencontainers.image.source\"=${{ github.server_url }}/${{ github.repository }}
+          -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ inputs.git-ref }}
+          -Dquarkus.container-image.labels.vcs-type=git
+          -Dquarkus.container-image.labels.vcs-ref=${{ inputs.git-ref }}
+
+      - name: Build and Push Image (native-mode)
+        if: ${{ success() && contains(fromJSON('["only_native","jvm_and_native"]'), inputs.build-mode) }}
+        run: >-
+          ./mvnw
+          --settings ${{ github.workspace }}/settings.xml
+          --batch-mode
+          verify
+          -Pnative
+          -Dquarkus.container-image.build=true
+          -Dquarkus.container-image.push=true
+          -Dquarkus.container-image.registry=ghcr.io
+          -Dquarkus.container-image.username=${{ github.actor }}
+          -Dquarkus.container-image.password=${{ github.token }}
+          -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
+          -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
+          -Dquarkus.container-image.tag=${{ inputs.git-ref }}-native
+          ${{ inputs.tag-as-latest == true && '-Dquarkus.container-image.additional-tags=latest-native' || '' }}
+          -Dquarkus.container-image.labels.\"org.opencontainers.image.source\"=${{ github.server_url }}/${{ github.repository }}
+          -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ inputs.git-ref }}
+          -Dquarkus.container-image.labels.vcs-type=git
+          -Dquarkus.container-image.labels.vcs-ref=${{ inputs.git-ref }}

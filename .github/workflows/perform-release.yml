@@ -1,31 +1,59 @@
 name: Perform Release
 
 on:
-  workflow_dispatch: { }
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Dry Run
+        required: false
+        type: boolean
+        default: false
+      release-version:
+        description: Release Version
+        required: false
+        type: string
+      next-version:
+        description: Next Development Version
+        required: false
+        type: string
 
 jobs:
-  build-deploy-maven:
+  maven-build-deploy:
     name: Build and Deploy Maven Artifacts
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
       packages: write
 
     outputs:
       release-sha: ${{ steps.release-sha.outputs.value }}
+      release-tag: ${{ steps.release-tag.outputs.value }}
 
     steps:
     - name: Checkout 3scale CMS
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
         distribution: temurin
         java-version: '17'
-        cache: maven
         settings-path: ${{ github.workspace }}
         server-id: github
+
+    - name: Determine Home Directory
+      id: find-home
+      run: |
+        echo "home=$HOME" >> $GITHUB_OUTPUT
+
+    - name: Cache Maven Local Repo
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.find-home.outputs.home }}/.m2/repository
+        key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-maven-
 
     - name: Configure Git User
       run: |
@@ -41,12 +69,20 @@ jobs:
         -e 's;<developerConnection>.*</developerConnection>;<developerConnection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</developerConnection>;'
         pom.xml
 
-    - name: Prepare Maven Release (build code)
+    - name: Prepare Maven Release (build code and create tag)
+      id: release-prepare
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        NEXT_VERSION_ARGS: ${{ inputs.next-version && format('-DdevelopmentVersion={0}', inputs.next-version) || '' }}
+        RELEASE_VER_ARGS: ${{ inputs.release-version && format('-DreleaseVersion={0}', inputs.release-version) || '' }}
       run: >-
         ./mvnw
         --settings ${{ github.workspace }}/settings.xml
         --batch-mode
         release:prepare
+        ${{ format('-DdryRun={0}', inputs.dry-run) }}
+        $NEXT_VERSION_ARGS
+        $RELEASE_VER_ARGS
         -DcheckModificationExcludeList=pom.xml
         -Dusername=${{ github.token }}
         -DpreparationGoals='clean verify'
@@ -54,79 +90,86 @@ jobs:
         --settings ${{ github.workspace }}/settings.xml
         -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
         '
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
 
     - name: Perform Maven Release (deploy artifacts)
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: >-
         ./mvnw
         --settings ${{ github.workspace }}/settings.xml
         --batch-mode
         release:perform
+        -DlocalCheckout=true
+        ${{ format('-DdryRun={0}', inputs.dry-run) }}
         -Dusername=${{ github.token }}
         -Dgoals='deploy'
+
+    - name: Rollback Maven Release unless Success
+      if: ${{ !success() && !inputs.dry-run && steps.release-prepare.outcome == 'success' }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
-
-    - name: Determine release commit SHA
-      id: release-sha
-      run: |
-        echo "value=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
-
-  container-image:
-    name: Build, Tag, Push Container Image
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-
-    needs:
-    - build-deploy-maven
-
-    steps:
-    - name: Checkout 3scale CMS
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ needs.build-deploy-maven.outputs.release-sha }}
-
-    - name: Set Up JDK
-      uses: actions/setup-java@v3
-      with:
-        distribution: temurin
-        java-version: '17'
-        cache: maven
-        settings-path: ${{ github.workspace }}
-        server-id: github
-
-    - name: Calculate lowercase repository owner
-      id: repo-owner-string
-      uses: ASzc/change-string-case-action@v5
-      with:
-        string: ${{ github.repository_owner }}
-
-    - name: Calculate lowercase repository name
-      id: repo-name-string
-      uses: ASzc/change-string-case-action@v5
-      with:
-        string: ${{ github.event.repository.name }}
-
-    - name: Build and push CLI container image
       run: >-
         ./mvnw
         --settings ${{ github.workspace }}/settings.xml
         --batch-mode
-        verify
-        --projects cli
-        --also-make
-        -Dquarkus.jib.platforms=linux/amd64,linux/arm64
-        -Dquarkus.container-image.build=true
-        -Dquarkus.container-image.push=true
-        -Dquarkus.container-image.registry=ghcr.io
-        -Dquarkus.container-image.username=${{ github.actor }}
-        -Dquarkus.container-image.password=${{ github.token }}
-        -Dquarkus.container-image.group=${{ steps.repo-owner-string.outputs.lowercase }}
-        -Dquarkus.container-image.name=${{ steps.repo-name-string.outputs.lowercase }}
-        -Dquarkus.container-image.additional-tags=latest
-        -Dquarkus.container-image.labels.name=${{ steps.repo-owner-string.outputs.lowercase }}/${{ steps.repo-name-string.outputs.lowercase }}
-        -Dquarkus.container-image.labels.url=${{ github.server_url }}/${{ github.repository }}/tree/${{ needs.build-deploy-maven.outputs.release-sha }}
-        -Dquarkus.container-image.labels.vcs-type=git
-        -Dquarkus.container-image.labels.vcs-ref=${{ needs.build-deploy-maven.outputs.release-sha }}
+        release:rollback
+        -Dusername=${{ github.token }}
+
+    - name: Determine Release Commit SHA
+      id: release-sha
+      run: |
+        echo "value=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
+
+    - name: Determine Release Tag
+      id: release-tag
+      env:
+        RELEASE_SHA: ${{ steps.release-sha.outputs.value }}
+      run: |
+        echo "value=$(git show-ref --tags --dereference | grep -F $RELEASE_SHA | cut -d' ' -f2 | cut -d'^' -f1 | cut -d'/' -f3-)" >> $GITHUB_OUTPUT
+
+  create-github-release:
+    name: Create GitHub Release from Tag
+    runs-on: ubuntu-latest
+
+    if: ${{ success() && !inputs.dry-run }}
+
+    permissions:
+      contents: write
+
+    needs:
+      - maven-build-deploy
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+
+      - uses: spenserblack/actions-tag-to-release@v3
+        with:
+          tag: ${{ needs.maven-build-deploy.outputs.release-tag }}
+          tag-as-title: true
+          draft: true
+          dry-run: ${{ inputs.dry-run }}
+          prerelease: auto
+          prerelease-pattern: v*.*.*-*
+
+  build-container-image:
+    name: Build, Tag, Push Container Image
+
+    if: ${{ success() && !inputs.dry-run }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    secrets: inherit
+
+    needs:
+      - maven-build-deploy
+
+    uses: ./.github/workflows/build-container-image.yml
+    with:
+      git-ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+      build-mode: jvm_and_native
+      tag-as-latest: true
