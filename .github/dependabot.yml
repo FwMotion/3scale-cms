@@ -1,7 +1,30 @@
 version: 2
 updates:
-  - package-ecosystem: "maven"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "daily"
-    open-pull-requests-limit: 10
+      interval: weekly
+    commit-message:
+      prefix: '[github-actions] '
+      prefix-development: '[github-actions] '
+      include: scope
+    reviewers:
+      - rmgrimm
+    labels:
+      - build
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: '[maven] '
+      prefix-development: '[maven] '
+      include: scope
+    reviewers:
+      - rmgrimm
+    labels:
+      - build
+      - dependencies
+    open-pull-requests-limit: 5

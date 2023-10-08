@@ -11,10 +11,22 @@ on:
       - unlocked
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
+      - '.run/**'
+      - 'samples/**'
+      - .editorconfig
+      - .gitignore
+      - LICENSE
+      - README.adoc
 
 jobs:
-  build:
+  build-and-test:
+    name: Build and Run Tests
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout Code
@@ -23,10 +35,25 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
-      - name: Build and Verify
+      - name: Determine Home Directory
+        id: find-home
         run: |
-          ./mvnw clean verify
+          echo "home=$HOME" >> $GITHUB_OUTPUT
 
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Run Maven Build and Verify
+        run: >-
+          ./mvnw
+          --batch-mode
+          clean
+          verify
