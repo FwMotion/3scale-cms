@@ -1,0 +1,27 @@
+name: Submit Dependency Tree Samples
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/pom.xml'
+
+jobs:
+  submit-dependency-tree:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Submit Dependency Snapshot
+        uses: advanced-security/maven-dependency-submission-action@v3
