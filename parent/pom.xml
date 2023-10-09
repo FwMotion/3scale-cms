@@ -86,7 +86,7 @@
     <version.maven-install-plugin>3.1.1</version.maven-install-plugin>
     <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
     <version.maven-javadoc-plugin>3.4.1</version.maven-javadoc-plugin>
-    <version.maven-project-info-reports-plugin>3.4.1</version.maven-project-info-reports-plugin>
+    <version.maven-project-info-reports-plugin>3.4.5</version.maven-project-info-reports-plugin>
     <version.maven-site-plugin>3.12.1</version.maven-site-plugin>
     <version.maven-source-plugin>3.2.1</version.maven-source-plugin>
     <version.maven-release-plugin>3.0.1</version.maven-release-plugin>
@@ -97,7 +97,7 @@
 
     <!-- Third-party Maven Plugins -->
     <version.depgraph-maven-plugin>4.0.2</version.depgraph-maven-plugin>
-    <version.dokka-maven-plugin>1.7.20</version.dokka-maven-plugin>
+    <version.dokka-maven-plugin>1.9.0</version.dokka-maven-plugin>
     <version.find-and-replace-maven-plugin>
       1.1.0
     </version.find-and-replace-maven-plugin>
