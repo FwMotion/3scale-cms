@@ -141,8 +141,6 @@ jobs:
     permissions:
       contents: write
 
-    secrets: inherit
-
     needs:
       - maven-build-deploy
 
@@ -196,4 +194,5 @@ jobs:
 
     uses: ./.github/workflows/render-and-deploy-site.yml
     with:
-      git-ref: ${{ needs.maven-build-deploy.outputs.release-sha }}
+      git-ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+      dry-run: ${{ inputs.dry-run }}
