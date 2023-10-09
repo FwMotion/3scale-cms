@@ -51,6 +51,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-maven-
 
+      - name: Set Up Maven Repo Filters
+        run: |
+          mkdir -p ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+          cp -av ${{ github.workspace }}/.mvn/filters/*.txt ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+
       - name: Run Maven Build and Verify
         run: >-
           ./mvnw
