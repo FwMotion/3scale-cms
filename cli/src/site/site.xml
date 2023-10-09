@@ -9,7 +9,7 @@
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
-    <version>$context.get("version.maven-fluido-skin")</version>
+    <version>${maven-fluido-skin-version}</version>
   </skin>
 
   <body>
