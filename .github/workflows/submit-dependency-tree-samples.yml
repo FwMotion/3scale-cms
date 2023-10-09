@@ -23,5 +23,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Determine Home Directory
+        id: find-home
+        run: |
+          echo "home=$HOME" >> $GITHUB_OUTPUT
+
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Set Up Maven Repo Filters
+        run: |
+          mkdir -p ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+          cp -av ${{ github.workspace }}/.mvn/filters/*.txt ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+
       - name: Submit Dependency Snapshot
         uses: advanced-security/maven-dependency-submission-action@v3
