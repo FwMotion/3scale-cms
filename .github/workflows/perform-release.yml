@@ -178,3 +178,21 @@ jobs:
       git-ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
       build-mode: jvm_and_native
       tag-as-latest: true
+
+  render-and-deploy-site:
+    name: Render and Deploy Site
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    secrets: inherit
+
+    needs:
+      - maven-build-deploy
+
+    uses: ./.github/workflows/render-and-deploy-site.yml
+    with:
+      git-ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+      dry-run: ${{ inputs.dry-run }}

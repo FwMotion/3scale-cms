@@ -14,11 +14,19 @@
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (command-line interface)</name>
+  <url>https://fwmotion.github.io/3scale-cms/cli</url>
   <description><![CDATA[
     A Quarkus-based command-line interface to the 3scale Content Management
-    System. It is recommended to use this via the native-mode compiled
-    container image `ghcr.io/fwmotion/3scale-cms`.
+    System. It is recommended to use this via the assembled container image
+    `ghcr.io/fwmotion/3scale-cms`.
   ]]></description>
+
+  <distributionManagement>
+    <site>
+      <id>fwmotion.github.io</id>
+      <url>https://fwmotion.github.io/3scale-cms/cli</url>
+    </site>
+  </distributionManagement>
 
   <properties>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
@@ -99,5 +107,28 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>dependencies</report>
+              <report>dependency-info</report>
+              <report>licenses</report>
+              <report>plugins</report>
+              <report>summary</report>
+              <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>

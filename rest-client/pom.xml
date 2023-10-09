@@ -14,12 +14,20 @@
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (REST client library)</name>
+  <url>https://fwmotion.github.io/3scale-cms/rest-client</url>
   <description><![CDATA[
     Java library to interact with 3scale Content Management System via the
     CMS's REST API. This requires use of either a Provider Key or an
     Access Token that has been granted permission to the Account Management
     API and the hidden Content Management API
   ]]></description>
+
+  <distributionManagement>
+    <site>
+      <id>fwmotion.github.io</id>
+      <url>https://fwmotion.github.io/3scale-cms/rest-client</url>
+    </site>
+  </distributionManagement>
 
   <properties>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
@@ -206,8 +214,46 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>io.smallrye</groupId>
         <artifactId>jandex-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jetbrains.dokka</groupId>
+        <artifactId>dokka-maven-plugin</artifactId>
+        <configuration>
+          <jdkVersion>${maven.compiler.release}</jdkVersion>
+
+          <includes>
+            <include>${project.basedir}/src/main/dokka/module.md</include>
+            <include>${project.basedir}/src/main/dokka/packages.md</include>
+          </includes>
+
+          <sourceDirectories>
+            <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+            <sourceDirectory>${project.build.directory}/generated-sources/annotations</sourceDirectory>
+            <sourceDirectory>${project.build.directory}/generated-sources/threescale-cms-client/src/main/java</sourceDirectory>
+          </sourceDirectories>
+
+          <sourceLinks>
+            <sourceLink>
+              <path>${project.basedir}/src/main/java</path>
+              <url>${default.dokka-srclink-base}/rest-client/src/main/java</url>
+              <lineSuffix>${default.dokka-linesuffix}</lineSuffix>
+            </sourceLink>
+          </sourceLinks>
+
+<!--          <samples>-->
+<!--            <sample>src/test/samples</sample>-->
+<!--          </samples>-->
+
+          <reportUndocumented>true</reportUndocumented>
+          <suppressObviousFunctions>true</suppressObviousFunctions>
+          <suppressInheritedMembers>true</suppressInheritedMembers>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.openapitools</groupId>
@@ -326,5 +372,41 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc-no-fork</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependencies</report>
+              <report>dependency-info</report>
+              <report>index</report>
+              <report>issue-management</report>
+              <report>licenses</report>
+              <report>plugins</report>
+              <report>scm</report>
+              <report>summary</report>
+              <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>
