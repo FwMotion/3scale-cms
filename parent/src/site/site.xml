@@ -5,6 +5,13 @@
       http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd
       http://www.w3.org/2001/XMLSchema-instance https://www.w3.org/2001/XMLSchema-instance"
       name="3scale CMS Tools - Parent">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>$context.get("version.maven-fluido-skin")</version>
+  </skin>
+
   <body>
     <links>
       <item name="GitHub Project" href="https://github.com/FwMotion/3scale-cms" />

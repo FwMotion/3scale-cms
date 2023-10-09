@@ -67,6 +67,9 @@
     <maven.compiler.target>17</maven.compiler.target>
     <maven.compiler.release>17</maven.compiler.release>
 
+    <!-- Maven site skin version -->
+    <version.maven-fluido-skin>2.0.0-M7</version.maven-fluido-skin>
+
     <!-- Requirements -->
     <requirements.java-version>[17,)</requirements.java-version>
     <requirements.maven-version>[3.9.2,)</requirements.maven-version>
