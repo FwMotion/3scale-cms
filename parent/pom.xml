@@ -121,7 +121,7 @@
     <version.hamcrest>2.2</version.hamcrest>
     <version.imposter>3.31.2</version.imposter>
     <version.mapstruct>1.5.5.Final</version.mapstruct>
-    <version.quarkus>3.4.2</version.quarkus>
+    <version.quarkus>3.4.3</version.quarkus>
     <version.swagger-annotations>1.6.11</version.swagger-annotations>
     <version.swagger-parser>2.0.31</version.swagger-parser>
     <version.threeten-jaxb>2.1.0</version.threeten-jaxb>
