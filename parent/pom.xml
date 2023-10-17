@@ -100,7 +100,7 @@
 
     <!-- Third-party Maven Plugins -->
     <version.depgraph-maven-plugin>4.0.2</version.depgraph-maven-plugin>
-    <version.dokka-maven-plugin>1.9.0</version.dokka-maven-plugin>
+    <version.dokka-maven-plugin>1.9.10</version.dokka-maven-plugin>
     <version.find-and-replace-maven-plugin>
       1.1.0
     </version.find-and-replace-maven-plugin>
