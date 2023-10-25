@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.OffsetDateTime;
 
-public class CmsSection implements CmsObject{
+public class CmsSection implements CmsObject {
 
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -93,9 +93,7 @@ public class CmsSection implements CmsObject{
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof CmsSection)) return false;
-
-        CmsSection that = (CmsSection) o;
+        if (!(o instanceof CmsSection that)) return false;
 
         return new EqualsBuilder().append(getId(), that.getId()).isEquals();
     }

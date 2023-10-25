@@ -41,7 +41,7 @@ import static com.fwmotion.threescale.cms.matchers.HeaderMatcher.header;
 import static com.fwmotion.threescale.cms.matchers.InputStreamContentsMatcher.inputStreamContents;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
@@ -87,7 +87,7 @@ class ThreescaleCmsClientImplUnitTest {
 
     @Test
     void testStreamAllCmsObjects() throws Exception {
-        sectionsApiTestSupport.givenListSectionOnlyRoot();
+        sectionsApiTestSupport.givenListSectionRootAndCss();
         filesApiTestSupport.givenListFilesOnlyFavicon();
         templatesApiTestSupport.givenListTemplatesOnlyMainLayout();
 
@@ -99,7 +99,8 @@ class ThreescaleCmsClientImplUnitTest {
         templatesApiTestSupport.thenOnlyListTemplatesCalled();
 
         assertThat(result, contains(
-            SectionsApiTestSupport.ROOT_SECTION_MATCHER,
+            SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER,
+            SectionsApiTestSupport.CSS_SECTION_MATCHER,
             FilesApiTestSupport.FAVICON_FILE_MATCHER,
             TemplatesApiTestSupport.MAIN_LAYOUT_MATCHER));
     }
@@ -117,7 +118,7 @@ class ThreescaleCmsClientImplUnitTest {
         templatesApiTestSupport.thenOnlyListTemplatesCalled();
 
         assertThat(result, contains(
-            SectionsApiTestSupport.ROOT_SECTION_MATCHER,
+            SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER,
             FilesApiTestSupport.FAVICON_FILE_MATCHER,
             TemplatesApiTestSupport.MAIN_LAYOUT_MATCHER));
     }
@@ -133,7 +134,7 @@ class ThreescaleCmsClientImplUnitTest {
         then(filesApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
 
-        assertThat(result, contains(SectionsApiTestSupport.ROOT_SECTION_MATCHER));
+        assertThat(result, contains(SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER));
     }
 
     @Test
@@ -146,7 +147,7 @@ class ThreescaleCmsClientImplUnitTest {
         then(filesApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
 
-        assertThat(result, contains(SectionsApiTestSupport.ROOT_SECTION_MATCHER));
+        assertThat(result, contains(SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER));
     }
 
     @Test
@@ -194,7 +195,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
-            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>) invocation.getArgument(1))
                 .handleResponse(httpResponseMock));
 
         BasicHttpEntity responseEntity = new BasicHttpEntity(
@@ -256,7 +257,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
-            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>) invocation.getArgument(1))
                 .handleResponse(httpResponseMock));
 
         BasicHttpEntity responseEntity = new BasicHttpEntity(
@@ -318,7 +319,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
-            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>) invocation.getArgument(1))
                 .handleResponse(httpResponseMock));
 
         BasicHttpEntity responseEntity = new BasicHttpEntity(
@@ -383,7 +384,7 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
-            .willAnswer(invocation -> ((HttpClientResponseHandler<?>)invocation.getArgument(1))
+            .willAnswer(invocation -> ((HttpClientResponseHandler<?>) invocation.getArgument(1))
                 .handleResponse(httpResponseMock));
 
         BasicHttpEntity responseEntity = new BasicHttpEntity(
@@ -638,6 +639,30 @@ class ThreescaleCmsClientImplUnitTest {
 
         // And the new section should have an ID
         assertThat(newSection.getId(), is(32L));
+    }
+
+    @Test
+    void save_UpdateBuiltinSectionUnsupported() {
+        // Given a CmsBuiltinSection object to update
+        CmsBuiltinSection builtinSection = new CmsBuiltinSection();
+        builtinSection.setId(30L);
+        builtinSection.setSystemName("root");
+        builtinSection.setParentId(32L);
+
+        // When the CmsBuiltinSection is saved
+        UnsupportedOperationException thrown = assertThrows(
+            UnsupportedOperationException.class,
+            () -> threescaleCmsClient.save(builtinSection)
+        );
+
+        // Then an exception should have been thrown because builtin sections
+        // cannot be created or updated
+        assertNotNull(thrown);
+
+        // And no APIs should have been called
+        then(sectionsApi).shouldHaveNoInteractions();
+        then(filesApi).shouldHaveNoInteractions();
+        then(templatesApi).shouldHaveNoInteractions();
     }
 
     @Test

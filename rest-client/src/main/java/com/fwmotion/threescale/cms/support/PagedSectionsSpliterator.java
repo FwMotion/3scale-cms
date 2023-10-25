@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.fwmotion.threescale.cms.mappers.CmsBuiltinSectionMapper;
 import com.fwmotion.threescale.cms.mappers.CmsSectionMapper;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.redhat.threescale.rest.cms.ApiException;
@@ -14,10 +15,12 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<CmsSection> {
 
     private static final CmsSectionMapper SECTION_MAPPER = Mappers.getMapper(CmsSectionMapper.class);
+    private static final CmsBuiltinSectionMapper BUILTIN_SECTION_MAPPER = Mappers.getMapper(CmsBuiltinSectionMapper.class);
 
     private final SectionsApi sectionsApi;
 
@@ -47,10 +50,15 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
         try {
             SectionList sectionList = sectionsApi.listSections(pageNumber, pageSize);
 
-            List<CmsSection> resultPage = ListUtils.emptyIfNull(sectionList.getSections())
-                .stream()
-                .map(SECTION_MAPPER::fromRest)
-                .collect(Collectors.toList());
+            List<CmsSection> resultPage =
+                Stream.concat(
+                    ListUtils.emptyIfNull(sectionList.getBuiltinSections())
+                        .stream()
+                        .map(BUILTIN_SECTION_MAPPER::fromRest),
+                    ListUtils.emptyIfNull(sectionList.getSections())
+                        .stream()
+                        .map(SECTION_MAPPER::fromRest)
+                ).collect(Collectors.toList());
 
             validateResultPageSize(
                 "section",
