@@ -67,7 +67,8 @@ public class ThreescaleCmsClientImplIntegrationTest {
         assertThat(result, hasSize(97));
         assertThat(result, hasItems(
             FilesApiTestSupport.FAVICON_FILE_MATCHER,
-            SectionsApiTestSupport.ROOT_SECTION_MATCHER,
+            SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER,
+            SectionsApiTestSupport.CSS_SECTION_MATCHER,
             TemplatesApiTestSupport.MAIN_LAYOUT_MATCHER
         ));
     }
@@ -80,4 +81,5 @@ public class ThreescaleCmsClientImplIntegrationTest {
 
         assertThat(result.get(), inputStreamContents(equalTo("This is a test value.\n")));
     }
+
 }

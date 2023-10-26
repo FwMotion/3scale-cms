@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sections per_page="20" total_entries="25" total_pages="2" current_page="1">
-  <section>
+  <builtin_section>
     <id>30</id>
     <created_at>2022-03-05T04:48:27Z</created_at>
     <updated_at>2022-03-18T06:31:57Z</updated_at>
@@ -9,7 +9,7 @@
     <title>Root</title>
     <parent_id/>
     <system_name>root</system_name>
-  </section>
+  </builtin_section>
   <section>
     <id>31</id>
     <created_at>2022-03-05T04:48:27Z</created_at>

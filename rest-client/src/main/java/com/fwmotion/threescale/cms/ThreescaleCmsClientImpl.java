@@ -142,6 +142,18 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Override
     public void save(@Nonnull CmsSection section) throws ApiException {
+        if (section instanceof CmsBuiltinSection) {
+            saveBuiltinSection((CmsBuiltinSection) section);
+        } else {
+            saveSection(section);
+        }
+    }
+
+    private void saveBuiltinSection(CmsBuiltinSection builtinSection) {
+        throw new UnsupportedOperationException("CmsBuiltinSection cannot be modified");
+    }
+
+    private void saveSection(CmsSection section) throws ApiException {
         Section restSection = SECTION_MAPPER.toRest(section);
         if (section.getId() == null) {
             if (StringUtils.isBlank(restSection.getTitle())
