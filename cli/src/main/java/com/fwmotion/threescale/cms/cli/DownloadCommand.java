@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 @CommandLine.Command(
     header = "Download 3scale CMS Content",
@@ -105,7 +104,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         List<File> deleteFiles = localPathsToDelete.stream()
             .map(treeDetails.getLocalObjectsByCmsPath()::get)
             .map(Pair::getRight)
-            .collect(Collectors.toList());
+            .toList();
 
         List<Pair<CmsObject, Path>> remoteObjectsToDownload = remotePathsToDownload.stream()
             .map(pathKey -> {
@@ -114,7 +113,7 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
 
                 return Pair.of(object, targetPath);
             })
-            .collect(Collectors.toList());
+            .toList();
 
         if (noop) {
             for (File file : deleteFiles) {
@@ -167,8 +166,10 @@ public class DownloadCommand extends CommandBase implements Callable<Integer> {
         File targetFile = targetPath.toFile();
         File parentDirectory = targetFile.getParentFile();
 
-        if (!parentDirectory.exists() && !parentDirectory.mkdirs()) {
-            throw new IllegalStateException("Unable to create parent directories for " + targetFile);
+        if (parentDirectory != null) {
+            if (!parentDirectory.exists() && !parentDirectory.mkdirs()) {
+                throw new IllegalStateException("Unable to create parent directories for " + targetFile);
+            }
         }
 
         switch (cmsObject.getType()) {
