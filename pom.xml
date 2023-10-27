@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools</name>
-  <url>https://fwmotion.github.io/3scale-cms</url>
+  <url>https://fwmotion.github.io/3scale-cms/aggregate</url>
   <description><![CDATA[
     Maven project to group multiple submodules related to 3scale's Content
     Management System API, and to handle build ordering and aggregate test
@@ -23,6 +23,8 @@
 
   <properties>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
+
+    <maven.top-level-basedir>${project.basedir}</maven.top-level-basedir>
   </properties>
 
   <scm>
@@ -35,7 +37,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms</url>
+      <url>https://fwmotion.github.io/3scale-cms/aggregate</url>
     </site>
   </distributionManagement>
 
@@ -44,6 +46,19 @@
     <module>rest-client</module>
     <module>cli</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <!-- Don't deploy this -aggregate project -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <reporting>
     <excludeDefaults>true</excludeDefaults>

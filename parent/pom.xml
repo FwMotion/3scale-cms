@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools (parent)</name>
-  <url>https://fwmotion.github.io/3scale-cms/parent</url>
+  <url>https://fwmotion.github.io/3scale-cms</url>
   <description><![CDATA[
     Maven project to provide common base configuration for inheritance by other
     related projects
@@ -17,7 +17,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms/parent</url>
+      <url>https://fwmotion.github.io/3scale-cms</url>
     </site>
   </distributionManagement>
 
@@ -56,6 +56,10 @@
   <properties>
     <project.build.outputTimestamp>1668725936</project.build.outputTimestamp>
 
+    <maven.top-level-basedir>${project.basedir}/..</maven.top-level-basedir>
+
+    <topSiteURL>https://fwmotion.github.io/3scale-cms</topSiteURL>
+
     <quarkus.container-image.labels.version>
       ${project.version}
     </quarkus.container-image.labels.version>
@@ -68,7 +72,7 @@
     <maven.compiler.release>17</maven.compiler.release>
 
     <!-- Maven site skin version (can't include dots in name) -->
-    <maven-fluido-skin-version>2.0.0-M7</maven-fluido-skin-version>
+    <maven-fluido-skin-version>2.0.0-M8</maven-fluido-skin-version>
 
     <!-- Requirements -->
     <requirements.java-version>[17,)</requirements.java-version>
@@ -94,7 +98,7 @@
     <version.maven-source-plugin>3.3.0</version.maven-source-plugin>
     <version.maven-release-plugin>3.0.1</version.maven-release-plugin>
     <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-    <version.maven-site-plugin>4.0.0-M10</version.maven-site-plugin>
+    <version.maven-site-plugin>4.0.0-M11</version.maven-site-plugin>
     <version.maven-surefire-plugin>3.2.1</version.maven-surefire-plugin>
     <version.maven-wrapper-plugin>3.2.0</version.maven-wrapper-plugin>
 
@@ -383,6 +387,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>${version.maven-site-plugin}</version>
+          <configuration>
+            <stagingDirectory>${maven.top-level-basedir}/target/staging</stagingDirectory>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -633,6 +640,30 @@
   </repositories>
 
   <profiles>
+    <profile>
+      <id>skipJavadoc</id>
+      <activation>
+        <property>
+          <name>skipJavadoc</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.jetbrains.dokka</groupId>
+              <artifactId>dokka-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>default-javadocJar</id>
+                  <phase>none</phase>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
     <profile>
       <id>native</id>
       <activation>

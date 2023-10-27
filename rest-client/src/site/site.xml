@@ -18,11 +18,12 @@
     </links>
 
     <breadcrumbs>
-      <item href="../index.html" name="3scale CMS Tools"/>
-      <item href="/index.html" name="REST Client"/>
+      <item href="${topSiteURL}/aggregate/index.html" name="3scale CMS Tools"/>
+      <item href="${topSiteURL}/rest-client/index.html" name="REST Client"/>
     </breadcrumbs>
 
     <menu ref="parent"/>
+    <menu ref="modules"/>
     <menu ref="reports"/>
     <menu name="GitHub Project Pages">
       <item name="Home" href="https://github.com/FwMotion/3scale-cms"/>

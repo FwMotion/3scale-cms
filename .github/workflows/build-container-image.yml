@@ -21,6 +21,11 @@ on:
         required: false
         type: boolean
         default: false
+      skip-tests:
+        description: Skip Tests
+        required: false
+        type: boolean
+        default: false
   workflow_call:
     inputs:
       git-ref:
@@ -31,6 +36,10 @@ on:
         type: string
         default: only_jvm
       tag-as-latest:
+        required: false
+        type: boolean
+        default: false
+      skip-tests:
         required: false
         type: boolean
         default: false
@@ -95,6 +104,8 @@ jobs:
           --settings ${{ github.workspace }}/settings.xml
           --batch-mode
           verify
+          ${{ inputs.skip-tests == true && '-DskipTests' || '' }}
+          -DskipJavadoc
           -Dquarkus.jib.platforms=linux/amd64,linux/arm64
           -Dquarkus.container-image.build=true
           -Dquarkus.container-image.push=true
@@ -118,6 +129,8 @@ jobs:
           --batch-mode
           verify
           -Pnative
+          ${{ inputs.skip-tests == true && '-DskipTests' || '' }}
+          -DskipJavadoc
           -Dquarkus.container-image.build=true
           -Dquarkus.container-image.push=true
           -Dquarkus.container-image.registry=ghcr.io

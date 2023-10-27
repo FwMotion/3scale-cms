@@ -77,6 +77,14 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <!-- Don't deploy the CLI as a maven artifact -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>${groupId.quarkus}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${version.quarkus}</version>
