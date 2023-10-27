@@ -18,11 +18,12 @@
     </links>
 
     <breadcrumbs>
-      <item href="../index.html" name="3scale CMS Tools"/>
-      <item href="/index.html" name="Command-Line Interface"/>
+      <item href="${topSiteURL}/aggregate/index.html" name="3scale CMS Tools"/>
+      <item href="${topSiteURL}/cli/index.html" name="Command-Line Interface"/>
     </breadcrumbs>
 
     <menu ref="parent"/>
+    <menu ref="modules"/>
     <menu ref="reports"/>
     <menu name="GitHub Project Pages">
       <item name="Home" href="https://github.com/FwMotion/3scale-cms"/>

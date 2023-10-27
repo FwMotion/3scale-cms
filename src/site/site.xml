@@ -18,7 +18,7 @@
     </links>
 
     <breadcrumbs>
-      <item href="index.html" name="3scale CMS Tools"/>
+      <item href="${topSiteURL}/aggregate/index.html" name="3scale CMS Tools"/>
     </breadcrumbs>
 
     <menu ref="parent"/>

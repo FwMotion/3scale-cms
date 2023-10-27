@@ -16,6 +16,16 @@ on:
         description: Next Development Version
         required: false
         type: string
+      tag-as-latest:
+        description: Latest
+        required: false
+        type: boolean
+        default: false
+      include-site:
+        description: Build and Deploy Site
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   maven-build-deploy:
@@ -78,22 +88,20 @@ jobs:
       id: release-prepare
       env:
         GITHUB_TOKEN: ${{ github.token }}
-        NEXT_VERSION_ARGS: ${{ inputs.next-version && format('-DdevelopmentVersion={0}', inputs.next-version) || '' }}
-        RELEASE_VER_ARGS: ${{ inputs.release-version && format('-DreleaseVersion={0}', inputs.release-version) || '' }}
       run: >-
         ./mvnw
         --settings ${{ github.workspace }}/settings.xml
         --batch-mode
         release:prepare
         ${{ format('-DdryRun={0}', inputs.dry-run) }}
-        $NEXT_VERSION_ARGS
-        $RELEASE_VER_ARGS
+        ${{ inputs.next-version && format('-DdevelopmentVersion={0}', inputs.next-version) || '' }}
+        ${{ inputs.release-version && format('-DreleaseVersion={0}', inputs.release-version) || '' }}
         -DcheckModificationExcludeList=pom.xml
         -Dusername=${{ github.token }}
         -DpreparationGoals='clean verify'
         -Darguments='
         --settings ${{ github.workspace }}/settings.xml
-        -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
+        -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
         '
 
     - name: Perform Maven Release (deploy artifacts)
@@ -108,6 +116,10 @@ jobs:
         ${{ format('-DdryRun={0}', inputs.dry-run) }}
         -Dusername=${{ github.token }}
         -Dgoals='deploy'
+        -Darguments='
+        --settings ${{ github.workspace }}/settings.xml
+        -DaltDeploymentRepository=github::https://maven.pkg.github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}
+        '
 
     - name: Rollback Maven Release unless Success
       if: ${{ !success() && !inputs.dry-run && steps.release-prepare.outcome == 'success' }}
@@ -130,7 +142,7 @@ jobs:
       env:
         RELEASE_SHA: ${{ steps.release-sha.outputs.value }}
       run: |
-        echo "value=$(git show-ref --tags --dereference | grep -F $RELEASE_SHA | cut -d' ' -f2 | cut -d'^' -f1 | cut -d'/' -f3-)" >> $GITHUB_OUTPUT
+        echo "value=$(git describe --tags --abbrev=0 $RELEASE_SHA 2>&1 || echo $RELEASE_SHA)" >> $GITHUB_OUTPUT
 
   create-github-release:
     name: Create GitHub Release from Tag
@@ -159,6 +171,185 @@ jobs:
           prerelease: auto
           prerelease-pattern: v*.*.*-*
 
+  add-jvm-build-to-release:
+    name: Add Executable JAR to Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    needs:
+      - maven-build-deploy
+      - create-github-release
+
+    steps:
+      - name: Checkout Tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Determine Home Directory
+        id: find-home
+        run: |
+          echo "home=$HOME" >> $GITHUB_OUTPUT
+
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Set Up Maven Repo Filters
+        run: |
+          mkdir -p ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+          cp -av ${{ github.workspace }}/.mvn/filters/*.txt ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+
+      - name: Perform JVM-mode CLI Build
+        run: >-
+          ./mvnw
+          --batch-mode
+          package
+          --projects cli
+          --also-make
+          -DskipTests
+          -DskipJavadoc
+
+      - name: Package CLI JAR into Tarball
+        run: |
+          mkdir -p tarball/3scale-cms-java
+          cp -av cli/target/quarkus-app/app cli/target/quarkus-app/lib cli/target/quarkus-app/quarkus tarball/3scale-cms-java/
+          cp -av cli/target/quarkus-app/quarkus-run.jar tarball/3scale-cms-java/3scale-cms.jar
+          cat <<EOF >tarball/3scale-cms
+          #!/bin/sh
+          java -jar "\$(dirname \$0)/3scale-cms-java/3scale-cms.jar" "\$@"
+          EOF
+          chmod +x tarball/3scale-cms
+          pushd tarball
+          tar cvfaS 3scale-cms-${{ runner.os }}-java.tar.gz --mtime=$(realpath 3scale-cms-java/3scale-cms.jar) 3scale-cms 3scale-cms-java
+          popd
+
+      - name: Upload Artifact to GitHub Actions
+        uses: actions/upload-artifact@v3
+        with:
+          name: 3scale-cms-${{ runner.os }}-java
+          path: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-java.tar.gz
+          if-no-files-found: error
+
+      - name: Add Artifact to Release
+        if: ${{ success() && !inputs.dry-run }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ needs.maven-build-deploy.outputs.release-tag }}
+          allowUpdates: true
+          updateOnlyUnreleased: true
+
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          generateReleaseNotes: false
+
+          artifactErrorsFailBuild: true
+          removeArtifacts: false
+          replacesArtifacts: false
+
+          artifacts: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-java.tar.gz
+
+  add-native-build-to-release:
+    name: Add Native Executable to Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    needs:
+      - maven-build-deploy
+      - create-github-release
+
+    steps:
+      - name: Checkout Tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Determine Home Directory
+        id: find-home
+        run: |
+          echo "home=$HOME" >> $GITHUB_OUTPUT
+
+      - name: Cache Maven Local Repo
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.find-home.outputs.home }}/.m2/repository
+          key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-maven-
+
+      - name: Set Up Maven Repo Filters
+        run: |
+          mkdir -p ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+          cp -av ${{ github.workspace }}/.mvn/filters/*.txt ${{ steps.find-home.outputs.home }}/.m2/repository/.remoteRepositoryFilters/
+
+      - name: Perform Native CLI Build
+        run: >-
+          ./mvnw
+          --batch-mode
+          package
+          --projects cli
+          --also-make
+          -DskipTests
+          -DskipJavadoc
+          -Dnative
+
+      - name: Package CLI into Tarball
+        run: |
+          mkdir -p tarball
+          cp -av cli/target/3scale-cms-*-runner tarball/3scale-cms
+          pushd tarball
+          tar cvfaS 3scale-cms-${{ runner.os }}-${{ runner.arch }}.tar.gz 3scale-cms
+          popd
+
+      - name: Upload Artifact to GitHub Actions
+        uses: actions/upload-artifact@v3
+        with:
+          name: 3scale-cms-${{ runner.os }}-${{ runner.arch }}
+          path: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-${{ runner.arch }}.tar.gz
+          if-no-files-found: error
+
+      - name: Add Artifact to Release
+        if: ${{ success() && !inputs.dry-run }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ needs.maven-build-deploy.outputs.release-tag }}
+          allowUpdates: true
+          updateOnlyUnreleased: true
+
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          generateReleaseNotes: false
+
+          artifactErrorsFailBuild: true
+          removeArtifacts: false
+          replacesArtifacts: false
+
+          artifacts: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-${{ runner.arch }}.tar.gz
+
   build-container-image:
     name: Build, Tag, Push Container Image
 
@@ -177,10 +368,13 @@ jobs:
     with:
       git-ref: ${{ needs.maven-build-deploy.outputs.release-tag }}
       build-mode: jvm_and_native
-      tag-as-latest: true
+      tag-as-latest: ${{ inputs.tag-as-latest }}
+      skip-tests: true
 
   render-and-deploy-site:
     name: Render and Deploy Site
+
+    if: ${{ success() && inputs.include-site == true }}
 
     permissions:
       contents: read

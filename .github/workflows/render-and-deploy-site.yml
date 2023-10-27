@@ -78,8 +78,8 @@ jobs:
           compile
           post-site
           site:stage
-          -DstagingDirectory=${{ github.workspace }}/target/staging/parent
           -Ddefault.dokka-srclink-base=${{ github.server_url }}/${{ github.repository }}/tree/${{ inputs.git-ref }}
+          -DtopSiteURL=https://fwmotion.github.io/${{ github.repository }}
 
       - name: Upload Site Artifacts
         uses: actions/upload-pages-artifact@v2
