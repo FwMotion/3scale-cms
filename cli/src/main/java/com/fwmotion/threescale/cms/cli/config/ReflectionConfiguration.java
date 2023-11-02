@@ -1,15 +1,12 @@
 package com.fwmotion.threescale.cms.cli.config;
 
-import com.fwmotion.threescale.cms.mixins.*;
+import com.fwmotion.threescale.cms.mixins.EnumHandlerMixIn;
 import com.redhat.threescale.rest.cms.model.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@SuppressWarnings("unused")
 @RegisterForReflection(targets = {
     EnumHandlerMixIn.class,
-    FileListMixIn.class,
-    SectionListMixIn.class,
-    TemplateListMixIn.class,
-    TemplateMergingList.class,
 
     BuiltinPage.class,
     BuiltinPartial.class,
@@ -20,23 +17,20 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
     FileList.class,
     FileUpdatableFields.class,
     Layout.class,
-    ListPaginationAttributes.class,
+    ListPaginationMetadata.class,
     ModelFile.class,
     Page.class,
     Partial.class,
     ProviderAccount.class,
-    ProviderPlan.class,
-    ProviderUser.class,
     Section.class,
     SectionCreationRequest.class,
     SectionList.class,
     SectionUpdatableFields.class,
     Template.class,
-    TemplateCommon.class,
     TemplateCreationRequest.class,
     TemplateList.class,
-    TemplateList.class,
     TemplateUpdatableFields.class,
+    WrappedProviderAccount.class
 })
 public class ReflectionConfiguration {
 }

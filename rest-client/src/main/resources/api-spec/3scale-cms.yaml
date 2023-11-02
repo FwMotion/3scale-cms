@@ -4,47 +4,47 @@ info:
   version: '2.14'
   description: 3scale's undocumented content management system API
 servers:
-- url: 'https://{tenant-name}-admin.{ocp-wildcard-url}'
-  description: TODO
-  variables:
-    tenant-name:
-      default: 3scale
-      description: The 3scale tenant to operate on
-    ocp-wildcard-url:
-      default: apps.your.openshift.example.com
-      description: Wildcard URL used when installing 3scale
+  - url: 'https://{tenant-name}-admin.{ocp-wildcard-url}'
+    description: The base URL for a 3scale system-app admin route
+    variables:
+      tenant-name:
+        default: 3scale
+        description: The 3scale tenant to operate on
+      ocp-wildcard-url:
+        default: apps.your.openshift.example.com
+        description: Wildcard URL used when installing 3scale
 paths:
-  /admin/api/cms/files.xml:
+  /admin/api/cms/files.json:
     get:
       tags:
-      - Files
+        - Files
       parameters:
-      - name: page
-        description: |
-          The number for the page of results to retrieve, starting from page 1;
-          defaults to 1
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-        in: query
-        required: false
-      - name: per_page
-        description: |
-          The number of items to retrieve per page of results; defaults to 20
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-        required: false
-        in: query
-      - name: section_id
-        description: The section to query for files (hidden option in CMS API)
-        schema:
-          $ref: '#/components/schemas/SectionId'
-        required: false
-        in: query
+        - name: page
+          description: |
+            The number for the page of results to retrieve, starting from page 1;
+            defaults to 1
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          in: query
+          required: false
+        - name: per_page
+          description: |
+            The number of items to retrieve per page of results; defaults to 20
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          required: false
+          in: query
+        - name: section_id
+          description: The section to query for files (hidden option in CMS API)
+          schema:
+            $ref: '#/components/schemas/SectionId'
+          required: false
+          in: query
       responses:
         '200':
           $ref: '#/components/responses/FileListResponse'
@@ -59,7 +59,7 @@ paths:
               $ref: '#/components/schemas/FileCreationRequest'
         required: true
       tags:
-      - Files
+        - Files
       responses:
         '201':
           $ref: '#/components/responses/FileResponse'
@@ -70,10 +70,10 @@ paths:
       operationId: create-file
       summary: Create File
       description: Create file within the 3scale CMS
-  '/admin/api/cms/files/{file_id}.xml':
+  '/admin/api/cms/files/{file_id}.json':
     get:
       tags:
-      - Files
+        - Files
       responses:
         '200':
           $ref: '#/components/responses/FileResponse'
@@ -88,7 +88,7 @@ paths:
               $ref: '#/components/schemas/FileUpdatableFields'
         required: true
       tags:
-      - Files
+        - Files
       responses:
         '200':
           $ref: '#/components/responses/FileResponse'
@@ -101,7 +101,7 @@ paths:
       description: Update an existing file
     delete:
       tags:
-      - Files
+        - Files
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
@@ -109,36 +109,36 @@ paths:
       summary: Delete File
       description: Delete a file from 3scale CMS
     parameters:
-    - name: file_id
-      schema:
-        $ref: '#/components/schemas/FileId'
-      in: path
-      required: true
-  /admin/api/cms/sections.xml:
+      - name: file_id
+        schema:
+          $ref: '#/components/schemas/FileId'
+        in: path
+        required: true
+  /admin/api/cms/sections.json:
     get:
       tags:
-      - Sections
+        - Sections
       parameters:
-      - name: page
-        description: |
-          The number for the page of results to retrieve, starting from page 1;
-          defautls to 1
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-        in: query
-        required: false
-      - name: per_page
-        description: |
-          The number of items to retrieve per page of results; defaults to 20
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-        required: false
-        in: query
+        - name: page
+          description: |
+            The number for the page of results to retrieve, starting from page 1;
+            defaults to 1
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          in: query
+          required: false
+        - name: per_page
+          description: |
+            The number of items to retrieve per page of results; defaults to 20
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          required: false
+          in: query
       responses:
         '200':
           $ref: '#/components/responses/SectionListResponse'
@@ -153,7 +153,7 @@ paths:
               $ref: '#/components/schemas/SectionCreationRequest'
         required: true
       tags:
-      - Sections
+        - Sections
       responses:
         '201':
           $ref: '#/components/responses/SectionResponse'
@@ -164,13 +164,13 @@ paths:
       operationId: create-section
       summary: Create Section
       description: Create section within the 3scale CMS
-  '/admin/api/cms/sections/{section_id}.xml':
+  '/admin/api/cms/sections/{section_id}.json':
     get:
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
-          $ref: '#/components/responses/SectionTypeResponse'
+          $ref: '#/components/responses/SectionResponse'
       operationId: get-section
       summary: Get Section
       description: Get section descriptor
@@ -182,7 +182,7 @@ paths:
               $ref: '#/components/schemas/SectionUpdatableFields'
         required: true
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
@@ -195,7 +195,7 @@ paths:
       description: Update section descriptor
     delete:
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
@@ -205,18 +205,18 @@ paths:
       summary: Delete Section
       description: Delete a section from 3scale CMS
     parameters:
-    - name: section_id
-      schema:
-        $ref: '#/components/schemas/SectionId'
-      in: path
-      required: true
-  '/admin/api/cms/sections/{system_name}.xml':
+      - name: section_id
+        schema:
+          $ref: '#/components/schemas/SectionId'
+        in: path
+        required: true
+  '/admin/api/cms/sections/{system_name}.json':
     get:
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
-          $ref: '#/components/responses/SectionTypeResponse'
+          $ref: '#/components/responses/SectionResponse'
       operationId: get-section-by-system-name
       summary: Get Section by System Name
       description: Get section descriptor
@@ -228,7 +228,7 @@ paths:
               $ref: '#/components/schemas/SectionUpdatableFields'
         required: true
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
@@ -241,7 +241,7 @@ paths:
       description: Update section descriptor
     delete:
       tags:
-      - Sections
+        - Sections
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
@@ -249,36 +249,44 @@ paths:
       summary: Delete Section by System Name
       description: Delete a section from 3scale CMS
     parameters:
-    - name: system_name
-      schema:
-        $ref: '#/components/schemas/SystemName'
-      in: path
-      required: true
-  /admin/api/cms/templates.xml:
+      - name: system_name
+        schema:
+          $ref: '#/components/schemas/SystemName'
+        in: path
+        required: true
+  /admin/api/cms/templates.json:
     get:
       tags:
-      - Templates
+        - Templates
       parameters:
-      - name: page
-        description: |
-          The number for the page of results to retrieve, starting from page 1;
-          defaults to 1
-        schema:
-          type: integer
-          minimum: 1
-          default: 1
-        in: query
-        required: false
-      - name: per_page
-        description: |
-          The number of items to retrieve per page of results; defaults to 20
-        schema:
-          type: integer
-          minimum: 1
-          maximum: 100
-          default: 20
-        required: false
-        in: query
+        - name: page
+          description: |
+            The number for the page of results to retrieve, starting from page 1;
+            defaults to 1
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          in: query
+          required: false
+        - name: per_page
+          description: |
+            The number of items to retrieve per page of results; defaults to 20
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          required: false
+          in: query
+        - name: content
+          description: |
+            Whether to include the draft and published content in listed
+            templates
+          schema:
+            type: boolean
+          required: false
+          in: query
       responses:
         '200':
           $ref: '#/components/responses/TemplateListResponse'
@@ -293,7 +301,7 @@ paths:
               $ref: '#/components/schemas/TemplateCreationRequest'
         required: true
       tags:
-      - Templates
+        - Templates
       responses:
         '201':
           $ref: '#/components/responses/TemplateResponse'
@@ -304,16 +312,17 @@ paths:
       operationId: create-template
       summary: Create Template
       description: Create template with the 3scale CMS
-  '/admin/api/cms/templates/{template_id}.xml':
+  '/admin/api/cms/templates/{template_id}.json':
     get:
       tags:
-      - Templates
+        - Templates
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
       operationId: get-template
       summary: Get Template
-      description: 'Retrieve a template of any kind from 3scale (TODO: double-check response)'
+      description: |-
+        Retrieve a template of any kind from 3scale (TODO: double-check response)
     put:
       requestBody:
         content:
@@ -322,7 +331,7 @@ paths:
               $ref: '#/components/schemas/TemplateUpdatableFields'
         required: true
       tags:
-      - Templates
+        - Templates
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
@@ -335,7 +344,7 @@ paths:
       description: 'Update a template draft (TODO: double-check response)'
     delete:
       tags:
-      - Templates
+        - Templates
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
@@ -343,15 +352,15 @@ paths:
       summary: Delete Template
       description: Delete a template from 3scale CMS
     parameters:
-    - name: template_id
-      schema:
-        $ref: '#/components/schemas/TemplateId'
-      in: path
-      required: true
+      - name: template_id
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+        in: path
+        required: true
   '/admin/api/cms/templates/{template_id}/publish':
     put:
       tags:
-      - Templates
+        - Templates
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
@@ -359,12 +368,12 @@ paths:
       summary: Publish Template
       description: Move a template draft to be "published"
     parameters:
-    - name: template_id
-      schema:
-        $ref: '#/components/schemas/TemplateId'
-      in: path
-      required: true
-  /admin/api/provider.xml:
+      - name: template_id
+        schema:
+          $ref: '#/components/schemas/TemplateId'
+        in: path
+        required: true
+  /admin/api/provider.json:
     get:
       operationId: read-provider-settings
       summary: Read 3scale Provider Settings
@@ -376,7 +385,7 @@ paths:
         used to determine the location and access-token for retrieving file
         content, so it is tagged with `Files`.
       tags:
-      - Files
+        - Files
       responses:
         '200':
           $ref: '#/components/responses/ProviderAccountResponse'
@@ -384,55 +393,50 @@ components:
   schemas:
     BuiltinPage:
       allOf:
-      - $ref: '#/components/schemas/TemplateCommon'
-      - properties:
-          path:
-            type: string
-            maxLength: 255
-          hidden:
-            type: boolean
-          layout:
-            type: string
-            maxLength: 255
-          title:
-            type: string
-            maxLength: 255
-          system_name:
-            $ref: '#/components/schemas/SystemName'
-      xml:
-        name: builtin_page
+        - $ref: '#/components/schemas/Template'
+        - properties:
+            path:
+              type: string
+              maxLength: 255
+            hidden:
+              type: boolean
+            layout:
+              type: string
+              maxLength: 255
+            title:
+              type: string
+              maxLength: 255
+            system_name:
+              $ref: '#/components/schemas/SystemName'
     BuiltinPartial:
       allOf:
-      - $ref: '#/components/schemas/TemplateCommon'
-      - properties:
-          system_name:
-            $ref: '#/components/schemas/SystemName'
-      xml:
-        name: builtin_page
-      example: |-
-        <builtin_partial>
-            <id>133</id>
-            <created_at>2022-03-05T04:48:29Z</created_at>
-            <updated_at>2022-03-05T04:48:29Z</updated_at>
-            <system_name>field</system_name>
-            <content_type>text/html</content_type>
-            <handler/>
-            <liquid_enabled>true</liquid_enabled>
-        </builtin_partial>
+        - $ref: '#/components/schemas/Template'
+        - properties:
+            system_name:
+              $ref: '#/components/schemas/SystemName'
+      example:
+        id: 133
+        type: builtin_partial
+        created_at: 2022-03-05T04:48:29Z
+        updated_at: 2022-03-05T04:48:29Z
+        system_name: field
+        content_type: text/html
+        handler: null
+        liquid_enabled: true
     EnumHandler:
       description: Handler type for rendering templates.
       type: string
       enum:
-      - markdown
-      - textile
+        - markdown
+        - textile
       maxLength: 255
     EnumTemplateType:
       description: Type of `Template` for creation requests
       type: string
       enum:
-      - page
-      - layout
-      - partial
+        - page
+        - layout
+        - partial
     ErrorHash:
       description: Unhandled server error on 3scale
       properties:
@@ -440,12 +444,8 @@ components:
           type: integer
         toXml:
           type: string
-          xml:
-            name: to_xml
         error:
           type: string
-      xml:
-        name: hash
     ErrorList:
       description: List of errors that occurred in processing a request
       type: array
@@ -454,53 +454,44 @@ components:
           Description of an individual error that occurred while processing
           an event.
         type: string
-        xml:
-          name: error
-      xml:
-        name: errors
     File:
       description: File as held in the 3scale CMS
       allOf:
-      - $ref: '#/components/schemas/FileUpdatableFields'
-      - properties:
-          id:
-            $ref: '#/components/schemas/FileId'
-          created_at:
-            format: date-time
-            description: The instant at which the file was first created in the 3scale CMS
-            type: string
-          updated_at:
-            format: date-time
-            description: The instant at which the file was last updated
-            type: string
-          url:
-            description: The location at which the file is stored by 3scale; for 3scale-internal use
-            type: string
-          title:
-            description: The name of the file
-            type: string
-      xml:
-        name: file
-      example: |-
-        <file>
-            <id>9</id>
-            <created_at>2022-03-05T04:48:27Z</created_at>
-            <updated_at>2022-03-05T04:48:27Z</updated_at>
-            <section_id>33</section_id>
-            <path>/images/desk.jpg</path>
-            <url>
-                http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
-            </url>
-            <tag_list></tag_list>
-            <title>desk.jpg</title>
-        </file>
+        - $ref: '#/components/schemas/FileUpdatableFields'
+        - properties:
+            id:
+              $ref: '#/components/schemas/FileId'
+            created_at:
+              format: date-time
+              description: The instant at which the file was first created in the 3scale CMS
+              type: string
+            updated_at:
+              format: date-time
+              description: The instant at which the file was last updated
+              type: string
+            url:
+              description: The location at which the file is stored by 3scale; for 3scale-internal use
+              type: string
+            title:
+              description: The name of the file
+              type: string
+      example:
+        id: 9
+        created_at: 2022-03-05T04:48:27Z
+        updated_at: 2022-03-05T04:48:27Z
+        section_id: 33
+        path: /images/desk.jpg
+        downloadable: false
+        url: http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
+        title: desk.jpg
+        content_type: image/jpeg
     FileCreationRequest:
       required:
-      - section_id
-      - path
-      - attachment
+        - section_id
+        - path
+        - attachment
       allOf:
-      - $ref: '#/components/schemas/FileUpdatableFields'
+        - $ref: '#/components/schemas/FileUpdatableFields'
     FileId:
       description: Unique identifier for a `File` object
       type: integer
@@ -508,118 +499,33 @@ components:
       example: '9'
     FileList:
       description: List of `File` objects
-      allOf:
-      - $ref: '#/components/schemas/ListPaginationAttributes'
-      - properties:
-          files:
-            type: array
-            items:
-              $ref: '#/components/schemas/File'
-            xml:
-              name: file
-              wrapped: false
-      xml:
-        name: files
-      example: |-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <files>
-            <file>
-                <id>9</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/desk.jpg</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
-                </url>
-                <tag_list></tag_list>
-                <title>desk.jpg</title>
-            </file>
-            <file>
-                <id>10</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/mouse.jpg</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/mouse-54d77f30bdfb31a4.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=186eab31325093ec6b542ff9805621e6c1fa9a26bdfce24f7f9e446f22e635ca
-                </url>
-                <tag_list></tag_list>
-                <title>mouse.jpg</title>
-            </file>
-            <file>
-                <id>11</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/notes.jpg</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/notes-cdb012e0b44492d9.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=0424bc84bed739a8d760c2e2d82ff9bc9707a1c232ee52364195a48fd11ea8f5
-                </url>
-                <tag_list></tag_list>
-                <title>notes.jpg</title>
-            </file>
-            <file>
-                <id>12</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/plant.jpg</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/plant-6cf9405a5703c212.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=e1b213fb1a7f2bf0690cd03e1d356245c06bb11b116e146d4e13cdf96ef8ce13
-                </url>
-                <tag_list></tag_list>
-                <title>plant.jpg</title>
-            </file>
-            <file>
-                <id>13</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/powered-by-3scale-dark.png</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-dark-2519267beee72f21.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=1830ac1251e8a29c6bae2a4f63cb561ea0fa6c1b74e742d0a5afea738fdcdb33
-                </url>
-                <tag_list></tag_list>
-                <title>powered-by-3scale-dark.png</title>
-            </file>
-            <file>
-                <id>14</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/powered-by-3scale-light.png</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-light-0c73033502d430fb.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=89232e2f94c6335db99c5e6f41be31cdfed6101f4b0d678acce1e8fd833665ba
-                </url>
-                <tag_list></tag_list>
-                <title>powered-by-3scale-light.png</title>
-            </file>
-            <file>
-                <id>15</id>
-                <created_at>2022-03-05T04:48:28Z</created_at>
-                <updated_at>2022-03-05T04:48:28Z</updated_at>
-                <section_id>33</section_id>
-                <path>/images/powered-by-3scale.png</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/powered-by-3scale-944f5dc769f78f56.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=12e9b10a8e0a36c3cbfc7fb857a6203037cf6f79e07e6afc52e7972adfc2e883
-                </url>
-                <tag_list></tag_list>
-                <title>powered-by-3scale.png</title>
-            </file>
-            <file>
-                <id>16</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <section_id>33</section_id>
-                <path>/favicon.ico</path>
-                <url>
-                    http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/favicon-e94f1a378c59231c.ico?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=deb0c4a3741a76adf739c3865c978aa0a062410685efa0b16e2827c977ea3143
-                </url>
-                <tag_list></tag_list>
-                <title>favicon.ico</title>
-            </file>
-        </files>
+      type: object
+      required:
+        - collection
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ListPaginationMetadata'
+        collection:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+      example:
+        - id: 9
+          created_at: 2022-03-05T04:48:27Z
+          updated_at: 2022-03-05T04:48:27Z
+          section_id: 33
+          path: /images/desk.jpg
+          url: http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
+          tag_list: ''
+          title: desk.jpg
+        - id: 10
+          created_at: 2022-03-05T04:48:28Z
+          updated_at: 2022-03-05T04:48:28Z
+          section_id: 33
+          path: /images/mouse.jpg
+          url: http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/mouse-54d77f30bdfb31a4.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=186eab31325093ec6b542ff9805621e6c1fa9a26bdfce24f7f9e446f22e635ca
+          tag_list: ''
+          title: mouse.jpg
     FileUpdatableFields:
       description: Fields that may be modified after file creation
       properties:
@@ -644,650 +550,282 @@ components:
           description: The full contents of the file
           type: string
           format: binary
+        content_type:
+          description: The mime-type describing type of content.
+          type: string
     Layout:
       allOf:
-      - $ref: '#/components/schemas/TemplateCommon'
-      - properties:
-          system_name:
-            $ref: '#/components/schemas/SystemName'
-          title:
-            description: Title for the layout
-            type: string
-      xml:
-        name: layout
-      example: |-
-        <layout>
-            <id>119</id>
-            <created_at>2022-03-05T04:48:27Z</created_at>
-            <updated_at>2022-03-05T04:48:27Z</updated_at>
-            <system_name>main_layout</system_name>
-            <content_type>text/html</content_type>
-            <handler/>
-            <liquid_enabled>true</liquid_enabled>
-            <title>Main layout</title>
-        </layout>
-    ListPaginationAttributes:
+        - $ref: '#/components/schemas/Template'
+        - properties:
+            system_name:
+              $ref: '#/components/schemas/SystemName'
+            title:
+              description: Title for the layout
+              type: string
+      example:
+        id: 119
+        type: layout
+        created_at: 2022-03-05T04:48:27Z
+        updated_at: 2022-03-05T04:48:27Z
+        system_name: main_layout
+        content_type: text/html
+        handler: null
+        liquid_enabled: true
+        title: Main Layout
+    ListPaginationMetadata:
       properties:
         per_page:
           description: The number of items returned per page
           type: integer
-          xml:
-            attribute: true
         total_entries:
           description: The total number of items available
           type: integer
-          xml:
-            attribute: true
         total_pages:
           description: The total number of pages available
           type: integer
-          xml:
-            attribute: true
         current_page:
           description: The current page number, starting from 1
           type: integer
-          xml:
-            attribute: true
     Page:
       allOf:
-      - $ref: '#/components/schemas/TemplateCommon'
-      - properties:
-          path:
-            description: |
-              The path to which this template will be retrieved when browsing
-              the developer portal
-            type: string
-            maxLength: 255
-          hidden:
-            type: boolean
-          layout:
-            type: string
-            maxLength: 255
-          title:
-            type: string
-            maxLength: 255
-      xml:
-        name: page
-      example: |-
-        <page>
-            <id>125</id>
-            <created_at>2022-03-05T04:48:27Z</created_at>
-            <updated_at>2022-03-05T04:48:27Z</updated_at>
-            <title>3scale_v2.js</title>
-            <system_name/>
-            <path>/javascripts/3scale_v2.js</path>
-            <hidden>false</hidden>
-            <layout/>
-            <content_type>text/javascript</content_type>
-            <handler/>
-            <liquid_enabled/>
-        </page>
+        - $ref: '#/components/schemas/Template'
+        - properties:
+            path:
+              description: |
+                The path to which this template will be retrieved when browsing
+                the developer portal
+              type: string
+              maxLength: 255
+            hidden:
+              type: boolean
+            layout:
+              type: string
+              maxLength: 255
+            title:
+              type: string
+              maxLength: 255
+      example:
+        id: 125
+        type: page
+        created_at: 2022-03-05T04:48:27Z
+        updated_at: 2022-03-05T04:48:27Z
+        title: 3scale_v2.js
+        system_name: null
+        path: /javascripts/3scale_v2.js
+        hidden: false
+        layout: null
+        content_type: text/javascript
+        handler: null
+        liquid_enabled: null
     Partial:
       allOf:
-      - $ref: '#/components/schemas/TemplateCommon'
-      - properties:
-          system_name:
-            $ref: '#/components/schemas/SystemName'
-      xml:
-        name: partial
-      example: |-
-        <partial>
-            <id>123</id>
-            <created_at>2022-03-05T04:48:27Z</created_at>
-            <updated_at>2022-03-05T04:48:27Z</updated_at>
-            <system_name>analytics</system_name>
-            <content_type>text/html</content_type>
-            <handler/>
-            <liquid_enabled/>
-        </partial>
+        - $ref: '#/components/schemas/Template'
+        - properties:
+            system_name:
+              $ref: '#/components/schemas/SystemName'
+      example:
+        id: 123
+        type: partial
+        created_at: 2022-03-05T04:48:27Z
+        updated_at: 2022-03-05T04:48:27Z
+        system_name: analytics
+        content_type: text/html
+        handler: null
+        liquid_enabled: null
     ProviderAccount:
       description: >-
         Settings for the tenant (provider), including base URL and access code
         (if any) for the developer portal.
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - state
+        - admin_domain
+        - domain
+        - admin_base_url
+        - base_url
+        - from_email
+        - support_email
+        - finance_support_email
+        - site_access_code
+        - organization_name
+        - monthly_billing_enabled
+        - monthly_charging_enabled
+        - credit_card_stored
       properties:
         id:
           $ref: '#/components/schemas/ProviderAccountId'
-        createdAt:
+        created_at:
           type: string
           format: date-time
-          xml:
-            name: created_at
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
-          xml:
-            name: updated_at
         state:
           type: string
-        adminDomain:
+        admin_domain:
           type: string
-          xml:
-            name: admin_domain
         domain:
           type: string
-        adminBaseUrl:
+        admin_base_url:
           type: string
-          xml:
-            name: admin_base_url
-        baseUrl:
+        base_url:
           type: string
-          xml:
-            name: base_url
-        fromEmail:
+        from_email:
           type: string
-          xml:
-            name: from_email
-        supportEmail:
+        support_email:
           type: string
-          xml:
-            name: support_email
-        financeSupportEmail:
+        finance_support_email:
           type: string
-          xml:
-            name: finance_support_email
-        siteAccessCode:
+        site_access_code:
           type: string
           format: password
-          xml:
-            name: site_access_code
-        organizationName:
+        organization_name:
           type: string
-          xml:
-            name: org_name
-        extraFields:
-          type: array
-          items: {}
-          xml:
-            name: extra_fields
-            wrapped: true
-        monthlyBillingEnabled:
+        monthly_billing_enabled:
           type: boolean
-          xml:
-            name: monthly_billing_enabled
-        monthlyChargingEnabled:
+        monthly_charging_enabled:
           type: boolean
-          xml:
-            name: monthly_charging_enabled
-        creditCardStored:
+        credit_card_stored:
           type: boolean
-          xml:
-            name: credit_card_stored
-        plans:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProviderPlan'
-          xml:
-            wrapped: true
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProviderUser'
-          xml:
-            wrapped: true
-      xml:
-        name: account
-      example: |-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <account>
-          <id>2</id>
-          <created_at>2022-03-05T03:27:58Z</created_at>
-          <updated_at>2022-10-11T18:44:46Z</updated_at>
-          <state>approved</state>
-          <admin_domain>3scale-admin.apps.ocp.example.com</admin_domain>
-          <domain>3scale.apps.ocp.example.com</domain>
-          <admin_base_url>https://3scale-admin.apps.ocp.example.com</admin_base_url>
-          <base_url>https://3scale.apps.ocp.example.com</base_url>
-          <from_email>no-reply@3scale.apps.ocp.example.com</from_email>
-          <support_email>admin@3scale.apps.ocp.example.com</support_email>
-          <finance_support_email>admin@3scale.apps.ocp.example.com</finance_support_email>
-          <site_access_code>abcd</site_access_code>
-          <org_name>Provider Name</org_name>
-          <extra_fields></extra_fields>
-          <monthly_billing_enabled>true</monthly_billing_enabled>
-          <monthly_charging_enabled>true</monthly_charging_enabled>
-          <credit_card_stored>false</credit_card_stored>
-          <plans>
-            <plan custom="false" default="true">
-              <id>4</id>
-              <name>enterprise</name>
-              <type>application_plan</type>
-              <state>hidden</state>
-              <approval_required>false</approval_required>
-              <setup_fee>0.0</setup_fee>
-              <cost_per_month>0.0</cost_per_month>
-              <trial_period_days/>
-              <cancellation_period>0</cancellation_period>
-              <service_id>1</service_id>
-            </plan>
-          </plans>
-          <users>
-            <user>
-              <id>3</id>
-              <created_at>2022-03-05T03:27:59Z</created_at>
-              <updated_at>2022-03-05T03:27:59Z</updated_at>
-              <account_id>2</account_id>
-              <state>active</state>
-              <role>admin</role>
-              <username>3scaleadmin</username>
-              <email>3scaleadmin+3scale-admin.apps.ocp.example.com@3scale.net</email>
-              <extra_fields></extra_fields>
-            </user>
-            <user>
-              <id>2</id>
-              <created_at>2022-03-05T03:27:59Z</created_at>
-              <updated_at>2022-03-05T03:27:59Z</updated_at>
-              <account_id>2</account_id>
-              <state>active</state>
-              <role>admin</role>
-              <username>admin</username>
-              <email>admin@3scale.apps.ocp.example.com</email>
-              <extra_fields></extra_fields>
-            </user>
-          </users>
-        </account>
+      additionalProperties: true
+      example:
+        id: 2445581598751
+        created_at: 2022-03-05T03:27:58Z
+        updated_at: 2022-10-11T18:44:46Z
+        admin_domain: 3scale-admin.apps.ocp.example.com
+        domain: 3scale.apps.ocp.example.com
+        admin_base_url: https://3scale-admin.apps.ocp.example.com
+        base_url: https://3scale.apps.ocp.example.com
+        from_email: no-reply@3scale.apps.ocp.example.com
+        support_email: admin@3scale.apps.ocp.example.com
+        finance_support_email: admin@3scale.apps.ocp.example.com
+        site_access_code: abcd
+        credit_card_stored: false
+        monthly_billing_enabled: true
+        monthly_charging_enabled: true
+        state: approved
+        links:
+          - rel: users
+            href: https://3scale-admin.apps.ocp.example.com/admin/api/accounts/2445581598751/users
+        org_name: Sample Organization
+        org_legaladdress: ''
+        billing_address:
+          company: Sample Organization
+          address: ''
+          address1: null
+          address2: null
+          phone_number: null
+          city: null
+          country: null
+          state: null
+          zip: null
+        API_Purpose_3s__c: Company internal integration
+        API_Status_3s__c: In design
+        API_Onprem_3s__c: No, I'm only interested in SaaS
+        Signup_origin: ''
     ProviderAccountId:
       type: integer
       format: int64
       example: '2'
-    ProviderPlan:
-      properties:
-        custom:
-          type: boolean
-          xml:
-            attribute: true
-        default:
-          type: boolean
-          xml:
-            attribute: true
-        id:
-          $ref: '#/components/schemas/ProviderPlanId'
-        name:
-          type: string
-        type:
-          type: string
-        state:
-          type: string
-        approvalRequired:
-          type: boolean
-          xml:
-            name: approval_required
-        setupFee:
-          type: number
-          xml:
-            name: setup_fee
-        costPerMonth:
-          type: number
-          xml:
-            name: costPerMonth
-        trialPeriodDays:
-          type: integer
-          xml:
-            name: trial_period_days
-        cancellationPeriod:
-          type: integer
-          xml:
-            name: cancellation_period
-        apiProductId:
-          type: integer
-          format: int64
-          xml:
-            name: service_id
-      example: |-
-        <plan custom="false" default="true">
-          <id>4</id>
-          <name>enterprise</name>
-          <type>application_plan</type>
-          <state>hidden</state>
-          <approval_required>false</approval_required>
-          <setup_fee>0.0</setup_fee>
-          <cost_per_month>0.0</cost_per_month>
-          <trial_period_days/>
-          <cancellation_period>0</cancellation_period>
-          <service_id>1</service_id>
-        </plan>
-    ProviderPlanId:
-      type: integer
-      format: int64
-      example: '4'
-    ProviderUser:
-      properties:
-        id:
-          $ref: '#/components/schemas/ProviderUserId'
-        createdAt:
-          type: string
-          format: date-time
-          xml:
-            name: created_at
-        updatedAt:
-          type: string
-          format: date-time
-          xml:
-            name: updated_at
-        accountId:
-          description: The same as ProviderAccountId
-          type: integer
-          format: int64
-          xml:
-            name: account_id
-        state:
-          type: string
-        role:
-          type: string
-        username:
-          type: string
-        email:
-          type: string
-        extraFields:
-          xml:
-            name: extra_fields
-      example: |-
-        <user>
-          <id>3</id>
-          <created_at>2022-03-05T03:27:59Z</created_at>
-          <updated_at>2022-03-05T03:27:59Z</updated_at>
-          <account_id>2</account_id>
-          <state>active</state>
-          <role>admin</role>
-          <username>3scaleadmin</username>
-          <email>3scaleadmin+3scale-admin.apps.ocp.example.com@3scale.net</email>
-          <extra_fields></extra_fields>
-        </user>
-    ProviderUserId:
-      type: integer
-      format: int64
-      example: 3
-    BuiltinSection:
-      description: Builtin section within 3scale CMS
-      allOf:
-      - $ref: '#/components/schemas/Section'
-      xml:
-        name: builtin_section
-      example: |-
-        <builtin_section>
-            <id>1974454</id>
-            <created_at>2016-10-29T17:55:09-05:00</created_at>
-            <updated_at>2020-07-22T16:08:40-05:00</updated_at>
-            <title>Root</title>
-            <system_name>root</system_name>
-            <public>true</public>
-            <parent_id/>
-            <partial_path>/</partial_path>
-        </builtin_section>
     Section:
       description: Section within 3scale CMS
       allOf:
-      - $ref: '#/components/schemas/SectionUpdatableFields'
-      - properties:
-          id:
-            $ref: '#/components/schemas/SectionId'
-          created_at:
-            format: date-time
-            type: string
-          updated_at:
-            format: date-time
-            type: string
-          partial_path:
-            type: string
-            maxLength: 255
-          system_name:
-            $ref: '#/components/schemas/SystemName'
-      xml:
-        name: section
-      example: |-
-        <section>
-            <id>30</id>
-            <created_at>2022-03-05T04:48:27Z</created_at>
-            <updated_at>2022-03-18T06:31:57Z</updated_at>
-            <partial_path>/</partial_path>
-            <public>true</public>
-            <title>Root</title>
-            <parent_id/>
-            <system_name>root</system_name>
-        </section>
+        - $ref: '#/components/schemas/SectionUpdatableFields'
+        - properties:
+            id:
+              $ref: '#/components/schemas/SectionId'
+            created_at:
+              format: date-time
+              type: string
+            updated_at:
+              format: date-time
+              type: string
+            partial_path:
+              type: string
+              maxLength: 255
+            system_name:
+              $ref: '#/components/schemas/SystemName'
+      example:
+        id: 30
+        created_at: 2022-03-05T04:48:27Z
+        updated_at: 2022-03-18T06:31:57Z
+        title: Root
+        system_name: root
+        public: true
+        parent_id: null
+        partial_path: /
     SectionCreationRequest:
       description: Request fields for creation of Sections
       allOf:
-      - $ref: '#/components/schemas/SectionUpdatableFields'
-      - properties:
-          partial_path:
-            type: string
-            maxLength: 255
-          system_name:
-            $ref: '#/components/schemas/SystemName'
+        - $ref: '#/components/schemas/SectionUpdatableFields'
+        - properties:
+            partial_path:
+              type: string
+              maxLength: 255
+            system_name:
+              $ref: '#/components/schemas/SystemName'
     SectionId:
       description: Unique identifier for a `Section`
       type: integer
       format: int64
       example: '30'
     SectionList:
-      description: List of sections
-      allOf:
-      - $ref: '#/components/schemas/ListPaginationAttributes'
-      - properties:
-          builtinSections:
-            type: array
-            items:
-              $ref: '#/components/schemas/BuiltinSection'
-            xml:
-              name: builtin_section
-              wrapped: false
-          sections:
-            type: array
-            items:
-              $ref: '#/components/schemas/Section'
-            xml:
-              name: section
-              wrapped: false
-      xml:
-        name: sections
-      example: |-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <sections per_page="20" total_entries="25" total_pages="2" current_page="1">
-            <builtin_section>
-                <id>30</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-18T06:31:57Z</updated_at>
-                <partial_path>/</partial_path>
-                <public>true</public>
-                <title>Root</title>
-                <parent_id/>
-                <system_name>root</system_name>
-            </section>
-            <section>
-                <id>31</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <partial_path>/javascripts</partial_path>
-                <public>true</public>
-                <title>javascripts</title>
-                <parent_id>30</parent_id>
-                <system_name>javascripts</system_name>
-            </section>
-            <section>
-                <id>32</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <partial_path>/css</partial_path>
-                <public>true</public>
-                <title>css</title>
-                <parent_id>30</parent_id>
-                <system_name>css</system_name>
-            </section>
-            <section>
-                <id>33</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/images</partial_path>
-                <public>true</public>
-                <title>images</title>
-                <parent_id>30</parent_id>
-                <system_name>images</system_name>
-            </section>
-            <section>
-                <id>34</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/password</partial_path>
-                <public>true</public>
-                <title>Password</title>
-                <parent_id>30</parent_id>
-                <system_name>password</system_name>
-            </section>
-            <section>
-                <id>35</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/login</partial_path>
-                <public>true</public>
-                <title>Login</title>
-                <parent_id>30</parent_id>
-                <system_name>login</system_name>
-            </section>
-            <section>
-                <id>36</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/signup</partial_path>
-                <public>true</public>
-                <title>Signup</title>
-                <parent_id>30</parent_id>
-                <system_name>signup</system_name>
-            </section>
-            <section>
-                <id>37</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/messages</partial_path>
-                <public>true</public>
-                <title>Messages</title>
-                <parent_id>30</parent_id>
-                <system_name>messages</system_name>
-            </section>
-            <section>
-                <id>38</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/messages/outbox</partial_path>
-                <public>true</public>
-                <title>Outbox</title>
-                <parent_id>37</parent_id>
-                <system_name>outbox</system_name>
-            </section>
-            <section>
-                <id>39</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/messages/inbox</partial_path>
-                <public>true</public>
-                <title>Inbox</title>
-                <parent_id>37</parent_id>
-                <system_name>inbox</system_name>
-            </section>
-            <section>
-                <id>40</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/messages/trash</partial_path>
-                <public>true</public>
-                <title>Trash</title>
-                <parent_id>37</parent_id>
-                <system_name>trash</system_name>
-            </section>
-            <section>
-                <id>41</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/stats</partial_path>
-                <public>true</public>
-                <title>Stats</title>
-                <parent_id>30</parent_id>
-                <system_name>stats</system_name>
-            </section>
-            <section>
-                <id>42</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/applications</partial_path>
-                <public>true</public>
-                <title>Applications</title>
-                <parent_id>30</parent_id>
-                <system_name>applications</system_name>
-            </section>
-            <section>
-                <id>43</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/application/alerts</partial_path>
-                <public>true</public>
-                <title>Application Alerts</title>
-                <parent_id>30</parent_id>
-                <system_name>application alerts</system_name>
-            </section>
-            <section>
-                <id>44</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/invoices</partial_path>
-                <public>true</public>
-                <title>Invoices</title>
-                <parent_id>30</parent_id>
-                <system_name>invoices</system_name>
-            </section>
-            <section>
-                <id>45</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/account_plans</partial_path>
-                <public>true</public>
-                <title>Account Plans</title>
-                <parent_id>30</parent_id>
-                <system_name>account plans</system_name>
-            </section>
-            <section>
-                <id>46</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/account</partial_path>
-                <public>true</public>
-                <title>Account</title>
-                <parent_id>30</parent_id>
-                <system_name>account</system_name>
-            </section>
-            <section>
-                <id>47</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/users</partial_path>
-                <public>true</public>
-                <title>Users</title>
-                <parent_id>30</parent_id>
-                <system_name>users</system_name>
-            </section>
-            <section>
-                <id>48</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/user</partial_path>
-                <public>true</public>
-                <title>User</title>
-                <parent_id>30</parent_id>
-                <system_name>user</system_name>
-            </section>
-            <section>
-                <id>49</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <partial_path>/search</partial_path>
-                <public>true</public>
-                <title>Search</title>
-                <parent_id>30</parent_id>
-                <system_name>search</system_name>
-            </section>
-        </sections>
-    SectionType:
-      oneOf:
-        - $ref: '#/components/schemas/BuiltinSection'
-        - $ref: '#/components/schemas/Section'
+      description: List of `Section` objects
+      type: object
+      required:
+        - collection
+      properties:
+        metadata:
+          $ref: '#/components/schemas/ListPaginationMetadata'
+        collection:
+          type: array
+          items:
+            $ref: '#/components/schemas/Section'
+      example:
+        collection:
+          - id: 30
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-18T06:31:57Z
+            title: Root
+            system_name: root
+            public: true
+            parent_id: null
+            partial_path: /
+          - id: 31
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            title: javascripts
+            system_name: javascripts
+            public: true
+            parent_id: 30
+            partial_path: /javascripts
+          - id: 32
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            title: css
+            system_name: css
+            public: true
+            parent_id: 30
+            partial_path: /css
+          - id: 33
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            title: images
+            system_name: images
+            public: true
+            parent_id: 30
+            partial_path: /images
+          - id: 34
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            title: Password
+            system_name: password
+            public: true
+            parent_id: 30
+            partial_path: /password
     SectionUpdatableFields:
       description: Fields that may be modified after section creation
       properties:
@@ -1306,14 +844,15 @@ components:
       type: string
       maxLength: 255
     Template:
-      oneOf:
-      - $ref: '#/components/schemas/BuiltinPage'
-      - $ref: '#/components/schemas/BuiltinPartial'
-      - $ref: '#/components/schemas/Layout'
-      - $ref: '#/components/schemas/Page'
-      - $ref: '#/components/schemas/Partial'
-    TemplateCommon:
-      description: Fields that are common across all types of templates
+      description: Base type for all template types
+      discriminator:
+        propertyName: type
+        mapping:
+          builtin_page: '#/components/schemas/BuiltinPage'
+          builtin_partial: '#/components/schemas/BuiltinPartial'
+          layout: '#/components/schemas/Layout'
+          page: '#/components/schemas/Page'
+          partial: '#/components/schemas/Partial'
       properties:
         id:
           $ref: '#/components/schemas/TemplateId'
@@ -1348,287 +887,64 @@ components:
           maxLength: 16777215
     TemplateCreationRequest:
       required:
-      - type
+        - type
       allOf:
-      - $ref: '#/components/schemas/TemplateUpdatableFields'
-      - properties:
-          type:
-            $ref: '#/components/schemas/EnumTemplateType'
+        - $ref: '#/components/schemas/TemplateUpdatableFields'
+        - properties:
+            type:
+              $ref: '#/components/schemas/EnumTemplateType'
     TemplateId:
       type: integer
       format: int64
       example: '119'
     TemplateList:
-      allOf:
-      - $ref: '#/components/schemas/ListPaginationAttributes'
-      - properties:
-          builtinPages:
-            type: array
-            items:
-              $ref: '#/components/schemas/BuiltinPage'
-            xml:
-              name: builtin_page
-              wrapped: false
-          builtinPartials:
-            type: array
-            items:
-              $ref: '#/components/schemas/BuiltinPartial'
-            xml:
-              name: builtin_partial
-              wrapped: false
-          layouts:
-            type: array
-            items:
-              $ref: '#/components/schemas/Layout'
-            xml:
-              name: layout
-              wrapped: false
-          pages:
-            type: array
-            items:
-              $ref: '#/components/schemas/Page'
-            xml:
-              name: page
-              wrapped: false
-          partials:
-            type: array
-            items:
-              $ref: '#/components/schemas/Partial'
-            xml:
-              name: partial
-              wrapped: false
-      xml:
-        name: templates
-      example: |-
-        <?xml version="1.0" encoding="UTF-8"?>
-        <templates per_page="20" total_entries="64" total_pages="4" current_page="1">
-            <layout>
-                <id>119</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <system_name>main_layout</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-                <title>Main layout</title>
-            </layout>
-            <layout>
-                <id>120</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <system_name>error</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-                <title>Error layout</title>
-            </layout>
-            <page>
-                <id>121</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T06:13:53Z</updated_at>
-                <title>Homepage</title>
-                <system_name></system_name>
-                <path>/</path>
-                <hidden>false</hidden>
-                <layout>main_layout</layout>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </page>
-            <page>
-                <id>122</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-18T05:39:40Z</updated_at>
-                <title>ActiveDocs Display</title>
-                <system_name></system_name>
-                <path>/api-docs</path>
-                <hidden>false</hidden>
-                <layout>main_layout</layout>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </page>
-            <partial>
-                <id>123</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <system_name>analytics</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </partial>
-            <page>
-                <id>124</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>3scale.js</title>
-                <system_name/>
-                <path>/javascripts/3scale.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>125</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>3scale_v2.js</title>
-                <system_name/>
-                <path>/javascripts/3scale_v2.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>126</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>bootstrap.js</title>
-                <system_name/>
-                <path>/javascripts/bootstrap.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>127</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>bootstrap.min.js</title>
-                <system_name/>
-                <path>/javascripts/bootstrap.min.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>128</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>excanvas.compiled.js</title>
-                <system_name/>
-                <path>/javascripts/excanvas.compiled.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>129</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>jquery.js</title>
-                <system_name/>
-                <path>/javascripts/jquery.js</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/javascript</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>130</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>bootstrap.css</title>
-                <system_name/>
-                <path>/css/bootstrap.css</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/css</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>131</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>default.css</title>
-                <system_name/>
-                <path>/css/default.css</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/css</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <page>
-                <id>132</id>
-                <created_at>2022-03-05T04:48:27Z</created_at>
-                <updated_at>2022-03-05T04:48:27Z</updated_at>
-                <title>plans_widget_overrides.css</title>
-                <system_name/>
-                <path>/css/plans_widget_overrides.css</path>
-                <hidden>false</hidden>
-                <layout/>
-                <content_type>text/css</content_type>
-                <handler/>
-                <liquid_enabled/>
-            </page>
-            <builtin_partial>
-                <id>133</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>field</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-            <builtin_partial>
-                <id>134</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>shared/pagination</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-            <builtin_partial>
-                <id>135</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>shared/swagger_ui</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-            <builtin_partial>
-                <id>136</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>submenu</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-            <builtin_partial>
-                <id>137</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>menu_item</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-            <builtin_partial>
-                <id>138</id>
-                <created_at>2022-03-05T04:48:29Z</created_at>
-                <updated_at>2022-03-05T04:48:29Z</updated_at>
-                <system_name>users_menu</system_name>
-                <content_type>text/html</content_type>
-                <handler/>
-                <liquid_enabled>true</liquid_enabled>
-            </builtin_partial>
-        </templates>
+      description: List of `Template` objects
+      type: object
+      required:
+        - collection
+      properties:
+        collection:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+        metadata:
+          $ref: '#/components/schemas/ListPaginationMetadata'
+      example:
+        collection:
+          - id: 119
+            type: layout
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            system_name: main_layout
+            content_type: text/html
+            handler: null
+            liquid_enabled: true
+            title: Main layout
+          - id: 121
+            type: page
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T06:13:53Z
+            title: Homepage
+            system_name: null
+            path: /
+            hidden: false
+            layout: main_layout
+            content_type: text/html
+            handler: null
+            liquid_enabled: true
+          - id: 123
+            type: partial
+            created_at: 2022-03-05T04:48:27Z
+            updated_at: 2022-03-05T04:48:27Z
+            system_name: analytics
+            content_type: text/html
+            handler: null
+            liquid_enabled: null
+        metadata:
+          per_page: 20
+          total_entries: 64
+          total_pages: 4
+          current_page: 1
     TemplateUpdatableFields:
       properties:
         system_name:
@@ -1655,6 +971,50 @@ components:
         content_type:
           type: string
           maxLength: 255
+    WrappedProviderAccount:
+      description: Wrapper around objects of `ProviderAccount` type
+      type: object
+      required:
+        - account
+      properties:
+        account:
+          $ref: '#/components/schemas/ProviderAccount'
+      example:
+        account:
+          id: 2445581598751
+          created_at: 2022-03-05T03:27:58Z
+          updated_at: 2022-10-11T18:44:46Z
+          admin_domain: 3scale-admin.apps.ocp.example.com
+          domain: 3scale.apps.ocp.example.com
+          admin_base_url: https://3scale-admin.apps.ocp.example.com
+          base_url: https://3scale.apps.ocp.example.com
+          from_email: no-reply@3scale.apps.ocp.example.com
+          support_email: admin@3scale.apps.ocp.example.com
+          finance_support_email: admin@3scale.apps.ocp.example.com
+          site_access_code: abcd
+          credit_card_stored: false
+          monthly_billing_enabled: true
+          monthly_charging_enabled: true
+          state: approved
+          links:
+            - rel: users
+              href: https://3scale-admin.apps.ocp.example.com/admin/api/accounts/2445581598751/users
+          org_name: Sample Organization
+          org_legaladdress: ""
+          billing_address:
+            company: Sample Organization
+            address: ""
+            address1: null
+            address2: null
+            phone_number: null
+            city: null
+            country: null
+            state: null
+            zip: nul
+          API_Purpose_3s__c: Company internal integration
+          API_Status_3s__c: In design
+          API_Onprem_3s__c: No, I'm only interested in SaaS
+          Signup_origin: ""
   responses:
     EmptyResponse:
       description: Response with no body; eg, to indicate successful deletion
@@ -1666,58 +1026,52 @@ components:
       description: Response containing an `ErrorHash`
     ErrorListResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/ErrorList'
       description: Response containing an `ErrorList`
     FileResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/File'
       description: Response containing a single file declaration
     FileListResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/FileList'
       description: Response containing a list of `File`s
     ProviderAccountResponse:
       content:
-        application/xml:
+        application/json:
           schema:
-            $ref: '#/components/schemas/ProviderAccount'
-      description: Response containing the `ProviderAccount` configuration
+            $ref: '#/components/schemas/WrappedProviderAccount'
+      description: Response containing the `WrappedProviderAccount` configuration
     SectionListResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/SectionList'
       description: Response containing a list of `Section`s
     TemplateResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/Template'
       description: Response containing a single `Template` of any kind
     TemplateListResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/TemplateList'
       description: Response containing a list of templates of various kinds
     SectionResponse:
       content:
-        application/xml:
+        application/json:
           schema:
             $ref: '#/components/schemas/Section'
       description: Response containing a single `Section`
-    SectionTypeResponse:
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/SectionType'
-      description: Response containing a single `SectionType`
   securitySchemes:
     provider_key:
       type: apiKey
@@ -1731,16 +1085,16 @@ components:
       description: >-
         Access Token from the `Account Settings > Personal > Tokens` page of a 3scale tenant.
         The token must have access to both the `Account Management API` and the
-        unlisted `Developer Portal API`.
+        `Developer Portal API`.
       name: access_token
       in: query
 security:
-- provider_key: [ ]
-- access_token: [ ]
+  - provider_key: [ ]
+  - access_token: [ ]
 tags:
-- name: Files
-  description: Requests related specifically to files
-- name: Sections
-  description: Requests related specifically to sections
-- name: Templates
-  description: Requests related specifically to templates
+  - name: Files
+    description: Requests related specifically to files
+  - name: Sections
+    description: Requests related specifically to sections
+  - name: Templates
+    description: Requests related specifically to templates

@@ -20,7 +20,7 @@ public interface ThreescaleCmsClient {
         return Stream.of(
             streamSections(),
             streamFiles(),
-            streamTemplates()
+            streamTemplates(false)
         ).flatMap(s -> s);
     }
 
@@ -66,11 +66,11 @@ public interface ThreescaleCmsClient {
     }
 
     @Nonnull
-    Stream<CmsTemplate> streamTemplates();
+    Stream<CmsTemplate> streamTemplates(boolean includeContent);
 
     @Nonnull
-    default List<CmsTemplate> listTemplates() {
-        return streamTemplates()
+    default List<CmsTemplate> listTemplates(boolean includeContent) {
+        return streamTemplates(includeContent)
             .collect(Collectors.toList());
     }
 

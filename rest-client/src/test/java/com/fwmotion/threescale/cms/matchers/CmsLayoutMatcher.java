@@ -21,18 +21,18 @@ public class CmsLayoutMatcher extends CmsObjectMatcher {
 
     @Override
     public boolean matchesSafely(@Nonnull CmsObject actual) {
-        if (!(actual instanceof CmsLayout)) {
+        if (!(actual instanceof CmsLayout actualLayout)) {
             return false;
         }
-
-        CmsLayout actualLayout = (CmsLayout) actual;
 
         return super.matchesSafely(actual)
             && actualMatchesExpected(expected.getSystemName(), actualLayout.getSystemName())
             && actualMatchesExpected(expected.getContentType(), actualLayout.getContentType())
             && actualMatchesExpected(expected.getHandler(), actualLayout.getHandler())
             && actualMatchesExpected(expected.getLiquidEnabled(), actualLayout.getLiquidEnabled())
-            && actualMatchesExpected(expected.getTitle(), actualLayout.getTitle());
+            && actualMatchesExpected(expected.getTitle(), actualLayout.getTitle())
+            && actualMatchesExpected(expected.getDraft(), actualLayout.getDraftContent())
+            && actualMatchesExpected(expected.getPublished(), actualLayout.getPublishedContent());
     }
 
     @Override

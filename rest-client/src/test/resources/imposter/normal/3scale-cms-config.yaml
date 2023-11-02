@@ -16,75 +16,112 @@ security:
 
 resources:
 # Pagination on files
-- path: /admin/api/cms/files.xml
+- path: /admin/api/cms/files.json
   method: get
   queryParams:
     page: 1
   response:
-    file: ../responses/list-files-1.xml
-- path: /admin/api/cms/files.xml
+    file: ../responses/list-files/list-files-1.json
+- path: /admin/api/cms/files.json
   method: get
   queryParams:
     page: 2
   response:
-    file: ../responses/list-files-2.xml
+    file: ../responses/list-files/list-files-2.json
 
 # Pagination on sections
-- path: /admin/api/cms/sections.xml
+- path: /admin/api/cms/sections.json
   method: get
   queryParams:
     page: 1
   response:
-    file: ../responses/list-sections-1.xml
-- path: /admin/api/cms/sections.xml
+    file: ../responses/list-sections/list-sections-1.json
+- path: /admin/api/cms/sections.json
   method: get
   queryParams:
     page: 2
   response:
-    file: ../responses/list-sections-2.xml
-- path: /admin/api/cms/sections.xml
+    file: ../responses/list-sections/list-sections-2.json
+- path: /admin/api/cms/sections.json
   method: get
   queryParams:
     page: 3
   response:
-    file: ../responses/list-sections-3.xml
+    file: ../responses/list-sections/list-sections-3.json
 
-# Pagination on templates
-- path: /admin/api/cms/templates.xml
+# Pagination on templates (without content)
+- path: /admin/api/cms/templates.json
   method: get
   queryParams:
     page: 1
   response:
-    file: ../responses/list-templates-1.xml
-- path: /admin/api/cms/templates.xml
+    file: ../responses/list-templates/list-templates-1.json
+- path: /admin/api/cms/templates.json
   method: get
   queryParams:
     page: 2
   response:
-    file: ../responses/list-templates-2.xml
-- path: /admin/api/cms/templates.xml
+    file: ../responses/list-templates/list-templates-2.json
+- path: /admin/api/cms/templates.json
   method: get
   queryParams:
     page: 3
   response:
-    file: ../responses/list-templates-3.xml
-- path: /admin/api/cms/templates.xml
+    file: ../responses/list-templates/list-templates-3.json
+- path: /admin/api/cms/templates.json
   method: get
   queryParams:
     page: 4
   response:
-    file: ../responses/list-templates-4.xml
-- path: /admin/api/cms/templates.xml
+    file: ../responses/list-templates/list-templates-4.json
+- path: /admin/api/cms/templates.json
   method: get
   queryParams:
     page: 5
   response:
-    file: ../responses/list-templates-5.xml
+    file: ../responses/list-templates/list-templates-5.json
+
+# Pagination on templates (with content)
+- path: /admin/api/cms/templates.json
+  method: get
+  queryParams:
+    page: 1
+    content: true
+  response:
+    file: ../responses/list-templates-with-content/list-templates-with-content-1.json
+- path: /admin/api/cms/templates.json
+  method: get
+  queryParams:
+    page: 2
+    content: true
+  response:
+    file: ../responses/list-templates-with-content/list-templates-with-content-2.json
+- path: /admin/api/cms/templates.json
+  method: get
+  queryParams:
+    page: 3
+    content: true
+  response:
+    file: ../responses/list-templates-with-content/list-templates-with-content-3.json
+- path: /admin/api/cms/templates.json
+  method: get
+  queryParams:
+    page: 4
+    content: true
+  response:
+    file: ../responses/list-templates-with-content/list-templates-with-content-4.json
+- path: /admin/api/cms/templates.json
+  method: get
+  queryParams:
+    page: 5
+    content: true
+  response:
+    file: ../responses/list-templates-with-content/list-templates-with-content-5.json
 
   # Templated provider settings
   # (This will point Developer Portal URL at Imposter-managed files described
   # in dev-portal-config.yaml)
-- path: /admin/api/provider.xml
+- path: /admin/api/provider.json
   method: get
   capture:
     host:
@@ -92,4 +129,4 @@ resources:
       store: request
   response:
     template: true
-    file: ../responses/templated-provider-settings.xml
+    file: ../responses/templated-provider-settings.json

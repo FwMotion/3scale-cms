@@ -14,31 +14,37 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<CmsTemplate> {
 
     private static final CmsTemplateMapper TEMPLATE_MAPPER = Mappers.getMapper(CmsTemplateMapper.class);
 
     private final TemplatesApi templatesApi;
+    private final boolean includeContent;
 
-    public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi) {
+    public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                     boolean includeContent) {
         super(Collections.emptySet(), 0);
         this.templatesApi = templatesApi;
+        this.includeContent = includeContent;
     }
 
     public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                     boolean includeContent,
                                      @Positive int requestedPageSize) {
         super(requestedPageSize, Collections.emptySet(), 0);
         this.templatesApi = templatesApi;
+        this.includeContent = includeContent;
     }
 
     private PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                      boolean includeContent,
                                       @Positive int requestedPageSize,
                                       @Nonnull Collection<CmsTemplate> currentPage,
                                       @PositiveOrZero int currentPageNumber) {
         super(requestedPageSize, currentPage, currentPageNumber);
         this.templatesApi = templatesApi;
+        this.includeContent = includeContent;
     }
 
     @Nullable
@@ -46,20 +52,16 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
     protected Collection<CmsTemplate> getPage(@PositiveOrZero int pageNumber,
                                               @Positive int pageSize) {
         try {
-            TemplateList templateList = templatesApi.listTemplates(pageNumber, pageSize);
+            TemplateList templateList = templatesApi.listTemplates(
+                pageNumber,
+                pageSize,
+                includeContent
+            );
 
-            List<CmsTemplate> resultPage = Stream.of(
-                    ListUtils.emptyIfNull(templateList.getBuiltinPages()).stream()
-                        .map(TEMPLATE_MAPPER::fromRestBuiltinPage),
-                    ListUtils.emptyIfNull(templateList.getBuiltinPartials()).stream()
-                        .map(TEMPLATE_MAPPER::fromRestBuiltinPartial),
-                    ListUtils.emptyIfNull(templateList.getLayouts()).stream()
-                        .map(TEMPLATE_MAPPER::fromRestLayout),
-                    ListUtils.emptyIfNull(templateList.getPages()).stream()
-                        .map(TEMPLATE_MAPPER::fromRestPage),
-                    ListUtils.emptyIfNull(templateList.getPartials()).stream()
-                        .map(TEMPLATE_MAPPER::fromRestPartial)
-                ).flatMap(s -> s)
+            List<CmsTemplate> resultPage = ListUtils
+                .emptyIfNull(templateList.getCollection())
+                .stream()
+                .map(TEMPLATE_MAPPER::fromRest)
                 .sorted(getComparator())
                 .collect(Collectors.toList());
 
@@ -68,10 +70,7 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
                 pageNumber,
                 pageSize,
                 resultPage,
-                templateList::getCurrentPage,
-                templateList::getTotalPages,
-                templateList::getPerPage,
-                templateList::getTotalEntries);
+                templateList.getMetadata());
 
             return resultPage;
         } catch (ApiException e) {
@@ -87,7 +86,12 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
         @Positive int requestedPageSize,
         @Nonnull Collection<CmsTemplate> currentPage,
         @PositiveOrZero int currentPageNumber) {
-        return new PagedTemplatesSpliterator(templatesApi, requestedPageSize, currentPage, currentPageNumber);
+        return new PagedTemplatesSpliterator(
+            templatesApi,
+            includeContent, requestedPageSize,
+            currentPage,
+            currentPageNumber
+        );
     }
 
     @Override

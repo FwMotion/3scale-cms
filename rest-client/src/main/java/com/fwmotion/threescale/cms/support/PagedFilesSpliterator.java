@@ -48,7 +48,7 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
         try {
             FileList fileList = filesApi.listFiles(pageNumber, pageSize, null);
 
-            List<CmsFile> resultPage = ListUtils.emptyIfNull(fileList.getFiles())
+            List<CmsFile> resultPage = ListUtils.emptyIfNull(fileList.getCollection())
                 .stream()
                 .map(FILE_MAPPER::fromRest)
                 .collect(Collectors.toList());
@@ -58,10 +58,7 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
                 pageNumber,
                 pageSize,
                 resultPage,
-                fileList::getCurrentPage,
-                fileList::getTotalPages,
-                fileList::getPerPage,
-                fileList::getTotalEntries);
+                fileList.getMetadata());
 
             return resultPage;
         } catch (ApiException e) {

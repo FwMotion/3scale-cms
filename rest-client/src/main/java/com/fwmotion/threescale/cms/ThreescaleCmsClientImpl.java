@@ -7,8 +7,8 @@ import com.fwmotion.threescale.cms.model.*;
 import com.fwmotion.threescale.cms.support.PagedFilesSpliterator;
 import com.fwmotion.threescale.cms.support.PagedSectionsSpliterator;
 import com.fwmotion.threescale.cms.support.PagedTemplatesSpliterator;
+import com.redhat.threescale.rest.cms.ApiClient;
 import com.redhat.threescale.rest.cms.ApiException;
-import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
 import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
@@ -51,7 +51,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
         this.templatesApi = templatesApi;
     }
 
-    public ThreescaleCmsClientImpl(@Nonnull XmlEnabledApiClient apiClient) {
+    public ThreescaleCmsClientImpl(@Nonnull ApiClient apiClient) {
         this(new FilesApi(apiClient),
             new SectionsApi(apiClient),
             new TemplatesApi(apiClient));
@@ -74,7 +74,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
     public Optional<InputStream> getFileContent(long fileId) throws ApiException {
         CloseableHttpClient httpClient = filesApi.getApiClient().getHttpClient();
         ModelFile file = filesApi.getFile(fileId);
-        ProviderAccount account = filesApi.readProviderSettings();
+        ProviderAccount account = filesApi.readProviderSettings().getAccount();
 
         HttpGet request = new HttpGet(account.getBaseUrl() + file.getPath());
         request.setHeader(HttpHeaders.ACCEPT, "*/*");
@@ -107,8 +107,8 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Nonnull
     @Override
-    public Stream<CmsTemplate> streamTemplates() {
-        return StreamSupport.stream(new PagedTemplatesSpliterator(templatesApi), true);
+    public Stream<CmsTemplate> streamTemplates(boolean includeContent) {
+        return StreamSupport.stream(new PagedTemplatesSpliterator(templatesApi, includeContent), true);
     }
 
     @Nonnull
@@ -142,18 +142,6 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Override
     public void save(@Nonnull CmsSection section) throws ApiException {
-        if (section instanceof CmsBuiltinSection) {
-            saveBuiltinSection((CmsBuiltinSection) section);
-        } else {
-            saveSection(section);
-        }
-    }
-
-    private void saveBuiltinSection(CmsBuiltinSection builtinSection) {
-        throw new UnsupportedOperationException("CmsBuiltinSection cannot be modified");
-    }
-
-    private void saveSection(CmsSection section) throws ApiException {
         Section restSection = SECTION_MAPPER.toRest(section);
         if (section.getId() == null) {
             if (StringUtils.isBlank(restSection.getTitle())
@@ -187,7 +175,8 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
                 restFile.getPath(),
                 fileContent,
                 restFile.getTagList(),
-                restFile.getDownloadable());
+                restFile.getDownloadable(),
+                restFile.getContentType());
 
             file.setId(response.getId());
         } else {
@@ -196,22 +185,20 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
                 restFile.getPath(),
                 restFile.getTagList(),
                 restFile.getDownloadable(),
-                fileContent);
+                fileContent,
+                restFile.getContentType());
         }
     }
 
     @Override
     public void save(@Nonnull CmsTemplate template, @Nullable File templateDraft) throws ApiException {
-        if (template instanceof CmsBuiltinPage) {
-            saveBuiltinPage((CmsBuiltinPage) template, templateDraft);
-        } else if (template instanceof CmsBuiltinPartial) {
-            saveBuiltinPartial((CmsBuiltinPartial) template, templateDraft);
-        } else if (template instanceof CmsLayout) {
-            saveLayout((CmsLayout) template, templateDraft);
-        } else if (template instanceof CmsPage) {
-            savePage((CmsPage) template, templateDraft);
-        } else if (template instanceof CmsPartial) {
-            savePartial((CmsPartial) template, templateDraft);
+        switch (template) {
+            case CmsBuiltinPage cmsBuiltinPage -> saveBuiltinPage(cmsBuiltinPage, templateDraft);
+            case CmsBuiltinPartial cmsBuiltinPartial -> saveBuiltinPartial(cmsBuiltinPartial, templateDraft);
+            case CmsLayout cmsLayout -> saveLayout(cmsLayout, templateDraft);
+            case CmsPage cmsPage -> savePage(cmsPage, templateDraft);
+            case CmsPartial cmsPartial -> savePartial(cmsPartial, templateDraft);
+            default -> throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
         }
     }
 
@@ -303,6 +290,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private Template saveUpdatedTemplate(long id, @Nonnull TemplateUpdatableFields template, @Nullable File templateDraft) throws ApiException {
 
         String draft;

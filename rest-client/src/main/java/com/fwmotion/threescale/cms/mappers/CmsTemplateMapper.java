@@ -26,6 +26,8 @@ public interface CmsTemplateMapper {
     @Mapping(target = "title", ignore = true)
     TemplateUpdatableFields toRestBuiltinPartial(CmsBuiltinPartial builtinPartial);
 
+    @Mapping(target = "draftContent", source = "draft")
+    @Mapping(target = "publishedContent", source = "published")
     CmsLayout fromRestLayout(Layout layout);
 
     @Mapping(target = "type", constant = "LAYOUT")
@@ -79,6 +81,20 @@ public interface CmsTemplateMapper {
     @Mapping(target = "sectionId", ignore = true)
     @Mapping(target = "title", ignore = true)
     TemplateUpdatableFields toRestPartialUpdate(CmsPartial partial);
+
+    default CmsTemplate fromRest(Template template) {
+        return switch (template) {
+            case null -> null;
+
+            case BuiltinPage builtinPage -> fromRestBuiltinPage(builtinPage);
+            case BuiltinPartial builtinPartial -> fromRestBuiltinPartial(builtinPartial);
+            case Layout layout -> fromRestLayout(layout);
+            case Page page -> fromRestPage(page);
+            case Partial partial -> fromRestPartial(partial);
+
+            default -> throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
+        };
+    }
 
     default String mapHandlerFromRest(EnumHandler handler) {
         if (handler == null
