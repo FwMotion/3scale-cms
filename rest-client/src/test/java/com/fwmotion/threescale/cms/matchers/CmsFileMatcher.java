@@ -21,11 +21,9 @@ public class CmsFileMatcher extends CmsObjectMatcher {
 
     @Override
     public boolean matchesSafely(@Nonnull CmsObject actual) {
-        if (!(actual instanceof CmsFile)) {
+        if (!(actual instanceof CmsFile actualFile)) {
             return false;
         }
-
-        CmsFile actualFile = (CmsFile) actual;
 
         return super.matchesSafely(actual)
             && actualMatchesExpected(expected.getSectionId(), actualFile.getSectionId())

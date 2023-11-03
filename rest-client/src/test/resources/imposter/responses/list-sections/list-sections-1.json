@@ -1,0 +1,210 @@
+{
+  "collection": [
+    {
+      "id": 2675712,
+      "created_at": "2022-03-05T04:48:27Z",
+      "updated_at": "2022-03-18T06:31:57Z",
+      "title": "Root",
+      "system_name": "root",
+      "public": true,
+      "parent_id": null,
+      "partial_path": "/"
+    },
+    {
+      "id": 2675713,
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "javascripts",
+      "system_name": "javascripts",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/javascripts"
+    },
+    {
+      "id": 2675714,
+      "created_at": "2022-03-05T04:48:27Z",
+      "updated_at": "2022-03-05T04:48:27Z",
+      "title": "css",
+      "system_name": "css",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/css"
+    },
+    {
+      "id": 2675715,
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:52Z",
+      "title": "images",
+      "system_name": "images",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/images"
+    },
+    {
+      "id": 2675716,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Password",
+      "system_name": "password",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/password"
+    },
+    {
+      "id": 2675717,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Login",
+      "system_name": "login",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/login"
+    },
+    {
+      "id": 2675718,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Signup",
+      "system_name": "signup",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/signup"
+    },
+    {
+      "id": 2675719,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Messages",
+      "system_name": "messages",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/messages"
+    },
+    {
+      "id": 2675720,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Outbox",
+      "system_name": "outbox",
+      "public": true,
+      "parent_id": 2675719,
+      "partial_path": "/messages/outbox"
+    },
+    {
+      "id": 2675721,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Inbox",
+      "system_name": "inbox",
+      "public": true,
+      "parent_id": 2675719,
+      "partial_path": "/messages/inbox"
+    },
+    {
+      "id": 2675722,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Trash",
+      "system_name": "trash",
+      "public": true,
+      "parent_id": 2675719,
+      "partial_path": "/messages/trash"
+    },
+    {
+      "id": 2675723,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Stats",
+      "system_name": "stats",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/stats"
+    },
+    {
+      "id": 2675724,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Applications",
+      "system_name": "applications",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/applications"
+    },
+    {
+      "id": 2675725,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Application Alerts",
+      "system_name": "application-alerts",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/application/alerts"
+    },
+    {
+      "id": 2675726,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Invoices",
+      "system_name": "invoices",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/invoices"
+    },
+    {
+      "id": 2675727,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Account Plans",
+      "system_name": "account-plans",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/account_plans"
+    },
+    {
+      "id": 2675728,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Plan Changes Wizard",
+      "system_name": "plan-changes-wizard",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/plan_changes_wizard"
+    },
+    {
+      "id": 2675729,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Account",
+      "system_name": "account",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/account"
+    },
+    {
+      "id": 2675730,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "Users",
+      "system_name": "users",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/users"
+    },
+    {
+      "id": 2675731,
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "title": "User",
+      "system_name": "user",
+      "public": true,
+      "parent_id": 2675712,
+      "partial_path": "/user"
+    }
+  ],
+  "metadata": {
+    "per_page": 20,
+    "total_entries": 26,
+    "total_pages": 2,
+    "current_page": 1
+  }
+}

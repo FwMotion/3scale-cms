@@ -1,7 +1,7 @@
 package com.fwmotion.threescale.cms;
 
 import com.fwmotion.threescale.cms.support.ApiClientBuilder;
-import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
+import com.redhat.threescale.rest.cms.ApiClient;
 import com.redhat.threescale.rest.cms.auth.ApiKeyAuth;
 import com.redhat.threescale.rest.cms.auth.Authentication;
 import jakarta.annotation.Nonnull;
@@ -69,8 +69,8 @@ public class ThreescaleCmsClientFactory implements AutoCloseable {
         return httpClient;
     }
 
-    private XmlEnabledApiClient newApiClient() {
-        XmlEnabledApiClient apiClient = ApiClientBuilder.buildApiClient(getHttpClient());
+    private ApiClient newApiClient() {
+        ApiClient apiClient = ApiClientBuilder.buildApiClient(getHttpClient());
 
         apiClient.setBasePath(baseUrl);
 

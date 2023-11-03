@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.redhat.threescale.rest.cms.model.ListPaginationMetadata;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Positive;
@@ -7,7 +8,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<T> {
 
@@ -105,16 +105,16 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
                                           @PositiveOrZero int pageNumber,
                                           @Positive int pageSize,
                                           @Nonnull Collection<T> resultPage,
-                                          @Nonnull Supplier<Integer> getCurrentPage,
-                                          @Nonnull Supplier<Integer> getTotalPages,
-                                          @Nonnull Supplier<Integer> getPerPage,
-                                          @Nonnull Supplier<Integer> getTotalEntries) {
-        int currentPage = Optional.ofNullable(getCurrentPage.get())
+                                          @Nullable ListPaginationMetadata paginationMetadata) {
+        int currentPage = Optional.ofNullable(paginationMetadata)
+            .map(ListPaginationMetadata::getCurrentPage)
             .orElse(pageNumber);
-        Optional<Integer> totalPagesOptional = Optional.ofNullable(getTotalPages.get());
+        Optional<Integer> totalPagesOptional = Optional.ofNullable(paginationMetadata)
+            .map(ListPaginationMetadata::getTotalPages);
         int totalPages = totalPagesOptional
             .orElse(Integer.MAX_VALUE);
-        int perPage = Optional.ofNullable(getPerPage.get())
+        int perPage = Optional.ofNullable(paginationMetadata)
+            .map(ListPaginationMetadata::getPerPage)
             .orElse(pageSize);
 
         int expectedPageSize;
@@ -122,7 +122,8 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
             expectedPageSize = 0;
         } else if (totalPagesOptional.isEmpty()
             || currentPage == totalPages) {
-            expectedPageSize = Optional.ofNullable(getTotalEntries.get())
+            expectedPageSize = Optional.ofNullable(paginationMetadata)
+                .map(ListPaginationMetadata::getTotalEntries)
                 .map(totalEntries -> totalEntries % perPage)
                 .orElseGet(resultPage::size);
         } else {

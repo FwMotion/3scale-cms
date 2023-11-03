@@ -67,15 +67,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.release>21</maven.compiler.release>
 
     <!-- Maven site skin version (can't include dots in name) -->
     <maven-fluido-skin-version>2.0.0-M8</maven-fluido-skin-version>
 
     <!-- Requirements -->
-    <requirements.java-version>[17,)</requirements.java-version>
+    <requirements.java-version>[21,)</requirements.java-version>
     <requirements.maven-version>[3.9.2,)</requirements.maven-version>
 
     <!-- Support Quarkus knowing about multimodule project -->
@@ -574,7 +574,7 @@
               will be checked by JaCoCo)
             -->
             <!-- TODO: Increase this percentage as tests cover additional code -->
-            <mutationThreshold>30</mutationThreshold>
+            <mutationThreshold>40</mutationThreshold>
 
             <!--
               Unless overridden by a Maven profile (below), do not include

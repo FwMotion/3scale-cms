@@ -11,6 +11,8 @@
           </option>
           <option name="goals">
             <list>
+              <option value="clean" />
+              <option value="compile" />
               <option value="generate-sources" />
               <option value="-pl" />
               <option value="rest-client" />

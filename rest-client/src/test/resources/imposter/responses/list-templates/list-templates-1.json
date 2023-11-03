@@ -1,0 +1,231 @@
+{
+  "collection": [
+    {
+      "id": 7315434,
+      "type": "layout",
+      "created_at": "2022-03-05T04:48:27Z",
+      "updated_at": "2022-03-05T04:48:27Z",
+      "title": "Main layout",
+      "system_name": "main_layout",
+      "liquid_enabled": true
+    },
+    {
+      "id": 7315435,
+      "type": "layout",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "Error layout",
+      "system_name": "error",
+      "liquid_enabled": true
+    },
+    {
+      "id": 7315436,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "Homepage",
+      "system_name": "homepage",
+      "layout_id": 7315434,
+      "section_id": 2675712,
+      "path": "/",
+      "content_type": "text/html",
+      "liquid_enabled": true,
+      "hidden": false
+    },
+    {
+      "id": 7315437,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "Documentation",
+      "system_name": "documentation",
+      "layout_id": 7315434,
+      "section_id": 2675712,
+      "path": "/docs",
+      "content_type": "text/html",
+      "liquid_enabled": true,
+      "hidden": false
+    },
+    {
+      "id": 7315438,
+      "type": "partial",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "system_name": "analytics"
+    },
+    {
+      "id": 7315439,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "3scale.js",
+      "system_name": "3scale-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/3scale.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315440,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "3scale_v2.js",
+      "system_name": "3scale_v2-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/3scale_v2.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315441,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "bootstrap.js",
+      "system_name": "bootstrap-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/bootstrap.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315442,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "bootstrap.min.js",
+      "system_name": "bootstrap-min-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/bootstrap.min.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315443,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "excanvas.compiled.js",
+      "system_name": "excanvas-compiled-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/excanvas.compiled.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315444,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "jquery.js",
+      "system_name": "jquery-js",
+      "layout_id": null,
+      "section_id": 2675713,
+      "path": "/javascripts/jquery.js",
+      "content_type": "text/javascript",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315445,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "bootstrap.css",
+      "system_name": "bootstrap-css",
+      "layout_id": null,
+      "section_id": 2675714,
+      "path": "/css/bootstrap.css",
+      "content_type": "text/css",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315446,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "default.css",
+      "system_name": "default-css",
+      "layout_id": null,
+      "section_id": 2675714,
+      "path": "/css/default.css",
+      "content_type": "text/css",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315447,
+      "type": "page",
+      "created_at": "2023-10-26T15:38:51Z",
+      "updated_at": "2023-10-26T15:38:51Z",
+      "title": "plans_widget_overrides.css",
+      "system_name": "plans_widget_overrides-css",
+      "layout_id": null,
+      "section_id": 2675714,
+      "path": "/css/plans_widget_overrides.css",
+      "content_type": "text/css",
+      "liquid_enabled": false,
+      "hidden": false
+    },
+    {
+      "id": 7315448,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:52Z",
+      "updated_at": "2023-10-26T15:38:52Z",
+      "system_name": "field"
+    },
+    {
+      "id": 7315449,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:52Z",
+      "updated_at": "2023-10-26T15:38:52Z",
+      "system_name": "shared/pagination"
+    },
+    {
+      "id": 7315450,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:52Z",
+      "updated_at": "2023-10-26T15:38:52Z",
+      "system_name": "shared/swagger_ui"
+    },
+    {
+      "id": 7315451,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "system_name": "submenu"
+    },
+    {
+      "id": 7315452,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "system_name": "menu_item"
+    },
+    {
+      "id": 7315453,
+      "type": "builtin_partial",
+      "created_at": "2023-10-26T15:38:53Z",
+      "updated_at": "2023-10-26T15:38:53Z",
+      "system_name": "users_menu"
+    }
+  ],
+  "metadata": {
+    "per_page": 20,
+    "total_entries": 65,
+    "total_pages": 4,
+    "current_page": 1
+  }
+}

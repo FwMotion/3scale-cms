@@ -64,7 +64,7 @@ public class ThreescaleCmsClientImplIntegrationTest {
     void listAllCmsObjects() {
         List<CmsObject> result = cmsClient.listAllCmsObjects();
 
-        assertThat(result, hasSize(97));
+        assertThat(result, hasSize(99));
         assertThat(result, hasItems(
             FilesApiTestSupport.FAVICON_FILE_MATCHER,
             SectionsApiTestSupport.ROOT_BUILTIN_SECTION_MATCHER,

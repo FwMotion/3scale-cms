@@ -16,6 +16,8 @@ public class CmsLayout implements CmsTemplate {
     private String contentType;
     private String handler;
     private Boolean liquidEnabled;
+    private String draftContent;
+    private String publishedContent;
 
     @Override
     public OffsetDateTime getCreatedAt() {
@@ -84,13 +86,27 @@ public class CmsLayout implements CmsTemplate {
         this.liquidEnabled = liquidEnabled;
     }
 
+    public String getDraftContent() {
+        return draftContent;
+    }
+
+    public void setDraftContent(String draftContent) {
+        this.draftContent = draftContent;
+    }
+
+    public String getPublishedContent() {
+        return publishedContent;
+    }
+
+    public void setPublishedContent(String publishedContent) {
+        this.publishedContent = publishedContent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof CmsLayout)) return false;
-
-        CmsLayout cmsLayout = (CmsLayout) o;
+        if (!(o instanceof CmsLayout cmsLayout)) return false;
 
         return new EqualsBuilder().append(getId(), cmsLayout.getId()).isEquals();
     }
@@ -110,6 +126,8 @@ public class CmsLayout implements CmsTemplate {
             .append("contentType", contentType)
             .append("handler", handler)
             .append("liquidEnabled", liquidEnabled)
+            .append("draftContent", draftContent)
+            .append("publishedContent", publishedContent)
             .toString();
     }
 }

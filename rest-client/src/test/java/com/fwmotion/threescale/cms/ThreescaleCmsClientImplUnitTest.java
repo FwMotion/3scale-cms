@@ -5,13 +5,13 @@ import com.fwmotion.threescale.cms.testsupport.FilesApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.SectionsApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.TemplatesApiTestSupport;
 import com.redhat.threescale.rest.cms.ApiClient;
-import com.redhat.threescale.rest.cms.XmlEnabledApiClient;
 import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
 import com.redhat.threescale.rest.cms.model.ModelFile;
 import com.redhat.threescale.rest.cms.model.ProviderAccount;
 import com.redhat.threescale.rest.cms.model.Section;
+import com.redhat.threescale.rest.cms.model.WrappedProviderAccount;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -40,10 +40,10 @@ import java.util.stream.Collectors;
 import static com.fwmotion.threescale.cms.matchers.HeaderMatcher.header;
 import static com.fwmotion.threescale.cms.matchers.InputStreamContentsMatcher.inputStreamContents;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.same;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
@@ -82,7 +82,7 @@ class ThreescaleCmsClientImplUnitTest {
         filesApiTestSupport = new FilesApiTestSupport(filesApi);
         templatesApiTestSupport = new TemplatesApiTestSupport(templatesApi);
 
-        apiClient = new XmlEnabledApiClient(httpClientMock);
+        apiClient = new ApiClient(httpClientMock);
     }
 
     @Test
@@ -189,9 +189,10 @@ class ThreescaleCmsClientImplUnitTest {
         // And the Files API will return information about the tenant account
         // (including no access code)
         given(filesApi.readProviderSettings())
-            .willReturn(new ProviderAccount()
-                .baseUrl("https://3scale.example.com")
-                .siteAccessCode(""));
+            .willReturn(new WrappedProviderAccount()
+                .account(new ProviderAccount()
+                    .baseUrl("https://3scale.example.com")
+                    .siteAccessCode("")));
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
@@ -249,11 +250,12 @@ class ThreescaleCmsClientImplUnitTest {
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
-        // (including no access code)
+        // (including an access code)
         given(filesApi.readProviderSettings())
-            .willReturn(new ProviderAccount()
-                .baseUrl("https://3scale.example.com")
-                .siteAccessCode("this is my access code"));
+            .willReturn(new WrappedProviderAccount()
+                .account(new ProviderAccount()
+                    .baseUrl("https://3scale.example.com")
+                    .siteAccessCode("this is my access code")));
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
@@ -313,9 +315,10 @@ class ThreescaleCmsClientImplUnitTest {
         // And the Files API will return information about the tenant account
         // (including no access code)
         given(filesApi.readProviderSettings())
-            .willReturn(new ProviderAccount()
-                .baseUrl("https://3scale.example.com")
-                .siteAccessCode(""));
+            .willReturn(new WrappedProviderAccount()
+                .account(new ProviderAccount()
+                    .baseUrl("https://3scale.example.com")
+                    .siteAccessCode("")));
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
@@ -376,11 +379,12 @@ class ThreescaleCmsClientImplUnitTest {
             .willReturn(FilesApiTestSupport.FAVICON_FILE);
 
         // And the Files API will return information about the tenant account
-        // (including no access code)
+        // (including an access code)
         given(filesApi.readProviderSettings())
-            .willReturn(new ProviderAccount()
-                .baseUrl("https://3scale.example.com")
-                .siteAccessCode("this is my access code"));
+            .willReturn(new WrappedProviderAccount()
+                .account(new ProviderAccount()
+                    .baseUrl("https://3scale.example.com")
+                    .siteAccessCode("this is my access code")));
 
         // And any direct HTTP request will return a result
         given(httpClientMock.execute(ArgumentMatchers.any(HttpUriRequest.class), ArgumentMatchers.<HttpClientResponseHandler<?>>any()))
@@ -432,10 +436,10 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void streamTemplates() throws Exception {
+    void streamTemplates_WithNoContent() throws Exception {
         templatesApiTestSupport.givenListTemplatesOnlyMainLayout();
 
-        List<CmsTemplate> result = threescaleCmsClient.streamTemplates()
+        List<CmsTemplate> result = threescaleCmsClient.streamTemplates(false)
             .collect(Collectors.toList());
 
         then(filesApi).shouldHaveNoInteractions();
@@ -446,10 +450,10 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void listTemplates() throws Exception {
+    void listTemplates_WithNoContent() throws Exception {
         templatesApiTestSupport.givenListTemplatesOnlyMainLayout();
 
-        List<CmsTemplate> result = threescaleCmsClient.listTemplates();
+        List<CmsTemplate> result = threescaleCmsClient.listTemplates(false);
 
         then(filesApi).shouldHaveNoInteractions();
         then(sectionsApi).shouldHaveNoInteractions();
@@ -642,30 +646,6 @@ class ThreescaleCmsClientImplUnitTest {
     }
 
     @Test
-    void save_UpdateBuiltinSectionUnsupported() {
-        // Given a CmsBuiltinSection object to update
-        CmsBuiltinSection builtinSection = new CmsBuiltinSection();
-        builtinSection.setId(30L);
-        builtinSection.setSystemName("root");
-        builtinSection.setParentId(32L);
-
-        // When the CmsBuiltinSection is saved
-        UnsupportedOperationException thrown = assertThrows(
-            UnsupportedOperationException.class,
-            () -> threescaleCmsClient.save(builtinSection)
-        );
-
-        // Then an exception should have been thrown because builtin sections
-        // cannot be created or updated
-        assertNotNull(thrown);
-
-        // And no APIs should have been called
-        then(sectionsApi).shouldHaveNoInteractions();
-        then(filesApi).shouldHaveNoInteractions();
-        then(templatesApi).shouldHaveNoInteractions();
-    }
-
-    @Test
     void save_UpdatedSection() throws Exception {
         // Given a CmsSection object with an ID already
         CmsSection updatedSection = new CmsSection();
@@ -731,7 +711,8 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getPath()),
             same(newFileContent),
             eq(expectedTagString),
-            eq(newFile.getDownloadable())))
+            eq(newFile.getDownloadable()),
+            nullable(String.class)))
             .willReturn(new ModelFile()
                 // TODO
                 .id(17L));
@@ -745,7 +726,8 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getPath()),
             same(newFileContent),
             eq(expectedTagString),
-            eq(newFile.getDownloadable()));
+            eq(newFile.getDownloadable()),
+            nullable(String.class));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
 
@@ -768,7 +750,6 @@ class ThreescaleCmsClientImplUnitTest {
             .sorted()
             .collect(Collectors.joining(","));
 
-
         // And a File
         File newFileContent = new File("/tmp/file.jpg");
 
@@ -779,7 +760,8 @@ class ThreescaleCmsClientImplUnitTest {
             eq(updateFile.getPath()),
             eq(expectedTagString),
             eq(updateFile.getDownloadable()),
-            same(newFileContent)))
+            same(newFileContent),
+            nullable(String.class)))
             .willReturn(new ModelFile()
                 // TODO
                 .id(17L));
@@ -794,7 +776,8 @@ class ThreescaleCmsClientImplUnitTest {
             eq(updateFile.getPath()),
             eq(expectedTagString),
             eq(updateFile.getDownloadable()),
-            same(newFileContent));
+            same(newFileContent),
+            nullable(String.class));
         then(sectionsApi).shouldHaveNoInteractions();
         then(templatesApi).shouldHaveNoInteractions();
     }

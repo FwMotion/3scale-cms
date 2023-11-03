@@ -21,11 +21,9 @@ public class CmsSectionMatcher extends CmsObjectMatcher {
 
     @Override
     public boolean matchesSafely(@Nonnull CmsObject actual) {
-        if (!(actual instanceof CmsSection)) {
+        if (!(actual instanceof CmsSection actualSection)) {
             return false;
         }
-
-        CmsSection actualSection = (CmsSection) actual;
 
         return super.matchesSafely(actual)
             && actualMatchesExpected(expected.getParentId(), actualSection.getParentId())

@@ -64,7 +64,7 @@ public class TopLevelCommand extends CommandBase {
         arity = "1",
         description = "Use an access token instead of a provider key. The " +
             "access token must be granted permissions to both " +
-            "Account Management API and the hidden Content Management API"
+            "Account Management API and the Developer Portal API"
     )
     private String accessToken;
 

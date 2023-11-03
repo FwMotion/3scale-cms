@@ -43,6 +43,7 @@
 
   <modules>
     <module>parent</module>
+    <module>openapi-generator-template</module>
     <module>rest-client</module>
     <module>cli</module>
   </modules>

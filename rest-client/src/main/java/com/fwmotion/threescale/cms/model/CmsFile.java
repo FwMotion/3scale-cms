@@ -16,6 +16,7 @@ public class CmsFile implements CmsObject {
     private String path;
     private Set<String> tags;
     private Boolean downloadable;
+    private String contentType;
 
     @Override
     public ThreescaleObjectType getType() {
@@ -81,13 +82,19 @@ public class CmsFile implements CmsObject {
         this.downloadable = downloadable;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof CmsFile)) return false;
-
-        CmsFile cmsFile = (CmsFile) o;
+        if (!(o instanceof CmsFile cmsFile)) return false;
 
         return new EqualsBuilder().append(getId(), cmsFile.getId()).isEquals();
     }
