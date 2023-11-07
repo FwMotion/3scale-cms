@@ -1,0 +1,19 @@
+= 3scale CMS Concepts
+
+:sectnums:
+:toc:
+
+== 3scale Content Management API Concepts
+
+The 3scale Developer Portal consists of 3 primary types of objects:
+
+=== Sections
+A section is a logical grouping, somewhat similar to a directory.
+
+=== Files
+A file is a binary item, such as an image.
+
+=== Templates
+Templates refer to textual content that will be served from the 3scale CMS.
+Templates may hold static content (such as scripts or stylesheets) or may be
+templated for server-side rendering as needed.
