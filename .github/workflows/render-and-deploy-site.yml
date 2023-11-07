@@ -69,17 +69,16 @@ jobs:
         if: ${{ success() && !inputs.dry-run }}
 
       - name: Run Maven Site
-        # compile needs to run so Maven figures out cross-module dependencies
-        # and stagingDirectory will have a value appended relative to parent for each module
         run: >-
           ./mvnw
           --settings ${{ github.workspace }}/settings.xml
           --batch-mode
-          compile
+          verify
           post-site
           site:stage
+          -Ppitest-include-it
           -Ddefault.dokka-srclink-base=${{ github.server_url }}/${{ github.repository }}/tree/${{ inputs.git-ref }}
-          -DtopSiteURL=https://fwmotion.github.io/${{ github.repository }}
+          -DtopSiteURL=https://${{ github.repository_owner }}.github.io/${{ github.repository }}
 
       - name: Upload Site Artifacts
         uses: actions/upload-pages-artifact@v2

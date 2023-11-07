@@ -79,9 +79,9 @@ jobs:
       run: >-
         sed
         -i
-        -e 's;<url>.*</url>;<url>${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }}</url>;'
-        -e 's;<connection>.*</connection>;<connection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</connection>;'
-        -e 's;<developerConnection>.*</developerConnection>;<developerConnection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</developerConnection>;'
+        -e '/<scm>/,/<\/scm>/ s;<url>.*</url>;<url>https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/</url>;'
+        -e '/<scm>/,/<\/scm>/ s;<connection>.*</connection>;<connection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</connection>;'
+        -e '/<scm>/,/<\/scm>/ s;<developerConnection>.*</developerConnection>;<developerConnection>scm:git:${{ github.server_url }}/${{ github.repository }}.git</developerConnection>;'
         pom.xml
 
     - name: Prepare Maven Release (build code and create tag)

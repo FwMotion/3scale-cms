@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (OpenAPI-Generator Template Customizations)</name>
-  <url>https://fwmotion.github.io/3scale-cms/openapi-generator-template</url>
+  <url>https://FwMotion.github.io/3scale-cms/openapi-generator-template</url>
   <description><![CDATA[
     Customizations to the OpenAPI-Generator templates for use with generating
     code in the 3scale-cms project
@@ -23,12 +23,37 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms/cli</url>
+      <url>https://FwMotion.github.io/3scale-cms/openapi-generator-template</url>
     </site>
   </distributionManagement>
 
   <properties>
     <project.build.outputTimestamp>1</project.build.outputTimestamp>
   </properties>
+
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>dependencies</report>
+              <report>dependency-info</report>
+              <report>index</report>
+              <report>issue-management</report>
+              <report>licenses</report>
+              <report>plugins</report>
+              <report>scm</report>
+              <report>summary</report>
+              <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>

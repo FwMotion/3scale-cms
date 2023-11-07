@@ -18,13 +18,14 @@
     </links>
 
     <breadcrumbs>
-      <item href="${topSiteURL}/aggregate/index.html" name="3scale CMS Tools"/>
-      <item href="${topSiteURL}/parent/index.html" name="Parent"/>
+      <!-- TODO: Make these use property topSiteURL without erroring out the build -->
+      <item href="https://FwMotion.github.io/3scale-cms/aggregate/index.html" name="3scale CMS Tools"/>
     </breadcrumbs>
 
     <menu ref="modules"/>
     <menu ref="reports"/>
-    <menu name="GitHub Project Pages">
+
+    <menu name="GitHub Project Pages" inherit="bottom">
       <item name="Home" href="https://github.com/FwMotion/3scale-cms"/>
       <item name="Issues" href="https://github.com/FwMotion/3scale-cms/issues"/>
       <item name="Packages" href="https://github.com/orgs/FwMotion/packages?repo_name=3scale-cms"/>
