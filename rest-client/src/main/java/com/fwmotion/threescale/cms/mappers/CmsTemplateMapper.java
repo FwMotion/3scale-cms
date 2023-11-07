@@ -83,6 +83,7 @@ public interface CmsTemplateMapper {
     TemplateUpdatableFields toRestPartialUpdate(CmsPartial partial);
 
     default CmsTemplate fromRest(Template template) {
+        /* When upgraded to JDK21:
         return switch (template) {
             case null -> null;
 
@@ -94,6 +95,22 @@ public interface CmsTemplateMapper {
 
             default -> throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
         };
+        */
+        if (template == null) {
+            return null;
+        } else if (template instanceof BuiltinPage builtinPage) {
+            return fromRestBuiltinPage(builtinPage);
+        } else if (template instanceof BuiltinPartial builtinPartial) {
+            return fromRestBuiltinPartial(builtinPartial);
+        } else if (template instanceof Layout layout) {
+            return fromRestLayout(layout);
+        } else if (template instanceof Page page) {
+            return fromRestPage(page);
+        } else if (template instanceof Partial partial) {
+            return fromRestPartial(partial);
+        } else {
+            throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
+        }
     }
 
     default String mapHandlerFromRest(EnumHandler handler) {
