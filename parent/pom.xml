@@ -7,8 +7,8 @@
   <version>2.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>3scale CMS Tools (parent)</name>
-  <url>https://fwmotion.github.io/3scale-cms</url>
+  <name>3scale CMS Tools (Parent)</name>
+  <url>https://FwMotion.github.io/3scale-cms/</url>
   <description><![CDATA[
     Maven project to provide common base configuration for inheritance by other
     related projects
@@ -17,7 +17,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms</url>
+      <url>https://FwMotion.github.io/3scale-cms/</url>
     </site>
   </distributionManagement>
 
@@ -58,7 +58,7 @@
 
     <maven.top-level-basedir>${project.basedir}/..</maven.top-level-basedir>
 
-    <topSiteURL>https://fwmotion.github.io/3scale-cms</topSiteURL>
+    <topSiteURL>https://FwMotion.github.io/3scale-cms</topSiteURL>
 
     <quarkus.container-image.labels.version>
       ${project.version}
@@ -72,6 +72,7 @@
     <maven.compiler.release>21</maven.compiler.release>
 
     <!-- Maven site skin version (can't include dots in name) -->
+    <!-- https://maven.apache.org/skins/maven-fluido-skin/ -->
     <maven-fluido-skin-version>2.0.0-M8</maven-fluido-skin-version>
 
     <!-- Requirements -->

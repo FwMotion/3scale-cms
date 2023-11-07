@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (command-line interface)</name>
-  <url>https://fwmotion.github.io/3scale-cms/cli</url>
+  <url>https://FwMotion.github.io/3scale-cms/cli</url>
   <description><![CDATA[
     A Quarkus-based command-line interface to the 3scale Content Management
     System. It is recommended to use this via the assembled container image
@@ -24,7 +24,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms/cli</url>
+      <url>https://FwMotion.github.io/3scale-cms/cli/</url>
     </site>
   </distributionManagement>
 

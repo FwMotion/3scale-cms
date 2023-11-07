@@ -14,7 +14,7 @@
   <packaging>pom</packaging>
 
   <name>3scale CMS Tools</name>
-  <url>https://github.com/FwMotion/3scale-cms/tree/main</url>
+  <url>https://FwMotion.github.io/3scale-cms/aggregate/</url>
   <description><![CDATA[
     Maven project to group multiple submodules related to 3scale's Content
     Management System API, and to handle build ordering and aggregate test
@@ -28,7 +28,7 @@
   </properties>
 
   <scm>
-    <url>https://github.com/FwMotion/3scale-cms/tree/main</url>
+    <url>blah</url>
     <connection>scm:git:https://github.com/FwMotion/3scale-cms.git</connection>
     <developerConnection>scm:git:https://github.com/FwMotion/3scale-cms.git</developerConnection>
     <tag>HEAD</tag>
@@ -37,7 +37,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://github.com/FwMotion/3scale-cms/tree/main</url>
+      <url>https://FwMotion.github.io/3scale-cms/aggregate/</url>
     </site>
   </distributionManagement>
 

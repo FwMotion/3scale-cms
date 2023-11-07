@@ -13,22 +13,10 @@
   </skin>
 
   <body>
-    <links>
-      <item name="GitHub Project" href="https://github.com/FwMotion/3scale-cms" />
-    </links>
-
-    <breadcrumbs>
-      <item href="${topSiteURL}/aggregate/index.html" name="3scale CMS Tools"/>
-    </breadcrumbs>
+    <breadcrumbs/>
 
     <menu ref="parent"/>
     <menu ref="modules"/>
     <menu ref="reports"/>
-    <menu name="GitHub Project Pages">
-      <item name="Home" href="https://github.com/FwMotion/3scale-cms"/>
-      <item name="Issues" href="https://github.com/FwMotion/3scale-cms/issues"/>
-      <item name="Packages" href="https://github.com/orgs/FwMotion/packages?repo_name=3scale-cms"/>
-    </menu>
-
   </body>
 </site>

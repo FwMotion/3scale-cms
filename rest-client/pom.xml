@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <name>3scale CMS Tools (REST client library)</name>
-  <url>https://fwmotion.github.io/3scale-cms/rest-client</url>
+  <url>https://FwMotion.github.io/3scale-cms/rest-client/</url>
   <description><![CDATA[
     Java library to interact with 3scale Content Management System via the
     CMS's REST API. This requires use of either a Provider Key or an
@@ -25,7 +25,7 @@
   <distributionManagement>
     <site>
       <id>fwmotion.github.io</id>
-      <url>https://fwmotion.github.io/3scale-cms/rest-client</url>
+      <url>https://FwMotion.github.io/3scale-cms/rest-client/</url>
     </site>
   </distributionManagement>
 
@@ -152,6 +152,30 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${version.jacoco-maven-plugin}</version>
+          <configuration>
+            <includes>
+              <!-- Agent uses package/class names -->
+              <include>com.fwmotion.threescale.cms</include>
+              <include>com.fwmotion.threescale.cms.*</include>
+
+              <!-- Report uses filenames -->
+              <include>com/fwmotion/threescale/cms/**/*</include>
+            </includes>
+            <excludes>
+              <!-- Exclude Mapstruct-generated classes -->
+              <exclude>com/fwmotion/threescale/cms/mappers/*Impl.class</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -164,20 +188,6 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <includes>
-            <!-- Agent uses package/class names -->
-            <include>com.fwmotion.threescale.cms</include>
-            <include>com.fwmotion.threescale.cms.*</include>
-
-            <!-- Report uses filenames -->
-            <include>com/fwmotion/threescale/cms/**/*</include>
-          </includes>
-          <excludes>
-            <!-- Exclude Mapstruct-generated classes -->
-            <exclude>com/fwmotion/threescale/cms/mappers/*Impl.class</exclude>
-          </excludes>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -379,6 +389,28 @@
               <report>scm</report>
               <report>summary</report>
               <report>team</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
             </reports>
           </reportSet>
         </reportSets>
