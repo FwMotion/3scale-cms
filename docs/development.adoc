@@ -1,0 +1,80 @@
+= 3scale CMS Tools Development
+
+:sectnums:
+:toc:
+
+== Building Locally
+
+Project builds are orchestrated by link:https://maven.apache.org/[Apache Maven],
+utilizing link:https://maven.apache.org/wrapper[Maven Wrapper] with the goal for
+a consistent compilation environment.
+
+=== Prerequisites
+
+The following is required to build 3scale-cms for any build type:
+
+1. Java JDK 17 or newer
+2. Maven 3.9.2 or newer - this is automatic when using link:https://maven.apache.org/wrapper/[Maven Wrapper]
+
+To perform a native-mode build, at least one of the following must
+also be installed:
+
+1. link:https://podman.io[Podman]
+2. link:https://www.docker.com[Docker]
+3. link:https://github.com/graalvm/mandrel[Mandrel], a GraalVM downstream
+   distribution that focuses solely on Quarkus support
+4. link:https://www.graalvm.org/[GraalVM]
+
+For more information on prerequisites and configuration for native-mode builds,
+refer to the
+link:https://quarkus.io/guides/building-native-image[Quarkus "Building a Native Executable" Guide].
+
+=== Building in JVM-mode
+
+To build 3scale-cms to run in JVM-mode, run the following Maven Wrapper phase:
+
+[source,bash]
+----
+./mvnw verify
+----
+
+Upon successful compilation, the 3scale-cms CLI may be executed via the
+following Java command:
+
+[source,bash]
+----
+java -jar cli/target/quarkus-app/quarkus-run.jar
+----
+
+=== Building in Native-mode
+
+Similar to JVM-mode builds, native-mode builds are also run with Maven Wrapper.
+The difference is by enabling the `native` profile:
+
+[source,bash]
+----
+./mvnw verify -Pnative
+----
+
+Upon successful completion, the 3scale-cms CLI may be executed via the newly
+compiled executable:
+
+[source,bash]
+----
+cli/target/3scale-cms-tools-cli-VERSION-runner
+----
+
+[NOTE]
+====
+Replace `VERSION` with the version number of 3scale-cms that was just compiled.
+====
+
+=== Running in Quarkus Dev-Mode
+
+To run 3scale-cms CLI in Quarkus dev-mode, the following Maven Wrapper command
+may be invoked from the project root:
+
+[source,bash]
+----
+./mvnw -pl cli -am verify quarkus:dev
+----
