@@ -192,6 +192,7 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
 
     @Override
     public void save(@Nonnull CmsTemplate template, @Nullable File templateDraft) throws ApiException {
+        /* When upgraded to JDK21:
         switch (template) {
             case CmsBuiltinPage cmsBuiltinPage -> saveBuiltinPage(cmsBuiltinPage, templateDraft);
             case CmsBuiltinPartial cmsBuiltinPartial -> saveBuiltinPartial(cmsBuiltinPartial, templateDraft);
@@ -199,6 +200,20 @@ public class ThreescaleCmsClientImpl implements ThreescaleCmsClient {
             case CmsPage cmsPage -> savePage(cmsPage, templateDraft);
             case CmsPartial cmsPartial -> savePartial(cmsPartial, templateDraft);
             default -> throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
+        }
+        */
+        if (template instanceof CmsBuiltinPage cmsBuiltinPage) {
+            saveBuiltinPage(cmsBuiltinPage, templateDraft);
+        } else if (template instanceof CmsBuiltinPartial cmsBuiltinPartial) {
+            saveBuiltinPartial(cmsBuiltinPartial, templateDraft);
+        } else if (template instanceof CmsLayout cmsLayout) {
+            saveLayout(cmsLayout, templateDraft);
+        } else if (template instanceof CmsPage cmsPage) {
+            savePage(cmsPage, templateDraft);
+        } else if (template instanceof CmsPartial cmsPartial) {
+            savePartial(cmsPartial, templateDraft);
+        } else {
+            throw new UnsupportedOperationException("Unknown template type: " + template.getClass().getName());
         }
     }
 
