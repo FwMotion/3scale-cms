@@ -4,7 +4,7 @@ metadata:
   name: 3scale-cms
 spec:
   description: >-
-    3scale-cms task to interact with the 3scale Content Management API
+    3scale-cms task to interact with the 3scale Developer Portal API
   params:
   - name: 3scale-cms-image
     type: string
@@ -83,6 +83,6 @@ spec:
       A Workspace containing the information required to interact with 3scale,
       such as the Admin Portal base URL and either a Provider Key or a
       Personal Access Token. (Note that when a Personal Access Token is used,
-      it must have permission to the Content Management API. Binding a Secret
+      it must have permission to the Developer Portal API. Binding a Secret
       to this Workspace is strongly recommended over other volume types.
 

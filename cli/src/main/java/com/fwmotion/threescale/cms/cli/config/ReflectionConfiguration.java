@@ -1,6 +1,7 @@
 package com.fwmotion.threescale.cms.cli.config;
 
 import com.fwmotion.threescale.cms.mixins.EnumHandlerMixIn;
+import com.redhat.threescale.rest.cms.model.Error;
 import com.redhat.threescale.rest.cms.model.*;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -12,7 +13,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
     BuiltinPartial.class,
     EnumHandler.class,
     EnumTemplateType.class,
-    ErrorHash.class,
+    Error.class,
     FileCreationRequest.class,
     FileList.class,
     FileUpdatableFields.class,

@@ -12,11 +12,11 @@ public final class ApiClientBuilder {
     }
 
     public static ApiClient buildApiClient(CloseableHttpClient httpClient) {
-        ApiClient xmlApiClient = new ApiClient(httpClient);
+        ApiClient apiClient = new ApiClient(httpClient);
 
-        applyMixIns(xmlApiClient.getObjectMapper());
+        applyMixIns(apiClient.getObjectMapper());
 
-        return xmlApiClient;
+        return apiClient;
     }
 
     /**

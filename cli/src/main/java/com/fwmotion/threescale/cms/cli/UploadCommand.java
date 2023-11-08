@@ -3,9 +3,9 @@ package com.fwmotion.threescale.cms.cli;
 import com.fwmotion.threescale.cms.ThreescaleCmsClient;
 import com.fwmotion.threescale.cms.cli.support.*;
 import com.fwmotion.threescale.cms.model.*;
-import com.redhat.threescale.rest.cms.ApiException;
 import io.quarkus.logging.Log;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -108,16 +108,16 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         if (layoutFilename == null) {
             newPageLayoutSystemName = treeDetails.getDefaultLayout()
                 .map(CmsLayout::getSystemName)
-                .orElse("");
+                .orElse(null);
         } else if (StringUtils.isBlank(layoutFilename)) {
-            newPageLayoutSystemName = "";
+            newPageLayoutSystemName = null;
         } else {
             CmsObject layout = Optional.ofNullable(localObjectsByPath.get(layoutFilename))
                 .map(Pair::getLeft)
                 .orElseGet(() -> remoteObjectsByPath.get(layoutFilename));
 
-            if (layout instanceof CmsLayout) {
-                newPageLayoutSystemName = ((CmsLayout) layout).getSystemName();
+            if (layout instanceof CmsLayout cmsLayout) {
+                newPageLayoutSystemName = cmsLayout.getSystemName();
             } else {
                 throw new IllegalArgumentException("Specified layout for new pages is not a layout!");
             }
@@ -139,11 +139,11 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
             uploadSortComparator = Comparator.comparing(Pair::getLeft,
                 sectionToTopComparator
                     .thenComparing((o1, o2) -> {
-                        if (o1 instanceof CmsLayout && StringUtils.equals(newPageLayoutSystemName, ((CmsLayout) o1).getSystemName())) {
+                        if (o1 instanceof CmsLayout layout1 && StringUtils.equals(newPageLayoutSystemName, layout1.getSystemName())) {
                             return -1;
                         }
 
-                        if (o2 instanceof CmsLayout && StringUtils.equals(newPageLayoutSystemName, ((CmsLayout) o2).getSystemName())) {
+                        if (o2 instanceof CmsLayout layout2 && StringUtils.equals(newPageLayoutSystemName, layout2.getSystemName())) {
                             return 1;
                         }
 
@@ -168,7 +168,7 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
                 return localObjectPair;
             })
             .sorted(uploadSortComparator)
-            .collect(Collectors.toList());
+            .toList();
 
         if (noop) {
             for (CmsObject object : deleteObjects) {
@@ -203,9 +203,9 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
                 for (Pair<CmsObject, File> pair : localObjectsToUpload) {
                     CmsObject object = pair.getLeft();
 
-                    if (object instanceof CmsTemplate) {
+                    if (object instanceof CmsTemplate cmsTemplate) {
                         Log.info("Publishing " + object.getType() + " " + pathKeyGenerator.generatePathKeyForObject(object) + "...");
-                        client.publish((CmsTemplate) object);
+                        client.publish(cmsTemplate);
                     }
                 }
             }
@@ -218,35 +218,33 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
                                @Nonnull CmsObject object,
                                @Nonnull File file,
                                @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
-                               @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) throws ApiException {
+                               @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
         String pathKey = pathKeyGenerator.generatePathKeyForObject(object);
         Log.info("Uploading " + object.getType() + " " + pathKey + "...");
 
-        if (object instanceof CmsSection) {
-            CmsSection section = (CmsSection) object;
+        if (object instanceof CmsSection section) {
             if (section.getParentId() == null && !"/".equals(pathKey)) {
                 section.setParentId(findParentId(pathKey, localFilesByPathKey, remoteObjectsByPathKey));
             }
             client.save(section);
-        } else if (object instanceof CmsFile) {
-            CmsFile cmsFile = (CmsFile) object;
+        } else if (object instanceof CmsFile cmsFile) {
             if (cmsFile.getSectionId() == null) {
                 cmsFile.setSectionId(findParentId(pathKey, localFilesByPathKey, remoteObjectsByPathKey));
             }
             client.save(cmsFile, file);
-        } else if (object instanceof CmsTemplate) {
-            if (object instanceof CmsPage && ((CmsPage) object).getSectionId() == null) {
-                ((CmsPage) object).setSectionId(findParentId(pathKey, localFilesByPathKey, remoteObjectsByPathKey));
+        } else if (object instanceof CmsTemplate template) {
+            if (template instanceof CmsPage page && page.getSectionId() == null) {
+                page.setSectionId(findParentId(pathKey, localFilesByPathKey, remoteObjectsByPathKey));
             }
-            client.save((CmsTemplate) object, file);
+            client.save(template, file);
         } else {
             throw new UnsupportedOperationException("Unknown object type " + object.getClass());
         }
     }
 
     private Long findParentId(@Nonnull String pathKey,
-                                 @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
-                                 @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
+                              @Nonnull Map<String, Pair<CmsObject, File>> localFilesByPathKey,
+                              @Nonnull Map<String, CmsObject> remoteObjectsByPathKey) {
         String parentPathKey;
         if (pathKey.endsWith("/")) {
             parentPathKey = pathKey.substring(0, pathKey.lastIndexOf('/', pathKey.length() - 2) + 1);
@@ -268,21 +266,18 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
             }
 
             parentPathKey = parentPathKey.substring(0, pathKey.lastIndexOf('/', parentPathKey.length() - 2) + 1);
-        } while (!"".equals(parentPathKey));
+        } while (!parentPathKey.isEmpty());
 
         throw new IllegalStateException("Couldn't find any parent section ID... not even root");
     }
 
     private void setRequiredCreationProperties(@Nonnull CmsObject localObject,
-                                               @Nonnull String newPageLayoutSystemName) {
-        if (localObject instanceof CmsPage) {
-            CmsPage localPage = (CmsPage) localObject;
-
-            if ("text/html".equals(localPage.getContentType())) {
-                localPage.setLayout(newPageLayoutSystemName);
-            } else {
-                localPage.setLayout("");
-            }
+                                               @Nullable String newPageLayoutSystemName) {
+        if (newPageLayoutSystemName != null
+            && localObject instanceof CmsPage localPage
+            && "text/html".equals(localPage.getContentType())
+        ) {
+            localPage.setLayout(newPageLayoutSystemName);
         }
     }
 
@@ -297,28 +292,26 @@ public class UploadCommand extends CommandBase implements Callable<Integer> {
         // Only set ID... Leave the rest for 3scale to dictate what's updatable
         // and not on each type of object.
 
-        if (target instanceof CmsSection) {
-            CmsSection targetSection = (CmsSection) target;
+        if (target instanceof CmsSection targetSection) {
             CmsSection sourceSection = (CmsSection) source;
 
             targetSection.setId(source.getId());
             targetSection.setParentId(sourceSection.getParentId());
-        } else if (target instanceof CmsFile) {
-            CmsFile targetFile = (CmsFile) target;
+        } else if (target instanceof CmsFile targetFile) {
             CmsFile sourceFile = (CmsFile) source;
+
             targetFile.setId(sourceFile.getId());
             targetFile.setSectionId(sourceFile.getSectionId());
-        } else if (target instanceof CmsLayout) {
-            ((CmsLayout) target).setId(source.getId());
-        } else if (target instanceof CmsPage) {
-            CmsPage targetPage = (CmsPage) target;
+        } else if (target instanceof CmsLayout targetLayout) {
+            targetLayout.setId(source.getId());
+        } else if (target instanceof CmsPage targetPage) {
             targetPage.setId(source.getId());
 
-            if (source instanceof CmsPage) {
-                targetPage.setSectionId(((CmsPage) source).getSectionId());
+            if (source instanceof CmsPage sourcePage) {
+                targetPage.setSectionId((sourcePage.getSectionId()));
             }
-        } else if (target instanceof CmsPartial) {
-            ((CmsPartial) target).setId(source.getId());
+        } else if (target instanceof CmsPartial targetPartial) {
+            targetPartial.setId(source.getId());
         } else {
             // Unknown... built-in pages/partials shouldn't come from local
             // files anyway

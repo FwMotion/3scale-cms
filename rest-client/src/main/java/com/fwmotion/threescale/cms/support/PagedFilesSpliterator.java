@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fwmotion.threescale.cms.mappers.CmsFileMapper;
 import com.fwmotion.threescale.cms.model.CmsFile;
 import com.redhat.threescale.rest.cms.ApiException;
@@ -21,22 +22,25 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
 
     private final FilesApi filesApi;
 
-    public PagedFilesSpliterator(@Nonnull FilesApi filesApi) {
-        super(Collections.emptySet(), 0);
+    public PagedFilesSpliterator(@Nonnull FilesApi filesApi,
+                                 @Nonnull ObjectMapper objectMapper) {
+        super(Collections.emptySet(), objectMapper, 0);
         this.filesApi = filesApi;
     }
 
     public PagedFilesSpliterator(@Nonnull FilesApi filesApi,
+                                 @Nonnull ObjectMapper objectMapper,
                                  @Positive int requestedPageSize) {
-        super(requestedPageSize, Collections.emptySet(), 0);
+        super(requestedPageSize, objectMapper, Collections.emptySet(), 0);
         this.filesApi = filesApi;
     }
 
     private PagedFilesSpliterator(@Nonnull FilesApi filesApi,
+                                  @Nonnull ObjectMapper objectMapper,
                                   @Positive int requestedPageSize,
                                   @Nonnull Collection<CmsFile> currentPage,
                                   @PositiveOrZero int currentPageNumber) {
-        super(requestedPageSize, currentPage, currentPageNumber);
+        super(requestedPageSize, objectMapper, currentPage, currentPageNumber);
         this.filesApi = filesApi;
     }
 
@@ -62,9 +66,7 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
 
             return resultPage;
         } catch (ApiException e) {
-            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
-            throw new IllegalStateException("Unexpected exception while iterating CMS file page " + pageNumber
-                + " (with page size of " + pageSize + ")", e);
+            throw handleApiException(e, "file", pageNumber, pageSize);
         }
     }
 
@@ -74,7 +76,7 @@ public class PagedFilesSpliterator extends AbstractPagedRestApiSpliterator<CmsFi
         @Positive int requestedPageSize,
         @Nonnull Collection<CmsFile> currentPage,
         @PositiveOrZero int currentPageNumber) {
-        return new PagedFilesSpliterator(filesApi, requestedPageSize, currentPage, currentPageNumber);
+        return new PagedFilesSpliterator(filesApi, getObjectMapper(), requestedPageSize, currentPage, currentPageNumber);
     }
 
     @Override

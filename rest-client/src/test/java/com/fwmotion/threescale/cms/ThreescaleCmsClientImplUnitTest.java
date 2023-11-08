@@ -1,5 +1,7 @@
 package com.fwmotion.threescale.cms;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fwmotion.threescale.cms.mixins.EnumHandlerMixIn;
 import com.fwmotion.threescale.cms.model.*;
 import com.fwmotion.threescale.cms.testsupport.FilesApiTestSupport;
 import com.fwmotion.threescale.cms.testsupport.SectionsApiTestSupport;
@@ -8,10 +10,7 @@ import com.redhat.threescale.rest.cms.ApiClient;
 import com.redhat.threescale.rest.cms.api.FilesApi;
 import com.redhat.threescale.rest.cms.api.SectionsApi;
 import com.redhat.threescale.rest.cms.api.TemplatesApi;
-import com.redhat.threescale.rest.cms.model.ModelFile;
-import com.redhat.threescale.rest.cms.model.ProviderAccount;
-import com.redhat.threescale.rest.cms.model.Section;
-import com.redhat.threescale.rest.cms.model.WrappedProviderAccount;
+import com.redhat.threescale.rest.cms.model.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -34,7 +33,6 @@ import java.nio.charset.Charset;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.fwmotion.threescale.cms.matchers.HeaderMatcher.header;
@@ -60,6 +58,8 @@ class ThreescaleCmsClientImplUnitTest {
     SectionsApi sectionsApi;
     @Mock
     TemplatesApi templatesApi;
+    @Spy
+    ObjectMapper objectMapper = new ObjectMapper();
 
     SectionsApiTestSupport sectionsApiTestSupport;
     FilesApiTestSupport filesApiTestSupport;
@@ -78,6 +78,8 @@ class ThreescaleCmsClientImplUnitTest {
 
     @BeforeEach
     void setUp() {
+        objectMapper.addMixIn(EnumHandler.class, EnumHandlerMixIn.class);
+
         sectionsApiTestSupport = new SectionsApiTestSupport(sectionsApi);
         filesApiTestSupport = new FilesApiTestSupport(filesApi);
         templatesApiTestSupport = new TemplatesApiTestSupport(templatesApi);
@@ -694,13 +696,7 @@ class ThreescaleCmsClientImplUnitTest {
         newFile.setId(null);
         newFile.setPath("/file.jpg");
         newFile.setSectionId(30L);
-        newFile.setTags(Set.of("a", "b", "c"));
         newFile.setDownloadable(true);
-
-        String expectedTagString = newFile.getTags()
-            .stream()
-            .sorted()
-            .collect(Collectors.joining(","));
 
         // And a File
         File newFileContent = new File("/tmp/file.jpg");
@@ -710,7 +706,6 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getSectionId()),
             eq(newFile.getPath()),
             same(newFileContent),
-            eq(expectedTagString),
             eq(newFile.getDownloadable()),
             nullable(String.class)))
             .willReturn(new ModelFile()
@@ -725,7 +720,6 @@ class ThreescaleCmsClientImplUnitTest {
             eq(newFile.getSectionId()),
             eq(newFile.getPath()),
             same(newFileContent),
-            eq(expectedTagString),
             eq(newFile.getDownloadable()),
             nullable(String.class));
         then(sectionsApi).shouldHaveNoInteractions();
@@ -742,13 +736,7 @@ class ThreescaleCmsClientImplUnitTest {
         updateFile.setId(16L);
         updateFile.setPath("/file.jpg");
         updateFile.setSectionId(30L);
-        updateFile.setTags(Set.of("a", "b", "c"));
         updateFile.setDownloadable(true);
-
-        String expectedTagString = updateFile.getTags()
-            .stream()
-            .sorted()
-            .collect(Collectors.joining(","));
 
         // And a File
         File newFileContent = new File("/tmp/file.jpg");
@@ -758,7 +746,6 @@ class ThreescaleCmsClientImplUnitTest {
             eq(updateFile.getId()),
             eq(updateFile.getSectionId()),
             eq(updateFile.getPath()),
-            eq(expectedTagString),
             eq(updateFile.getDownloadable()),
             same(newFileContent),
             nullable(String.class)))
@@ -774,7 +761,6 @@ class ThreescaleCmsClientImplUnitTest {
             eq(updateFile.getId()),
             eq(updateFile.getSectionId()),
             eq(updateFile.getPath()),
-            eq(expectedTagString),
             eq(updateFile.getDownloadable()),
             same(newFileContent),
             nullable(String.class));
@@ -805,7 +791,6 @@ class ThreescaleCmsClientImplUnitTest {
         newFile.setId(16L);
         newFile.setPath("/file.jpg");
         newFile.setSectionId(30L);
-        newFile.setTags(Set.of("a", "b", "c"));
         newFile.setDownloadable(true);
 
         // When the interface code is called

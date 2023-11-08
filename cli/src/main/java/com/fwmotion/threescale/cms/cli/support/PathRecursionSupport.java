@@ -45,7 +45,7 @@ public class PathRecursionSupport {
                         Long childParentId = GET_PARENT_ID_FUNCTIONS.getOrDefault(childObject.getClass(), o -> Long.MIN_VALUE)
                             .apply(childObject);
 
-                        return parentId.equals(childParentId);
+                        return Objects.equals(parentId, childParentId);
                     })
                     .peek(e -> treeWalker.add(Pair.of(e)))
                     .count());
@@ -72,24 +72,19 @@ public class PathRecursionSupport {
 
         validatePaths(specifiedPaths, objectsByPath);
 
-        switch (recurseBy) {
-            case NONE:
-                return new HashSet<>(specifiedPaths);
-
-            case PATH_PREFIX:
-                return specifiedPaths.stream()
+        return switch (recurseBy) {
+            case NONE -> new HashSet<>(specifiedPaths);
+            case PATH_PREFIX -> specifiedPaths.stream()
                     .flatMap(pathKey -> {
                         if (objectsByPath.get(pathKey).getType() == ThreescaleObjectType.SECTION) {
                             return objectsByPath.keySet().stream()
-                                .filter(subKey -> StringUtils.startsWith(subKey, pathKey));
+                                    .filter(subKey -> StringUtils.startsWith(subKey, pathKey));
                         }
 
                         return Stream.of(pathKey);
                     })
                     .collect(Collectors.toSet());
-
-            case PARENT_ID:
-                return specifiedPaths.stream()
+            case PARENT_ID -> specifiedPaths.stream()
                     .flatMap(pathKey -> {
                         CmsObject parentObject = objectsByPath.get(pathKey);
 
@@ -99,13 +94,10 @@ public class PathRecursionSupport {
                         addChildObjectsToList(recursingList, objectsByPath);
 
                         return recursingList.stream()
-                            .map(Pair::getKey);
+                                .map(Pair::getKey);
                     })
                     .collect(Collectors.toSet());
-
-            default:
-                throw new UnsupportedOperationException("Unknown recursion style: " + recurseBy);
-        }
+        };
     }
 
     public enum RecursionOption {

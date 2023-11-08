@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.model;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -38,6 +39,7 @@ public class CmsPage implements CmsTemplate {
         this.updatedAt = updatedAt;
     }
 
+    @Nullable
     @Override
     public Long getId() {
         return id;
@@ -115,9 +117,7 @@ public class CmsPage implements CmsTemplate {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof CmsPage)) return false;
-
-        CmsPage cmsPage = (CmsPage) o;
+        if (!(o instanceof CmsPage cmsPage)) return false;
 
         return new EqualsBuilder().append(getId(), cmsPage.getId()).isEquals();
     }

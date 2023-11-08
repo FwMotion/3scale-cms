@@ -1,12 +1,13 @@
 package com.fwmotion.threescale.cms.model;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.OffsetDateTime;
 
-public class CmsBuiltinPartial implements CmsTemplate {
+public class CmsBuiltinPartial implements CmsBuiltinTemplate {
 
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
@@ -34,6 +35,7 @@ public class CmsBuiltinPartial implements CmsTemplate {
         this.updatedAt = updatedAt;
     }
 
+    @Nullable
     @Override
     public Long getId() {
         return id;
@@ -79,9 +81,7 @@ public class CmsBuiltinPartial implements CmsTemplate {
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof CmsBuiltinPartial)) return false;
-
-        CmsBuiltinPartial that = (CmsBuiltinPartial) o;
+        if (!(o instanceof CmsBuiltinPartial that)) return false;
 
         return new EqualsBuilder().append(getId(), that.getId()).isEquals();
     }

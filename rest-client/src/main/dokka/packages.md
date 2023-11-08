@@ -11,7 +11,7 @@ developer-friendly model objects and auto-generated REST client objects
 # Package com.fwmotion.threescale.cms.mixins
 
 Support files to instruct Jackson on handling of JSON data when interacting
-with the 3scale Content Management API
+with the 3scale Developer Portal API
 
 # Package com.fwmotion.threescale.cms.model
 

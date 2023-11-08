@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fwmotion.threescale.cms.mappers.CmsTemplateMapper;
 import com.fwmotion.threescale.cms.model.CmsTemplate;
 import com.redhat.threescale.rest.cms.ApiException;
@@ -23,26 +24,29 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
     private final boolean includeContent;
 
     public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                     @Nonnull ObjectMapper objectMapper,
                                      boolean includeContent) {
-        super(Collections.emptySet(), 0);
+        super(Collections.emptySet(), objectMapper, 0);
         this.templatesApi = templatesApi;
         this.includeContent = includeContent;
     }
 
     public PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                     @Nonnull ObjectMapper objectMapper,
                                      boolean includeContent,
                                      @Positive int requestedPageSize) {
-        super(requestedPageSize, Collections.emptySet(), 0);
+        super(requestedPageSize, objectMapper, Collections.emptySet(), 0);
         this.templatesApi = templatesApi;
         this.includeContent = includeContent;
     }
 
     private PagedTemplatesSpliterator(@Nonnull TemplatesApi templatesApi,
+                                      @Nonnull ObjectMapper objectMapper,
                                       boolean includeContent,
                                       @Positive int requestedPageSize,
                                       @Nonnull Collection<CmsTemplate> currentPage,
                                       @PositiveOrZero int currentPageNumber) {
-        super(requestedPageSize, currentPage, currentPageNumber);
+        super(requestedPageSize, objectMapper, currentPage, currentPageNumber);
         this.templatesApi = templatesApi;
         this.includeContent = includeContent;
     }
@@ -74,9 +78,7 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
 
             return resultPage;
         } catch (ApiException e) {
-            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
-            throw new IllegalStateException("Unexpected exception while iterating CMS template list page " + pageNumber
-                + " (with page size of " + pageSize + ")", e);
+            throw handleApiException(e, "template", pageNumber, pageSize);
         }
     }
 
@@ -85,10 +87,13 @@ public class PagedTemplatesSpliterator extends AbstractPagedRestApiSpliterator<C
     protected AbstractPagedRestApiSpliterator<CmsTemplate> doSplit(
         @Positive int requestedPageSize,
         @Nonnull Collection<CmsTemplate> currentPage,
-        @PositiveOrZero int currentPageNumber) {
+        @PositiveOrZero int currentPageNumber
+    ) {
         return new PagedTemplatesSpliterator(
             templatesApi,
-            includeContent, requestedPageSize,
+            getObjectMapper(),
+            includeContent,
+            requestedPageSize,
             currentPage,
             currentPageNumber
         );

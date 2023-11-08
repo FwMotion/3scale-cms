@@ -1,8 +1,9 @@
 = 3scale CMS Tools
-
+:sectnums:
 :toc:
 
 == Overview
+
 The 3scale CMS tools project provides the ability to interact with 3scale's
 Content Management System programmatically. The project also
 demonstrates API-first code generation.
@@ -24,21 +25,24 @@ This repository provides the following artifacts:
 
 === Command-Line Interface
 
-The 3scale CMS tools project provides a CLI tool that provides a convenient
-mechanism for interacting with the 3scale Content Management API. It is
-implemented using link:https://quarkus.io[Quarkus] and
+The 3scale CMS tools project includes a Command-Line Interface (CLI) tool that
+provides a convenient mechanism for interacting with the 3scale Developer Portal
+API. It is implemented using link:https://quarkus.io[Quarkus] and
 link:https://picocli.info[picocli].
+
+More information on CLI Usage may be found in the
+link:docs/cli-usage.adoc[Command-Line Interface Usage] document.
 
 === Container Images
 
 Images are available for running the command-line interface in container
 environments. Images are available in the GitHub Packages repository at
-link:https://github.com/orgs/FwMotion/packages?repo_name=3scale-cms[ghcr.io/fwmotion/3scale-cms].
+link:https://github.com/FwMotion/3scale-cms/pkgs/container/3scale-cms[ghcr.io/fwmotion/3scale-cms].
 
 The following image tags are used:
 
-* **VERSION** _(eg, 1.0.0)_: Execution of the CLI using the JVM
-* **VERSION-native** _(eg, 1.0.0-native)_: Execution of a native-built CLI
+* **VERSION** _(eg, v2.0.1)_: Execution of the CLI using the JVM
+* **VERSION-native** _(eg, v2.0.1-native)_: Execution of a native-built CLI
 * **latest**: The latest version available using JVM-mode builds
 * **latest-native**: The latest version available using native-mode builds
 
@@ -83,12 +87,13 @@ the available endpoints for managing CMS objects, along with the "provider"
 endpoint of the Account Management API. This provider endpoint is used for
 lookup of the Developer Portal base URL and the Developer Portal access code.
 
-=== REST Client JAR
+=== REST Client JARs
 
-The 3scale CMS tools project provides a standalone REST client JAR. The JAR is
-available in the GitHub Packages maven repository.
+The 3scale CMS tools project provides JARs to handle interaction with 3scale's
+Developer Portal API. These JARs are available in the GitHub Packages maven
+repository.
 
-To use the JAR in a Maven project, first include the following repository
+To use a JAR in a Maven project, first include the following repository
 definition:
 
 [source,xml]
@@ -110,8 +115,8 @@ definition:
 </repositories>
 ----
 
-To include the client JAR as a dependency, use the following dependency
-definition:
+As an example, to include the REST client JAR as a dependency, use the following
+dependency definition:
 
 [source,xml]
 ----

@@ -1,5 +1,6 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fwmotion.threescale.cms.mappers.CmsSectionMapper;
 import com.fwmotion.threescale.cms.model.CmsSection;
 import com.redhat.threescale.rest.cms.ApiException;
@@ -21,22 +22,24 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
 
     private final SectionsApi sectionsApi;
 
-    public PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi) {
-        super(Collections.emptySet(), 0);
+    public PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi, @Nonnull ObjectMapper objectMapper) {
+        super(Collections.emptySet(), objectMapper, 0);
         this.sectionsApi = sectionsApi;
     }
 
     public PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi,
+                                    @Nonnull ObjectMapper objectMapper,
                                     @Positive int requestedPageSize) {
-        super(requestedPageSize, Collections.emptySet(), 0);
+        super(requestedPageSize, objectMapper, Collections.emptySet(), 0);
         this.sectionsApi = sectionsApi;
     }
 
     private PagedSectionsSpliterator(@Nonnull SectionsApi sectionsApi,
+                                     @Nonnull ObjectMapper objectMapper,
                                      @Positive int requestedPageSize,
                                      @Nonnull Collection<CmsSection> currentPage,
                                      @PositiveOrZero int currentPageNumber) {
-        super(requestedPageSize, currentPage, currentPageNumber);
+        super(requestedPageSize, objectMapper, currentPage, currentPageNumber);
         this.sectionsApi = sectionsApi;
     }
 
@@ -62,9 +65,7 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
 
             return resultPage;
         } catch (ApiException e) {
-            // TODO: Create ThreescaleCmsException and throw it instead of IllegalStateException
-            throw new IllegalStateException("Unexpected exception while iterating CMS section list page " + pageNumber
-                + " (with page size of " + pageSize + ")", e);
+            throw handleApiException(e, "section", pageNumber, pageSize);
         }
     }
 
@@ -74,7 +75,7 @@ public class PagedSectionsSpliterator extends AbstractPagedRestApiSpliterator<Cm
         @Positive int requestedPageSize,
         @Nonnull Collection<CmsSection> currentPage,
         @PositiveOrZero int currentPageNumber) {
-        return new PagedSectionsSpliterator(sectionsApi, requestedPageSize, currentPage, currentPageNumber);
+        return new PagedSectionsSpliterator(sectionsApi, getObjectMapper(), requestedPageSize, currentPage, currentPageNumber);
     }
 
     @Override

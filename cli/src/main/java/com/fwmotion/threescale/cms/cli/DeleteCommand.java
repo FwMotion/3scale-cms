@@ -4,6 +4,7 @@ import com.fwmotion.threescale.cms.ThreescaleCmsClient;
 import com.fwmotion.threescale.cms.cli.support.CmsObjectPathKeyGenerator;
 import com.fwmotion.threescale.cms.cli.support.CmsSectionToTopComparator;
 import com.fwmotion.threescale.cms.cli.support.PathRecursionSupport;
+import com.fwmotion.threescale.cms.exception.ThreescaleCmsCannotDeleteBuiltinException;
 import com.fwmotion.threescale.cms.model.CmsObject;
 import io.quarkus.logging.Log;
 import jakarta.annotation.Nonnull;
@@ -115,6 +116,8 @@ public class DeleteCommand extends CommandBase implements Callable<Integer> {
             Log.info("Deleting " + objectName);
             try {
                 client.delete(object);
+            } catch (ThreescaleCmsCannotDeleteBuiltinException e) {
+                Log.info("Could not delete built-in " + objectName);
             } catch (Exception e) {
                 // TODO: Handle exceptions properly, and provide better logs
                 //       indicating the reason for failure
