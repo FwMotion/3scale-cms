@@ -11,7 +11,7 @@ To use the `3scale-cms` command you need to provide a few parameters:
 
 - An **ACCESS_TOKEN**, which can be used instead of a PROVIDER_KEY. The access
 token must be granted permissions to both the Account Management API and the
-Content Management API.
+Developer Portal API.
 - The **PROVIDER_KEY**, which can be found in the Account tab of your admin
 portal (only visible to the users with "admin" role). The PROVIDER_KEY will be
 ignored if an ACCESS_TOKEN is specified.

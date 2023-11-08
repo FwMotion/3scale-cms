@@ -1,5 +1,7 @@
 package com.fwmotion.threescale.cms.model;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -17,6 +19,7 @@ public class CmsSection implements CmsObject {
     private Boolean _public;
     private String path;
 
+    @Nonnull
     @Override
     public ThreescaleObjectType getType() {
         return ThreescaleObjectType.SECTION;
@@ -40,6 +43,7 @@ public class CmsSection implements CmsObject {
         this.updatedAt = updatedAt;
     }
 
+    @Nullable
     @Override
     public Long getId() {
         return id;

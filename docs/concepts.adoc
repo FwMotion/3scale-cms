@@ -3,7 +3,7 @@
 :sectnums:
 :toc:
 
-== 3scale Content Management API Concepts
+== 3scale Developer Portal API Concepts
 
 The 3scale Developer Portal consists of 3 primary types of objects:
 

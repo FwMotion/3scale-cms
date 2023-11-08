@@ -15,10 +15,8 @@ import java.util.stream.Collectors;
 @Mapper
 public interface CmsFileMapper {
 
-    @Mapping(target = "tags", source = "tagList")
     CmsFile fromRest(ModelFile file);
 
-    @Mapping(target = "tagList", source = "tags")
     // title is only the filename without path... not useful
     @Mapping(target = "title", ignore = true)
     // url is the S3 or local filesystem location for 3scale... not useful

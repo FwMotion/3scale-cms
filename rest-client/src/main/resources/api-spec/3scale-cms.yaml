@@ -16,6 +16,9 @@ servers:
 paths:
   /admin/api/cms/files.json:
     get:
+      operationId: list-files
+      summary: List Files
+      description: List files held within the 3scale CMS
       tags:
         - Files
       parameters:
@@ -23,99 +26,99 @@ paths:
           description: |
             The number for the page of results to retrieve, starting from page 1;
             defaults to 1
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             default: 1
-          in: query
-          required: false
         - name: per_page
           description: |
             The number of items to retrieve per page of results; defaults to 20
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             maximum: 100
             default: 20
-          required: false
-          in: query
         - name: section_id
           description: The section to query for files (hidden option in CMS API)
+          in: query
+          required: false
           schema:
             $ref: '#/components/schemas/SectionId'
-          required: false
-          in: query
       responses:
         '200':
           $ref: '#/components/responses/FileListResponse'
-      operationId: list-files
-      summary: List Files
-      description: List files held within the 3scale CMS
     post:
+      operationId: create-file
+      summary: Create File
+      description: Create file within the 3scale CMS
+      tags:
+        - Files
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FileCreationRequest'
-        required: true
-      tags:
-        - Files
       responses:
         '201':
           $ref: '#/components/responses/FileResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
-      operationId: create-file
-      summary: Create File
-      description: Create file within the 3scale CMS
+          $ref: '#/components/responses/ErrorResponse'
   '/admin/api/cms/files/{file_id}.json':
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/FileId'
     get:
+      operationId: get-file
+      summary: Get File
+      description: Get a file descriptor
       tags:
         - Files
       responses:
         '200':
           $ref: '#/components/responses/FileResponse'
-      operationId: get-file
-      summary: Get File
-      description: Get a file descriptor
     put:
+      operationId: update-file
+      summary: Update File
+      description: Update an existing file
+      tags:
+        - Files
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/FileUpdatableFields'
-        required: true
-      tags:
-        - Files
       responses:
         '200':
           $ref: '#/components/responses/FileResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
-      operationId: update-file
-      summary: Update File
-      description: Update an existing file
+          $ref: '#/components/responses/ErrorResponse'
     delete:
+      operationId: delete-file
+      summary: Delete File
+      description: Delete a file from 3scale CMS
       tags:
         - Files
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
-      operationId: delete-file
-      summary: Delete File
-      description: Delete a file from 3scale CMS
-    parameters:
-      - name: file_id
-        schema:
-          $ref: '#/components/schemas/FileId'
-        in: path
-        required: true
   /admin/api/cms/sections.json:
     get:
+      operationId: list-sections
+      summary: List Sections
+      description: List sections held within the 3scale CMS
       tags:
         - Sections
       parameters:
@@ -123,28 +126,25 @@ paths:
           description: |
             The number for the page of results to retrieve, starting from page 1;
             defaults to 1
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             default: 1
-          in: query
-          required: false
         - name: per_page
           description: |
             The number of items to retrieve per page of results; defaults to 20
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             maximum: 100
             default: 20
-          required: false
-          in: query
       responses:
         '200':
           $ref: '#/components/responses/SectionListResponse'
-      operationId: list-sections
-      summary: List Sections
-      description: List sections held within the 3scale CMS
     post:
       requestBody:
         content:
@@ -158,42 +158,51 @@ paths:
         '201':
           $ref: '#/components/responses/SectionResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
+          $ref: '#/components/responses/ErrorResponse'
       operationId: create-section
       summary: Create Section
       description: Create section within the 3scale CMS
   '/admin/api/cms/sections/{section_id}.json':
+    parameters:
+      - name: section_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/SectionId'
     get:
+      operationId: get-section
+      summary: Get Section
+      description: Get section descriptor
       tags:
         - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
-      operationId: get-section
-      summary: Get Section
-      description: Get section descriptor
     put:
+      operationId: update-section
+      summary: Update Section
+      description: Update section descriptor
+      tags:
+        - Sections
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/SectionUpdatableFields'
-        required: true
-      tags:
-        - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
-      operationId: update-section
-      summary: Update Section
-      description: Update section descriptor
+          $ref: '#/components/responses/ErrorResponse'
     delete:
+      operationId: delete-section
+      summary: Delete Section
+      description: Delete a section from 3scale CMS
       tags:
         - Sections
       responses:
@@ -201,61 +210,55 @@ paths:
           $ref: '#/components/responses/EmptyResponse'
         '423':
           $ref: '#/components/responses/EmptyResponse'
-      operationId: delete-section
-      summary: Delete Section
-      description: Delete a section from 3scale CMS
+  '/admin/api/cms/sections/{system_name}.json':
     parameters:
-      - name: section_id
-        schema:
-          $ref: '#/components/schemas/SectionId'
+      - name: system_name
         in: path
         required: true
-  '/admin/api/cms/sections/{system_name}.json':
+        schema:
+          $ref: '#/components/schemas/SystemName'
     get:
+      operationId: get-section-by-system-name
+      summary: Get Section by System Name
+      description: Get section descriptor
       tags:
         - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
-      operationId: get-section-by-system-name
-      summary: Get Section by System Name
-      description: Get section descriptor
     put:
+      operationId: update-section-by-system-name
+      summary: Update Section by System Name
+      description: Update section descriptor
+      tags:
+        - Sections
       requestBody:
         content:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/SectionUpdatableFields'
         required: true
-      tags:
-        - Sections
       responses:
         '200':
           $ref: '#/components/responses/SectionResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
-      operationId: update-section-by-system-name
-      summary: Update Section by System Name
-      description: Update section descriptor
+          $ref: '#/components/responses/ErrorResponse'
     delete:
+      operationId: delete-section-by-system-name
+      summary: Delete Section by System Name
+      description: Delete a section from 3scale CMS
       tags:
         - Sections
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
-      operationId: delete-section-by-system-name
-      summary: Delete Section by System Name
-      description: Delete a section from 3scale CMS
-    parameters:
-      - name: system_name
-        schema:
-          $ref: '#/components/schemas/SystemName'
-        in: path
-        required: true
   /admin/api/cms/templates.json:
     get:
+      operationId: list-templates
+      summary: List Templates
+      description: List all templates contained in the 3scale CMS
       tags:
         - Templates
       parameters:
@@ -263,116 +266,117 @@ paths:
           description: |
             The number for the page of results to retrieve, starting from page 1;
             defaults to 1
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             default: 1
-          in: query
-          required: false
         - name: per_page
           description: |
             The number of items to retrieve per page of results; defaults to 20
+          in: query
+          required: false
           schema:
             type: integer
             minimum: 1
             maximum: 100
             default: 20
-          required: false
-          in: query
         - name: content
           description: |
             Whether to include the draft and published content in listed
             templates
+          in: query
+          required: false
           schema:
             type: boolean
-          required: false
-          in: query
       responses:
         '200':
           $ref: '#/components/responses/TemplateListResponse'
-      operationId: list-templates
-      summary: List Templates
-      description: List all templates contained in the 3scale CMS
     post:
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TemplateCreationRequest'
-        required: true
+      operationId: create-template
+      summary: Create Template
+      description: Create template with the 3scale CMS
       tags:
         - Templates
+      requestBody:
+        required: true
+        content:
+          # 3scale gives an Internal Server Error when
+          # multipart/form-data is used for this
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TemplateCreationRequest'
       responses:
         '201':
           $ref: '#/components/responses/TemplateResponse'
         '422':
-          $ref: '#/components/responses/ErrorListResponse'
+          $ref: '#/components/responses/ErrorResponse'
         '500':
-          $ref: '#/components/responses/ErrorHashResponse'
-      operationId: create-template
-      summary: Create Template
-      description: Create template with the 3scale CMS
+          $ref: '#/components/responses/ErrorResponse'
   '/admin/api/cms/templates/{template_id}.json':
+    parameters:
+      - name: template_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateId'
     get:
-      tags:
-        - Templates
-      responses:
-        '200':
-          $ref: '#/components/responses/TemplateResponse'
       operationId: get-template
       summary: Get Template
       description: |-
         Retrieve a template of any kind from 3scale (TODO: double-check response)
-    put:
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TemplateUpdatableFields'
-        required: true
       tags:
         - Templates
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
-        '422':
-          $ref: '#/components/responses/ErrorListResponse'
-        '500':
-          $ref: '#/components/responses/ErrorHashResponse'
+    put:
       operationId: update-template
       summary: Update Template
       description: 'Update a template draft (TODO: double-check response)'
+      tags:
+        - Templates
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TemplateUpdatableFields'
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateResponse'
+        '422':
+          $ref: '#/components/responses/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ErrorResponse'
     delete:
+      operationId: delete-template
+      summary: Delete Template
+      description: Delete a template from 3scale CMS
       tags:
         - Templates
       responses:
         '200':
           $ref: '#/components/responses/EmptyResponse'
-      operationId: delete-template
-      summary: Delete Template
-      description: Delete a template from 3scale CMS
-    parameters:
-      - name: template_id
-        schema:
-          $ref: '#/components/schemas/TemplateId'
-        in: path
-        required: true
+        '422':
+          $ref: '#/components/responses/ErrorResponse'
   '/admin/api/cms/templates/{template_id}/publish':
     put:
+      operationId: publish-template
+      summary: Publish Template
+      description: Move a template draft to be "published"
       tags:
         - Templates
       responses:
         '200':
           $ref: '#/components/responses/TemplateResponse'
-      operationId: publish-template
-      summary: Publish Template
-      description: Move a template draft to be "published"
     parameters:
       - name: template_id
-        schema:
-          $ref: '#/components/schemas/TemplateId'
         in: path
         required: true
+        schema:
+          $ref: '#/components/schemas/TemplateId'
   /admin/api/provider.json:
     get:
       operationId: read-provider-settings
@@ -381,8 +385,8 @@ paths:
         Read 3scale Provider (Tenant) settings; particularly related to
         the developer portal.
 
-        *Note:* This is technically part of the Account Management API, but is
-        used to determine the location and access-token for retrieving file
+        *Note:* This is technically part of 3scale's Account Management API, but
+        is used to determine the location and access-token for retrieving file
         content, so it is tagged with `Files`.
       tags:
         - Files
@@ -394,7 +398,8 @@ components:
     BuiltinPage:
       allOf:
         - $ref: '#/components/schemas/Template'
-        - properties:
+        - type: object
+          properties:
             path:
               type: string
               maxLength: 255
@@ -411,7 +416,8 @@ components:
     BuiltinPartial:
       allOf:
         - $ref: '#/components/schemas/Template'
-        - properties:
+        - type: object
+          properties:
             system_name:
               $ref: '#/components/schemas/SystemName'
       example:
@@ -437,38 +443,36 @@ components:
         - page
         - layout
         - partial
-    ErrorHash:
-      description: Unhandled server error on 3scale
+    Error:
+      description: Error message from the server
+      type: object
+      required:
+        - error
       properties:
         status:
+          description: Error code
           type: integer
-        toXml:
-          type: string
         error:
+          description: Error message
           type: string
-    ErrorList:
-      description: List of errors that occurred in processing a request
-      type: array
-      items:
-        description: |
-          Description of an individual error that occurred while processing
-          an event.
-        type: string
+      example:
+        error: Built-in resources can't be deleted
     File:
       description: File as held in the 3scale CMS
       allOf:
         - $ref: '#/components/schemas/FileUpdatableFields'
-        - properties:
+        - type: object
+          properties:
             id:
               $ref: '#/components/schemas/FileId'
             created_at:
-              format: date-time
               description: The instant at which the file was first created in the 3scale CMS
               type: string
-            updated_at:
               format: date-time
+            updated_at:
               description: The instant at which the file was last updated
               type: string
+              format: date-time
             url:
               description: The location at which the file is stored by 3scale; for 3scale-internal use
               type: string
@@ -516,7 +520,6 @@ components:
           section_id: 33
           path: /images/desk.jpg
           url: http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/desk-b2a6c318d66334d2.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=aa05d76d599d07c6e8593a92edbe2d261aa6990326864d39465430b25761275e
-          tag_list: ''
           title: desk.jpg
         - id: 10
           created_at: 2022-03-05T04:48:28Z
@@ -524,10 +527,10 @@ components:
           section_id: 33
           path: /images/mouse.jpg
           url: http://s3.openshift-storage.svc/bucket--99173774-11c4-4a63-9d1a-2df7b6a0b5bd/provider-name/2022/03/05/mouse-54d77f30bdfb31a4.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=VLXdr0R4TkaRNkgubbLx%2F20221005%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20221005T214121Z&amp;X-Amz-Expires=900&amp;X-Amz-SignedHeaders=host&amp;X-Amz-Signature=186eab31325093ec6b542ff9805621e6c1fa9a26bdfce24f7f9e446f22e635ca
-          tag_list: ''
           title: mouse.jpg
     FileUpdatableFields:
       description: Fields that may be modified after file creation
+      type: object
       properties:
         section_id:
           $ref: '#/components/schemas/SectionId'
@@ -537,9 +540,6 @@ components:
             Portal. Must be unique across all CMS objects
           type: string
           maxLength: 255
-        tag_list:
-          description: Comma-separated list of tags
-          type: string
         downloadable:
           description: |
             Flag indicating whether the file will be returned from the Developer
@@ -556,7 +556,8 @@ components:
     Layout:
       allOf:
         - $ref: '#/components/schemas/Template'
-        - properties:
+        - type: object
+          properties:
             system_name:
               $ref: '#/components/schemas/SystemName'
             title:
@@ -589,7 +590,8 @@ components:
     Page:
       allOf:
         - $ref: '#/components/schemas/Template'
-        - properties:
+        - type: object
+          properties:
             path:
               description: |
                 The path to which this template will be retrieved when browsing
@@ -620,7 +622,8 @@ components:
     Partial:
       allOf:
         - $ref: '#/components/schemas/Template'
-        - properties:
+        - type: object
+          properties:
             system_name:
               $ref: '#/components/schemas/SystemName'
       example:
@@ -734,7 +737,8 @@ components:
       description: Section within 3scale CMS
       allOf:
         - $ref: '#/components/schemas/SectionUpdatableFields'
-        - properties:
+        - type: object
+          properties:
             id:
               $ref: '#/components/schemas/SectionId'
             created_at:
@@ -761,7 +765,8 @@ components:
       description: Request fields for creation of Sections
       allOf:
         - $ref: '#/components/schemas/SectionUpdatableFields'
-        - properties:
+        - type: object
+          properties:
             partial_path:
               type: string
               maxLength: 255
@@ -828,6 +833,7 @@ components:
             partial_path: /password
     SectionUpdatableFields:
       description: Fields that may be modified after section creation
+      type: object
       properties:
         public:
           description: Whether the section is viewable by users not logged in
@@ -845,6 +851,7 @@ components:
       maxLength: 255
     Template:
       description: Base type for all template types
+      type: object
       discriminator:
         propertyName: type
         mapping:
@@ -857,11 +864,11 @@ components:
         id:
           $ref: '#/components/schemas/TemplateId'
         created_at:
-          format: date-time
           type: string
+          format: date-time
         updated_at:
-          format: date-time
           type: string
+          format: date-time
         content_type:
           description: |
             How the template should be described to web browsers with the
@@ -886,6 +893,7 @@ components:
           type: string
           maxLength: 16777215
     TemplateCreationRequest:
+      type: object
       required:
         - type
       allOf:
@@ -946,6 +954,7 @@ components:
           total_pages: 4
           current_page: 1
     TemplateUpdatableFields:
+      type: object
       properties:
         system_name:
           $ref: '#/components/schemas/SystemName'
@@ -1018,36 +1027,40 @@ components:
   responses:
     EmptyResponse:
       description: Response with no body; eg, to indicate successful deletion
-    ErrorHashResponse:
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/ErrorHash'
-      description: Response containing an `ErrorHash`
-    ErrorListResponse:
+    ErrorResponse:
+      description: Response containing an `Error`
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorList'
-      description: Response containing an `ErrorList`
+            $ref: '#/components/schemas/Error'
+          examples:
+            server_error:
+              description: Internal Server Error
+              value:
+                status: 500
+                error: Internal Server Error
+            builtin_delete:
+              description: Built-in resource deletion error
+              value:
+                error: Built-in resources can't be deleted
     FileResponse:
+      description: Response containing a single file declaration
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/File'
-      description: Response containing a single file declaration
     FileListResponse:
+      description: Response containing a list of `File`s
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/FileList'
-      description: Response containing a list of `File`s
     ProviderAccountResponse:
+      description: Response containing the `WrappedProviderAccount` configuration
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/WrappedProviderAccount'
-      description: Response containing the `WrappedProviderAccount` configuration
     SectionListResponse:
       content:
         application/json:
@@ -1074,20 +1087,20 @@ components:
       description: Response containing a single `Section`
   securitySchemes:
     provider_key:
-      type: apiKey
       description: >-
         Provider API Key from the `Account Settings > Overview` page of a 3scale tenant.
         To view this key, a user must be logged in with `admin` privileges.
-      name: provider_key
-      in: query
-    access_token:
       type: apiKey
+      in: query
+      name: provider_key
+    access_token:
       description: >-
         Access Token from the `Account Settings > Personal > Tokens` page of a 3scale tenant.
         The token must have access to both the `Account Management API` and the
         `Developer Portal API`.
-      name: access_token
+      type: apiKey
       in: query
+      name: access_token
 security:
   - provider_key: [ ]
   - access_token: [ ]

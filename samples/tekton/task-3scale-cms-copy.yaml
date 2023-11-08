@@ -104,7 +104,7 @@ spec:
       for downloading CMS content. The information should include data such as
       the Admin Portal base URL and either a Provider Key or a Personal Access
       Token. (Note that when a Personal Access Token is used, it must have
-      permission to the Content Management API. Binding a Secret to this
+      permission to the Developer Portal API. Binding a Secret to this
       Workspace is strongly recommended over other volume types.
   - name: target-provider-details
     description: >-
@@ -112,5 +112,5 @@ spec:
       for uploading CMS content. The information should include data such as
       the Admin Portal base URL and either a Provider Key or a Personal Access
       Token. (Note that when a Personal Access Token is used, it must have
-      permission to the Content Management API. Binding a Secret to this
+      permission to the Developer Portal API. Binding a Secret to this
       Workspace is strongly recommended over other volume types.

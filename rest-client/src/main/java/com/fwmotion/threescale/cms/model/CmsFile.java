@@ -1,11 +1,12 @@
 package com.fwmotion.threescale.cms.model;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.OffsetDateTime;
-import java.util.Set;
 
 public class CmsFile implements CmsObject {
 
@@ -14,10 +15,10 @@ public class CmsFile implements CmsObject {
     private Long id;
     private Long sectionId;
     private String path;
-    private Set<String> tags;
     private Boolean downloadable;
     private String contentType;
 
+    @Nonnull
     @Override
     public ThreescaleObjectType getType() {
         return ThreescaleObjectType.FILE;
@@ -41,6 +42,7 @@ public class CmsFile implements CmsObject {
         this.updatedAt = updatedAt;
     }
 
+    @Nullable
     @Override
     public Long getId() {
         return id;
@@ -64,14 +66,6 @@ public class CmsFile implements CmsObject {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public Set<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
     }
 
     public Boolean getDownloadable() {
@@ -112,7 +106,6 @@ public class CmsFile implements CmsObject {
             .append("id", id)
             .append("sectionId", sectionId)
             .append("path", path)
-            .append("tags", tags)
             .append("downloadable", downloadable)
             .toString();
     }

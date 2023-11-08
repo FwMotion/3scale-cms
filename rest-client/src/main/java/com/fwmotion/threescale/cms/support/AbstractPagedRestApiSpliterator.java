@@ -1,5 +1,12 @@
 package com.fwmotion.threescale.cms.support;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fwmotion.threescale.cms.exception.ThreescaleCmsApiException;
+import com.fwmotion.threescale.cms.exception.ThreescaleCmsException;
+import com.fwmotion.threescale.cms.exception.ThreescaleCmsUnexpectedPaginationException;
+import com.redhat.threescale.rest.cms.ApiException;
+import com.redhat.threescale.rest.cms.model.Error;
 import com.redhat.threescale.rest.cms.model.ListPaginationMetadata;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -14,23 +21,32 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
     protected static final int DEFAULT_REQUESTED_PAGE_SIZE = 20;
 
     private final int requestedPageSize;
+    private final ObjectMapper objectMapper;
     private Iterator<T> currentPageIterator;
     private int currentPageSize;
     private int currentPageNumber;
     private boolean didSplit = false;
 
     protected AbstractPagedRestApiSpliterator(@Positive int requestedPageSize,
+                                              @Nonnull ObjectMapper objectMapper,
                                               @Nonnull Collection<T> currentPage,
                                               @PositiveOrZero int currentPageNumber) {
         this.requestedPageSize = requestedPageSize;
+        this.objectMapper = objectMapper;
         this.currentPageIterator = currentPage.iterator();
         this.currentPageSize = currentPage.size();
         this.currentPageNumber = currentPageNumber;
     }
 
     protected AbstractPagedRestApiSpliterator(@Nonnull Collection<T> currentPage,
+                                              @Nonnull ObjectMapper objectMapper,
                                               @PositiveOrZero int currentPageNumber) {
-        this(DEFAULT_REQUESTED_PAGE_SIZE, currentPage, currentPageNumber);
+        this(DEFAULT_REQUESTED_PAGE_SIZE, objectMapper, currentPage, currentPageNumber);
+    }
+
+    @Nonnull
+    ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     @Nullable
@@ -134,11 +150,34 @@ public abstract class AbstractPagedRestApiSpliterator<T> implements Spliterator<
             return;
         }
 
-        // TODO: Create ThreescaleCMSException and throw it instead of IllegalStateException
-        throw new IllegalStateException("Unexpected page size for " + type + " list page " + pageNumber
-            + " (with page size of " + pageSize
-            + "); parsed page size is " + resultPage.size()
-            + " but expected size of " + expectedPageSize);
+        throw new ThreescaleCmsUnexpectedPaginationException(type,
+            pageNumber,
+            pageSize,
+            resultPage.size(),
+            expectedPageSize);
+    }
+
+    protected ThreescaleCmsException handleApiException(
+        @Nonnull ApiException e,
+        @Nonnull String type,
+        @PositiveOrZero int pageNumber,
+        @Positive int pageSize
+    ) {
+        String errorMessage = "Unexpected exception while iterating CMS " + type
+            + " page " + pageNumber
+            + " (with page size of " + pageSize + ")";
+
+        Error responseError;
+        try {
+            responseError = objectMapper.readValue(e.getResponseBody(), Error.class);
+        } catch (JsonProcessingException ex) {
+            return new ThreescaleCmsApiException(e.getCode(), errorMessage, e);
+        }
+
+        return new ThreescaleCmsApiException(e.getCode(),
+            responseError,
+            errorMessage,
+            e);
     }
 
 }

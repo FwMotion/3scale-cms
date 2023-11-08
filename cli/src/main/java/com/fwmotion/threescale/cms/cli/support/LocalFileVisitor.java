@@ -62,7 +62,8 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
         // If directory is not ignored, try loading .cmsignore
         Path cmsIgnorePath = dir.resolve(CMSIGNORE_FILENAME);
         if (cmsIgnorePath.toFile().exists()
-            && cmsIgnorePath.toFile().canRead()) {
+            && cmsIgnorePath.toFile().canRead()
+        ) {
             readCmsIgnoreFile(cmsIgnorePath);
         } else {
             ignoreRules.addLast(Collections.emptyList());
@@ -136,11 +137,10 @@ class LocalFileVisitor extends SimpleFileVisitor<Path> {
         Path normalizedPath = path.normalize();
 
         List<Boolean> matchingRules = ignoreRules.stream()
-            .sequential()
             .flatMap(Collection::stream)
             .filter(matcherEntry -> matcherEntry.getLeft().matches(normalizedPath))
             .map(Pair::getRight)
-            .collect(Collectors.toList());
+            .toList();
 
         if (matchingRules.isEmpty()) {
             // Nothing matched, so not ignored

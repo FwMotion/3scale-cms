@@ -278,7 +278,7 @@
                 or docs
               -->
               <generateModels>true</generateModels>
-              <generateModelTests>false</generateModelTests>
+              <generateModelTests>true</generateModelTests>
               <generateModelDocumentation>false</generateModelDocumentation>
 
               <generateSupportingFiles>true</generateSupportingFiles>
