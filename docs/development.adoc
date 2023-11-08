@@ -1,5 +1,4 @@
 = 3scale CMS Tools Development
-
 :sectnums:
 :toc:
 

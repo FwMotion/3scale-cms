@@ -1,5 +1,4 @@
 = 3scale CMS Tools Command-Line Interface Usage
-
 :sectnums:
 :toc:
 
