@@ -109,7 +109,7 @@
     </version.find-and-replace-maven-plugin>
     <version.jacoco-maven-plugin>0.8.11</version.jacoco-maven-plugin>
     <version.jandex-maven-plugin>3.1.5</version.jandex-maven-plugin>
-    <version.openapi-generator-maven-plugin>7.0.1</version.openapi-generator-maven-plugin>
+    <version.openapi-generator-maven-plugin>7.1.0</version.openapi-generator-maven-plugin>
     <version.pitest-maven>1.15.3</version.pitest-maven>
     <version.pitest-junit5-plugin>1.2.1</version.pitest-junit5-plugin>
 
