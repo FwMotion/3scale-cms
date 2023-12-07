@@ -119,7 +119,7 @@
 
     <!-- Dependency Versions -->
     <version.apache-commons-collections>4.4</version.apache-commons-collections>
-    <version.apache-httpclient5>5.2.2</version.apache-httpclient5>
+    <version.apache-httpclient5>5.3</version.apache-httpclient5>
     <version.brotli-dec>0.1.2</version.brotli-dec>
     <version.hamcrest>2.2</version.hamcrest>
     <version.imposter>3.33.3</version.imposter>
