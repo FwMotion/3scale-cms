@@ -237,7 +237,7 @@ jobs:
           popd
 
       - name: Upload Artifact to GitHub Actions
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 3scale-cms-${{ runner.os }}-java
           path: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-java.tar.gz
@@ -324,7 +324,7 @@ jobs:
           popd
 
       - name: Upload Artifact to GitHub Actions
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: 3scale-cms-${{ runner.os }}-${{ runner.arch }}
           path: ${{ github.workspace }}/tarball/3scale-cms-${{ runner.os }}-${{ runner.arch }}.tar.gz
