@@ -122,7 +122,7 @@
     <version.apache-httpclient5>5.3</version.apache-httpclient5>
     <version.brotli-dec>0.1.2</version.brotli-dec>
     <version.hamcrest>2.2</version.hamcrest>
-    <version.imposter>3.33.3</version.imposter>
+    <version.imposter>3.33.4</version.imposter>
     <version.mapstruct>1.5.5.Final</version.mapstruct>
     <version.quarkus>3.6.1</version.quarkus>
     <version.swagger-annotations>1.6.12</version.swagger-annotations>
