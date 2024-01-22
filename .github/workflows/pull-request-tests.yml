@@ -45,7 +45,7 @@ jobs:
           echo "home=$HOME" >> $GITHUB_OUTPUT
 
       - name: Cache Maven Local Repo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.find-home.outputs.home }}/.m2/repository
           key: ${{ runner.os }}-${{ runner.arch }}-maven-${{ hashFiles('**/pom.xml') }}
